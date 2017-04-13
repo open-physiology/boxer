@@ -28,6 +28,7 @@ To use this template for a new project, it's best to [duplicate it](https://help
     $ git clone https://github.com/open-physiology/<new-repo>.git
     ```
 * Do a search/replace across the whole project (not just `src`) to replace `project-template` with the name of the new repo.
+* Remove the `/template/angular2` from the Travis shield image code in `README.md`.
 * Replace the example code, example documentation and example tests with real code, real documentation and real tests.
 * Run the `init-repo.js` script from the [open-physiology/open-physiology-scripts](https://github.com/open-physiology/open-physiology-scripts) to add the proper labels and milestones.
 * Go to the [ZenHub Board](https://github.com/open-physiology/open-physiology#boards) and [merge the new repo](https://www.zenhub.com/blog/multi-repo-boards-have-arrived#mergingrepositories) into the board.
