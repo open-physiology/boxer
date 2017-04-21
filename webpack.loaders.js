@@ -5,6 +5,10 @@ module.exports = [
 		loader: 'babel-loader'
 	},
 	{
+		test: /node_modules[\\\/](utilities|rxjs-animation-loop)[\\\/].*\.js$/,
+		loader: 'babel-loader'
+	},
+	{
 		test: /\.json$/,
 		loader: 'json-loader'
 	},
