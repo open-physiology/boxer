@@ -43,11 +43,19 @@ export class LineSegment extends SvgArtefact {
 	create(options = {}) {
 		
 		const inkLine = $.svg('<line>').css({
-			stroke:     'black',
-			strokeWidth: 2
+			stroke:           'inherit',
+			strokeWidth:       2,
+			strokeDasharray:  'inherit',
+			strokeDashoffset: 'inherit'
 		}).appendTo(this.svg.ink);
+		const overlayLine = $.svg('<line>').css({
+			stroke:           'inherit',
+			strokeWidth:      'inherit',
+			strokeDasharray:  'inherit',
+			strokeDashoffset: 'inherit'
+		}).appendTo(this.svg.overlay);
 		const handleLine = $.svg('<line>').css({
-			strokeWidth: 4
+			strokeWidth: 6
 		}).appendTo(this.svg.handles);
 		
 		this.p(['point1', 'point2', 'lengthen1', 'lengthen2'])
@@ -56,6 +64,7 @@ export class LineSegment extends SvgArtefact {
 				p1 = p1.in(this.coordinateSystem);
 				p2 = p2.in(this.coordinateSystem);
 				$().add(inkLine)
+				   .add(overlayLine)
 				   .add(handleLine)
 				   .attr({
 						...p1.withDistanceTo(-l1, p2).obj('x1', 'y1'),
@@ -64,6 +73,14 @@ export class LineSegment extends SvgArtefact {
 			});
 		
 		
+	}
+	
+	get inkPoint1() {
+		return this.point1.withDistanceTo(-this.lengthen1, this.point2);
+	}
+	
+	get inkPoint2() {
+		return this.point2.withDistanceTo(-this.lengthen2, this.point1);
 	}
 	
 }

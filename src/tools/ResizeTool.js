@@ -6,7 +6,7 @@ import {emitWhenComplete} from '../util/misc.js';
 
 import {snap45, moveToFront, ID_MATRIX, M11, M12, M21, M22} from "../util/svg";
 
-import Tool from './Tool';
+import Tool, {handleBoxer} from './Tool';
 
 const {min, max} = Math;
 
@@ -49,46 +49,38 @@ export class ResizeTool extends Tool {
 				.filter(withoutMod('ctrl', 'shift', 'meta'))
 				.do(stopPropagation)
                 // .withLatestFrom(context.p('selected')) // TODO: bring 'selected' back
-				.filter(event => $(event.target).data('boxer-handler').resizable)
-				.map((downEvent) => {
-					const resizable = $(downEvent.target).data('boxer-handler').resizable;
-					return {
-						downEvent:        downEvent,
-						resizingArtefact: resizable.artefact,
-						directions:       resizable::pick('x', 'y')
-					}
-				})
+				::handleBoxer('resizable')
 		        ::enterState('INSIDE_RESIZE_THRESHOLD'),
-			'INSIDE_RESIZE_THRESHOLD': ({downEvent, resizingArtefact, directions}) => [
+			'INSIDE_RESIZE_THRESHOLD': (args) => [
 				mousemove
 					.take(4)
 					.ignoreElements()
-					::emitWhenComplete({ downEvent, resizingArtefact, directions })
+					::emitWhenComplete(args)
 					::enterState('RESIZING_RECTANGLE'),
 			    mouseup
 				    ::enterState('IDLE')
 			    // TODO: go IDLE on pressing escape
 			],
-			'RESIZING_RECTANGLE': ({downEvent, resizingArtefact, directions, mouseDownIsOrigin}) => {
+			'RESIZING_RECTANGLE': ({point, artefact, directions, mouseDownIsOrigin}) => {
 				/* start dragging */
-				resizingArtefact.handlesActive = false;
-				resizingArtefact.svg.main::moveToFront();
+				artefact.handlesActive = false;
+				artefact.svg.main::moveToFront();
 				
 				/* record start dimensions and mouse position */
 				const start = {
-					transformation: resizingArtefact.transformation,
-					width:          mouseDownIsOrigin ? 0 : resizingArtefact.width,
-					height:         mouseDownIsOrigin ? 0 : resizingArtefact.height,
-					mouse:          downEvent.point
+					transformation: artefact.transformation,
+					width:          mouseDownIsOrigin ? 0 : artefact.width,
+					height:         mouseDownIsOrigin ? 0 : artefact.height,
+					mouse:          point
 				};
 				
 				/* resize while dragging */
 				mousemove
-					.map(event => event.point.minus(start.mouse))
+					.map(event => event.point.in(artefact.svg.main).minus(start.mouse))
 					::subscribeDuringState(({x: xDiff, y: yDiff}) => {
-						xDiff = directions.x * max(directions.x * xDiff, resizingArtefact.minWidth  - start.width );
-						yDiff = directions.y * max(directions.y * yDiff, resizingArtefact.minHeight - start.height);
-						resizingArtefact::assign({
+						xDiff = directions.x * max(directions.x * xDiff, artefact.minWidth  - start.width );
+						yDiff = directions.y * max(directions.y * yDiff, artefact.minHeight - start.height);
+						artefact::assign({
 							transformation: start.transformation.translate(xDiff/2, yDiff/2),
 							width:          start.width  + directions.x * xDiff,
 							height:         start.height + directions.y * yDiff
@@ -97,7 +89,7 @@ export class ResizeTool extends Tool {
 			
 				/* stop resizing */
 				mouseup
-					.do(() => { resizingArtefact.handlesActive = true })
+					.do(() => { artefact.handlesActive = true })
 					::enterState('IDLE');
 			}
 		}));

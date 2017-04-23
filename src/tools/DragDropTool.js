@@ -2,7 +2,7 @@ import $ from '../libs/jquery.js';
 
 import {assign, isFunction} from 'lodash-bound';
 
-import Tool from './Tool';
+import Tool, {handleBoxer} from './Tool';
 import {withoutMod, stopPropagation} from 'utilities';
 import {emitWhenComplete} from '../util/misc.js';
 
@@ -32,68 +32,55 @@ export class DragDropTool extends Tool {
 				.filter(withoutMod('ctrl', 'shift', 'meta'))
 				.do(stopPropagation)
                 // .withLatestFrom(context.p('selected')) // TODO: bring 'selected' back
-				.filter(event => $(event.target).data('boxer-handler').draggable)
-				.map(event => ({
-					mousedownPoint: event.point,
-					movingArtefact: $(event.target).data('boxer-handler').draggable.artefact
-				}))
+				::handleBoxer('draggable')
 				::enterState('INSIDE_MOVE_THRESHOLD'),
-			'INSIDE_MOVE_THRESHOLD': ({mousedownPoint, movingArtefact}) => [
+			'INSIDE_MOVE_THRESHOLD': (args) => [
 				mousemove
 					.take(4)
 					.ignoreElements()
-					::emitWhenComplete({mousedownPoint, movingArtefact})
+					::emitWhenComplete(args)
 					::enterState('MOVING'),
 			    mouseup
 				    ::enterState('IDLE')
 				// TODO: go IDLE on pressing escape
 			],
-			'MOVING': ({mousedownPoint, movingArtefact, referencePoint}) =>  {
+			'MOVING': ({point, artefact, referencePoint}) =>  {
 				/* start dragging */
-				movingArtefact.handlesActive = false;
-				movingArtefact.svg.main::moveToFront();
+				artefact.handlesActive = false;
+				artefact.svg.main::moveToFront();
 				
 				/* record start dimensions */
-				const transformationStart = movingArtefact.transformation;
+				const transformationStart = artefact.transformation;
 				
 				/* move while dragging */
 				mousemove::subscribeDuringState((moveEvent) => {
-					let mouseVector = moveEvent.point.in(movingArtefact.coordinateSystem);
+					let mouseVector = moveEvent.point.in(artefact.svg.main);
 					if (referencePoint && moveEvent.ctrlKey) {
-						mouseVector = snap45(mouseVector, movingArtefact, referencePoint);
+						mouseVector = snap45(mouseVector, artefact, referencePoint);
 					}
-					let translationDiff = mouseVector.minus(mousedownPoint.in(movingArtefact.coordinateSystem));
-					movingArtefact.transformation = transformationStart
+					let translationDiff = mouseVector.minus(point);
+					artefact.transformation = transformationStart
 						.translate(...translationDiff.xy);
 				});
 				
 				/* stop dragging and drop */
-				// const initial_dragged_transformation = movingArtefact.transformation;
-				// const initial_dragged_parent         = movingArtefact.parent;
+				// const initial_dragged_transformation = artefact.transformation;
+				// const initial_dragged_parent         = artefact.parent;
 				mouseup
 					// .withLatestFrom(context.p('selected'))
 					.do((mouseUpEvent) => {
 					
-						let dropzone = $(mouseUpEvent.target).data('boxer-handler').dropzone;
-						if (dropzone) {
-							movingArtefact.coordinateSystem = dropzone.artefact;
+						const handler = $(mouseUpEvent.target).data('boxer-handler');
+						if (handler) {
+							const dropzone = handler.dropzone;
+							artefact.coordinateSystem = dropzone.artefact;
 						}
 					
-						// /* either drop it on the recipient */
-						// let success = false;
-						// if (recipient.drop::isFunction()) {
-						// 	success = recipient.drop(movingArtefact, recipient) !== false;
-						// }
-						// /* or revert to previous state if recipient rejects it */
-						// if (!success) {
-						// 	movingArtefact::assign({
-						// 		transformation: initial_dragged_transformation,
-						// 		parent:         initial_dragged_parent
-						// 	});
-						// }
+						// TODO: allow dropzone to reject artefact;
+						//     : if it does, put artefact back in old location
 						
 						/* stop dragging */
-						movingArtefact.handlesActive = true;
+						artefact.handlesActive = true;
 				    })
 					::enterState('IDLE');
 			}

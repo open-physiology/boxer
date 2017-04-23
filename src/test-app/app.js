@@ -8,9 +8,11 @@ import $ from 'jquery';
 import {Box, LineSegment, BoxCorner, Canvas} from '../index.js';
 import {ID_MATRIX, Point2D} from '../util/svg.js';
 
-import {DragDropTool} from '../tools/DragDropTool.js';
-import {ResizeTool}   from '../tools/ResizeTool.js';
-
+import {HelperTool}      from '../tools/HelperTool.js';
+import {DragDropTool}    from '../tools/DragDropTool.js';
+import {ResizeTool}      from '../tools/ResizeTool.js';
+import {HighlightTool}   from '../tools/HighlightTool.js'
+import {MouseCursorTool} from '../tools/MouseCursorTool.js';
 
 /**
  * The HelloApp test application, which can greet the world or the universe!
@@ -51,13 +53,16 @@ export class TestApp {
 		
 		/* coach / tools */
 		const context = { coordinateSystem: canvas };
-		new DragDropTool({ context });
-		new ResizeTool  ({ context });
+		new HelperTool     ({ context });
+		new DragDropTool   ({ context });
+		new ResizeTool     ({ context });
+		new HighlightTool  ({ context });
+		new MouseCursorTool({ context });
 		
 		
 		/* test box */
 		let bigBox = new Box({
-			style: { '> .ink > *': { 'fill': '#eeffff' } },
+			style: { '&': { 'fill': 'cyan', 'stroke': 'black' } },
 			coordinateSystem: canvas,
 			width:  500,
 			height: 500
@@ -67,19 +72,19 @@ export class TestApp {
 
 		/* test box */
 		let box = new Box({
-			style: { '> .ink > *': { 'fill': 'green' } },
+			style: { '&': { 'fill': 'green', 'stroke': 'black' } },
 			coordinateSystem: bigBox,
 			width: 100,
 			height: 80
 		});
-		box.transformation = ID_MATRIX.translate(70, 70);
+		box.transformation = ID_MATRIX.translate(70, 70).rotate(45);
 		box.corners.top.left .rounded = true;
 		box.corners.top.right.rounded = true;
 
 
 		/* test box */
 		let innerBox = new Box({
-			style: { '> .ink > *': { 'fill': 'red' } },
+			style: { '&': { 'fill': 'red', 'stroke': 'black' } },
 			coordinateSystem: box,
 			width:  25,
 			height: 25

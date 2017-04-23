@@ -3,7 +3,7 @@ import {entries, isEmpty}      from 'lodash-bound';
 import $, {applyCSS, plainDOM} from '../libs/jquery.js';
 
 import {ID_MATRIX, SVGMatrix, setCTM} from '../util/svg.js';
-import {ValueTracker, property, flag}       from 'utilities';
+import {ValueTracker, property, flag, humanMsg}       from 'utilities';
 
 const $$handler = Symbol('$$handler');
 
@@ -47,6 +47,7 @@ export class SvgArtefact extends ValueTracker {
 		this.svg.ink      = $.svg('<g class="ink">')     .appendTo(this.svg.main);
 		this.svg.handles  = $.svg('<g class="handles">') .appendTo(this.svg.main);
 		this.svg.children = $.svg('<g class="children">').appendTo(this.svg.main);
+		this.svg.overlay  = $.svg('<g class="overlay">') .appendTo(this.svg.main).css({ opacity: 0 });
 		this.svg.main.data('boxer-controller', this);
 		
 		/* changing coordinateSystem */
@@ -57,27 +58,37 @@ export class SvgArtefact extends ValueTracker {
 	create(options = {}) {}
 	
 	postCreate(options = {}) {
-		/* set css styling if given */
-		if (options.style) {
-			this.setStyle(options.style);
-		}
-		
 		/* set handler if given */
 		if (this.handler::isEmpty() && options.handler) {
 			this.handler = options.handler;
 		}
 		
-		/* set pointer-events property */
-		this.svg.ink              .css({ 'pointer-events': 'none'    });
-		this.svg.children         .css({ 'pointer-events': 'inherit' });
-		this.svg.handles          .css({ 'pointer-events': 'inherit' });
-		this.svg.handles.find('*').css({ 'pointer-events': 'inherit' });
+		/* set css inheritance chains */
+		const inheritedProperties = {
+			strokeDasharray:  'inherit',
+			strokeDashoffset: 'inherit',
+		    fill:             'inherit',
+		    stroke:           'inherit'
+		};
+		this.svg.main             .css({ 'pointer-events': 'inherit', ...inheritedProperties });
+		this.svg.ink              .css({ 'pointer-events': 'none',    ...inheritedProperties });
+		this.svg.overlay          .css({ 'pointer-events': 'none',                           });
+		this.svg.children         .css({ 'pointer-events': 'inherit', ...inheritedProperties });
+		this.svg.handles          .css({ 'pointer-events': 'inherit'                         });
+		this.svg.handles.find('*').css({ 'pointer-events': 'inherit'                         });
+		
+		/* toggle pointer-events for active handles */
 		this.p(['coordinateSystem', 'handlesActive']).subscribe(([parent, active]) => {
 			this.svg.main.css({ 'pointer-events': (active ? (!!parent ? 'inherit' : 'all') : 'none') });
 		});
 		
 		/* always make handles invisible, but present */
 		this.svg.handles.find('*').css({ visibility: 'hidden' });
+		
+		/* set css styling if given, which should override any of the stuff above */
+		if (options.style) {
+			this.setStyle(options.style);
+		}
 	}
 	
 	setStyle(style: Object) {

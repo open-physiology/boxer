@@ -2,6 +2,7 @@ import assert from 'power-assert';
 import $      from '../libs/jquery.js';
 import {isBoolean as _isBoolean} from 'lodash';
 import {entries, values, assign, isEmpty} from 'lodash-bound';
+import {Observable} from 'rxjs';
 
 import {ID_MATRIX, SVGMatrix, setCTM, Point2D} from '../util/svg.js';
 import {property, flag, definePropertyByValue, definePropertiesByValue} from 'utilities';
@@ -57,34 +58,27 @@ export class Box extends SvgTransformable {
 	create(options = {}) {
 		super.create(options);
 		
-		this.svg._inkRect = $.svg('<rect>').attr({
-			rx:      CORNER_RADIUS,
-			ry:      CORNER_RADIUS,
-			stroke: 'none',
-			fill:    DEFAULT_INK_COLOR
-		}).appendTo(this.svg.ink);
-		
-		this.svg._handleRect = $.svg('<rect>').attr({
+		const handleRect = $.svg('<rect>').attr({
 			rx:      CORNER_RADIUS,
 			ry:      CORNER_RADIUS,
 			stroke: 'none',
 			fill:   'none'
 		}).appendTo(this.svg.handles);
 		
-		/* corners */
-		this.corners = {};
-		for (let [key, x, y] of [
-			['tl', -1, -1],
-			['tr', +1, -1],
-			['bl', -1, +1],
-			['br', +1, +1]
-		]) {
-			this.corners[key] = new BoxCorner({
-				coordinateSystem: this,
-				size: CORNER_RADIUS,
-				handler: { resizable: { artefact: this, x, y } }
-			});
-		}
+		const inkRect = $.svg('<rect>').attr({
+			rx:      CORNER_RADIUS,
+			ry:      CORNER_RADIUS,
+			stroke:  'transparent',
+			fill:    'inherit'
+		}).appendTo(this.svg.ink);
+		
+		const overlayPath = $.svg('<path>').attr({
+			stroke:           'inherit',
+			strokeWidth:      'inherit',
+			strokeDasharray:  'inherit',
+			strokeDashoffset: 'inherit',
+			fill:             'transparent',
+		}).appendTo(this.svg.overlay);
 		
 		/* borders */
 		this.borders = {};
@@ -97,9 +91,45 @@ export class Box extends SvgTransformable {
 			this.borders[key] = new LineSegment({
 				coordinateSystem: this,
 				lengthen1: -CORNER_RADIUS,
-				lengthen2: -CORNER_RADIUS,
-				handler: { resizable: { artefact: this, x, y } }
+				lengthen2: -CORNER_RADIUS
 			});
+			this.borders[key].svg.main.addClass('boxer-BoxBorder');
+			this.borders[key].handler = {
+				resizable: { artefact: this, directions: {x, y} },
+				highlightable: {
+					artefact: this,
+					effect: {
+						elements: this.borders[key].svg.overlay
+					}
+				}
+			};
+		}
+		
+		/* corners */
+		this.corners = {};
+		for (let [key, x, y, s1, s2] of [
+			['tl', -1, -1, 'top',    'left' ],
+			['tr', +1, -1, 'top',    'right'],
+			['bl', -1, +1, 'bottom', 'left' ],
+			['br', +1, +1, 'bottom', 'right']
+		]) {
+			this.corners[key] = new BoxCorner({
+				coordinateSystem: this,
+				size: CORNER_RADIUS
+			});
+			this.corners[key].handler = {
+				resizable: { artefact: this, directions: {x, y} },
+				highlightable: {
+					artefact: this,
+					effect: {
+						// elements: this.svg.overlay
+						//               .add(this.corners[key].svg.overlay)
+						elements: this.corners[key].svg.overlay
+			                           .add(this.borders[s1].svg.overlay)
+			                           .add(this.borders[s2].svg.overlay)
+					}
+				}
+			};
 		}
 		
 		/* better corner accessibility */
@@ -110,7 +140,7 @@ export class Box extends SvgTransformable {
 			left:   { top:  this.corners.tl, bottom: this.corners.bl }
 		});
 		
-		/* resizing */
+		/* bookkeeping */
 		let cornerPoints = {
 			tl: { x: -1, y: -1, r:   0 },
 			tr: { x: +1, y: -1, r:  90 },
@@ -118,20 +148,22 @@ export class Box extends SvgTransformable {
 			bl: { x: -1, y: +1, r: 270 },
 		};
 		let borderPoints = {
-			top:    [cornerPoints.tl, cornerPoints.tr],
-			right:  [cornerPoints.tr, cornerPoints.br],
+			top:    [cornerPoints.tr, cornerPoints.tl],
+			right:  [cornerPoints.br, cornerPoints.tr],
 			bottom: [cornerPoints.bl, cornerPoints.br],
 			left:   [cornerPoints.tl, cornerPoints.bl]
 		};
+		
+		/* resizing */
 		this.p(['width', 'height']).subscribe(([w, h]) => {
-			this.svg._inkRect   .attr({ width: w, height: h, x: -w/2, y: -h/2 });
-			this.svg._handleRect.attr({ width: w, height: h, x: -w/2, y: -h/2 });
+			inkRect    .attr({ width: w, height: h, x: -w/2, y: -h/2 });
+			handleRect .attr({ width: w, height: h, x: -w/2, y: -h/2 });
 			
 			for (let [key, cp] of cornerPoints::entries()) {
 				cp.p = new Point2D({
 					x:                cp.x * w / 2,
 					y:                cp.y * h / 2,
-					coordinateSystem: this.svg.children
+					coordinateSystem: this.svg.main
 				});
 				this.corners[key].transformation = ID_MATRIX.translate(...cp.p.xy).rotate(cp.r);
 			}
@@ -142,30 +174,64 @@ export class Box extends SvgTransformable {
 			}
 		});
 		
+		/* keep overlay outline updated */
+		Observable.combineLatest([
+			this.p('width'),
+			this.p('height'),
+			this.corners.tr.p('rounded'),
+			this.corners.br.p('rounded'),
+			this.corners.bl.p('rounded'),
+			this.corners.tl.p('rounded')
+		]).subscribe(() => {
+			const top1    = this.borders.top   .inkPoint1.in(this.svg.main);
+			const top2    = this.borders.top   .inkPoint2.in(this.svg.main);
+			const right1  = this.borders.right .inkPoint1.in(this.svg.main);
+			const right2  = this.borders.right .inkPoint2.in(this.svg.main);
+			const bottom1 = this.borders.bottom.inkPoint1.in(this.svg.main);
+			const bottom2 = this.borders.bottom.inkPoint2.in(this.svg.main);
+			const left1   = this.borders.left  .inkPoint1.in(this.svg.main);
+			const left2   = this.borders.left  .inkPoint2.in(this.svg.main);
+			const cornerPath = (key) => {
+				const c = this.corners[key];
+				const s = c.size;
+				const {x, y} = cornerPoints[key];
+				if (c.rounded) {
+					return `A ${s} ${s}, 0, 0, 1,`;
+				} else {
+					if (x*y === +1) { return `v ${y*s} L` }
+					else            { return `h ${x*s} L` }
+				}
+			};
+			overlayPath.attr({
+				d: `M
+					${top1.xy}    L ${top2.xy}    ${cornerPath('tr')}
+					${right1.xy}  L ${right2.xy}  ${cornerPath('br')}
+					${bottom1.xy} L ${bottom2.xy} ${cornerPath('bl')}
+					${left1.xy}   L ${left2.xy}   ${cornerPath('tl')}
+					${top1.xy}
+				Z`
+			});
+		});
+		
 	}
 	
 	postCreate(options = {}) {
 		/* set standard handler */
-		// console.log(this.handler);
-		// debugger;
 		if (this.handler::isEmpty()) {
 			this.handler = {
-				draggable: { artefact: this },
-				dropzone:  { artefact: this }
+				draggable:     { artefact: this },
+				dropzone:      { artefact: this },
+				highlightable: {
+					artefact: this,
+					effect: {
+						elements: this.svg.overlay
+					}
+				}
 			};
 		}
 		
 		/***/
 		super.postCreate(options);
-	}
-	
-	setStyle(style: Object) {
-		super.setStyle(style);
-		this.svg.children::applyCSS({
-			'> .boxer-BoxCorner > .ink *': {
-				fill: this.svg._inkRect.css('fill')
-			}
-		});
 	}
 	
 }

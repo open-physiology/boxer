@@ -26,7 +26,7 @@ export default class Tool extends ValueTracker {
 		/* set coordinateSystem if given */
 		if (context.coordinateSystem) {
 			if (context.coordinateSystem instanceof SvgArtefact) {
-				context.coordinateSystem = context.coordinateSystem.svg.children;
+				context.coordinateSystem = context.coordinateSystem.svg.main;
 			}
 			this.coordinateSystem = context.coordinateSystem::plainDOM();
 		}
@@ -80,4 +80,26 @@ function enrichMouseEvent(context) {
 		});//.transformedBy(context.coordinateSystem.getScreenCTM().inverse());
 	});
 }
+
+export function handleBoxer(key) {
+	return this
+		.map(event => [event, $(event.target).data('boxer-handler')[key]])
+	    .filter(v=>!!v[1])
+		.map(([event, handler]) => {
+			
+			let element = $(event.target);
+			let originalArtefact = null;
+			do {
+				originalArtefact = element.data('boxer-controller');
+				element = element.parent();
+			} while (!originalArtefact);
+			
+			return {
+				...handler,
+				originalArtefact,
+				point: event.point
+			}
+		});
+}
+
 

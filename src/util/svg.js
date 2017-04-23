@@ -45,11 +45,12 @@ export function matrixEquals(M1, M2) {
 }
 
 export function setCTM(matrix) {
-	if (!$(this).attr('transform')) {
+	if (!$(this)[0].transform) {
 		$(this).attr('transform', '');
 	}
+	assert($(this)[0].transform, `You probably tried to create an svg element outside the svg namespace.`);
 	$(this)[0].transform.baseVal
-		.initialize(refSVG.createSVGTransformFromMatrix(matrix));
+	          .initialize(refSVG.createSVGTransformFromMatrix(matrix));
 }
 
 export function newSVGPoint(x, y) {
@@ -87,6 +88,10 @@ export class Vector2D {
 	 * @readonly
 	 */
 	svgPoint;
+	
+	get x (): number                { return this.svgPoint.x  }
+	get y (): number                { return this.svgPoint.y  }
+	get xy(): Array<number, number> { return [this.x, this.y] }
 	
 	/**
 	 * Add this vector to another vector.
@@ -126,6 +131,18 @@ export class Vector2D {
 			x: this.x * scalar,
 			y: this.y * scalar
 		});
+	}
+	
+	/**
+	 * Get the angle this vector makes
+	 */
+	angle(): number {
+		const l = this.length;
+		return Math.atan2(this.x/l, this.y/l) * 180 / Math.PI;
+	}
+
+	get length(): number {
+		return sqrt(this.x*this.x + this.y*this.y);
 	}
 	
 }
@@ -173,10 +190,6 @@ export class Point2D extends Vector2D {
 		});
 	}
 	
-	get x (): number                { return this.svgPoint.x  }
-	get y (): number                { return this.svgPoint.y  }
-	get xy(): Array<number, number> { return [this.x, this.y] }
-	
 	obj(xKey: string = 'x', yKey: string = 'y'): Object {
 		return {
 			[xKey]: this.x,
@@ -193,12 +206,11 @@ export class Point2D extends Vector2D {
 		});
 	}
 	
-	minus(other: Point2D): Point2D {
+	minus(other: Point2D): Vector2D {
 		other = other.in(this.coordinateSystem);
-		return new Point2D({
-			x:                this.x - other.x,
-			y:                this.y - other.y,
-			coordinateSystem: this.coordinateSystem
+		return new Vector2D({
+			x: this.x - other.x,
+			y: this.y - other.y
 		});
 	}
 	

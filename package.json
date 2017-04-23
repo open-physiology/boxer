@@ -64,21 +64,23 @@
     "webpack-node-externals": "1.5"
   },
   "dependencies": {
-    "@angular/common":                   "2",
-    "@angular/compiler":                 "2",
-    "@angular/core":                     "2",
-    "@angular/platform-browser":         "2",
+    "@angular/common": "2",
+    "@angular/compiler": "2",
+    "@angular/core": "2",
+    "@angular/platform-browser": "2",
     "@angular/platform-browser-dynamic": "2",
-    "@angular/router":                   "3",
-    "babel-polyfill":                    "6",
-    "bound-native-methods":              "0.1",
-    "deep-freeze-strict":                "1",
-    "jquery":                            "3",
-    "lodash-bound":                      "1",
-    "rxjs":                              "5",
-    "rxjs-animation-loop":               "1",
-    "utilities":                         "open-physiology/utilities",
-    "zone.js":                           "0.7",
-	"lodash":                            "4"
+    "@angular/router": "3",
+    "babel-polyfill": "6",
+    "bound-native-methods": "0.1",
+    "cssprefix": "^2.0.3",
+    "deep-freeze-strict": "1",
+    "jquery": "3",
+    "lodash": "4",
+    "lodash-bound": "1",
+    "rxcss": "^0.9.0",
+    "rxjs": "5",
+    "rxjs-animation-loop": "1",
+    "utilities": "open-physiology/utilities",
+    "zone.js": "0.7"
   }
 }
