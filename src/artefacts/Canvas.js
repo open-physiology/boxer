@@ -10,6 +10,11 @@ export class Canvas extends SvgArtefact {
 			this.handler = { dropzone: { artefact: this } };
 		}
 		super.postCreate(options);
+		
+		/* set global stroke-width */
+		this.svg.main.css({
+			strokeWidth: 2
+		});
 	}
 	
 	set handler(handler: Object) {

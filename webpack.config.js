@@ -1,6 +1,7 @@
 var webpack           = require('webpack');
 var CopyWebpackPlugin = require('copy-webpack-plugin');
 var loaders           = require('./webpack.loaders.js');
+var path              = require('path');
 
 module.exports = {
 	devtool: 'source-map',
@@ -27,6 +28,16 @@ module.exports = {
 		new webpack.optimize.OccurrenceOrderPlugin(),
 		new CopyWebpackPlugin([
 			{ from: 'test-app/index.html', to: 'test-app/index.html' }
-		])
+		]),
+		new webpack.ContextReplacementPlugin(
+			/angular[\\\/]core[\\\/](esm[\\\/]src|src)[\\\/]linker/,
+			path.resolve('./src'),
+			{}
+		),
+		new webpack.ContextReplacementPlugin(
+			/power-assert-formatter[\\\/]lib/,
+			path.resolve('./src'),
+			{}
+		)
 	]
 };

@@ -2,6 +2,7 @@ var webpack           = require('webpack');
 var path              = require('path');
 var CopyWebpackPlugin = require('copy-webpack-plugin');
 var loaders           = require('./webpack.loaders.js');
+var path              = require('path');
 
 module.exports = {
 	devtool: 'cheap-eval-source-map',
@@ -24,6 +25,16 @@ module.exports = {
 	},
 	plugins: [
 		new webpack.optimize.OccurrenceOrderPlugin(),
-		new webpack.HotModuleReplacementPlugin()
+		new webpack.HotModuleReplacementPlugin(),
+		new webpack.ContextReplacementPlugin(
+			/angular[\\\/]core[\\\/](esm[\\\/]src|src)[\\\/]linker/,
+			path.resolve('./src'),
+			{}
+		),
+		new webpack.ContextReplacementPlugin(
+			/power-assert-formatter[\\\/]lib/,
+			path.resolve('./src'),
+			{}
+		)
 	]
 };

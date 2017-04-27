@@ -35,9 +35,6 @@ export class LineSegment extends SvgArtefact {
 				this.point2 = this.point2.in(coordinateSystem);
 			}
 		});
-			// .withLatestFrom(this.p('point1.transformation'), this.p('point2.transformation'), ([prev, curr], t) =>
-			// 	t.multiply(prev.transformation).multiply(curr.transformation.inverse()))
-			// .subscribe( this.p('transformation') );
 	}
 	
 	create(options = {}) {

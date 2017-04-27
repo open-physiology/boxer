@@ -5,7 +5,7 @@ import {animationLoop} from 'rxjs-animation-loop';
 import $ from 'jquery';
 
 
-import {Box, LineSegment, BoxCorner, Canvas} from '../index.js';
+import {Box, Glyph, Edge, LineSegment, BoxCorner, Canvas, Coach} from '../index.js';
 import {ID_MATRIX, Point2D} from '../util/svg.js';
 
 import {HelperTool}      from '../tools/HelperTool.js';
@@ -52,24 +52,47 @@ export class TestApp {
 		
 		
 		/* coach / tools */
-		const context = { coordinateSystem: canvas };
-		new HelperTool     ({ context });
-		new DragDropTool   ({ context });
-		new ResizeTool     ({ context });
-		new HighlightTool  ({ context });
-		new MouseCursorTool({ context });
+		const coach = new Coach({ coordinateSystem: canvas });
+		coach.addTool(new HelperTool     );
+		coach.addTool(new DragDropTool   );
+		coach.addTool(new ResizeTool     );
+		coach.addTool(new HighlightTool  );
+		coach.addTool(new MouseCursorTool);
 		
 		
 		/* test box */
 		let bigBox = new Box({
 			style: { '&': { 'fill': 'cyan', 'stroke': 'black' } },
 			coordinateSystem: canvas,
-			width:  500,
-			height: 500
+			width:  400,
+			height: 400
 		});
 		bigBox.transformation = ID_MATRIX.translate(250, 250);
 
 
+		/* test glyph 1 */
+		let glyph1 = new Glyph({
+			style: { '&': { 'fill': 'purple', 'stroke': 'black' } },
+			coordinateSystem: bigBox
+		});
+		glyph1.transformation = ID_MATRIX.translate(-100, -100);
+		
+		/* test glyph 2 */
+		let glyph2 = new Glyph({
+			style: { '&': { 'fill': 'purple', 'stroke': 'black' } },
+			coordinateSystem: canvas
+		});
+		glyph2.transformation = ID_MATRIX.translate(10, 10);
+		
+		/* test edge */
+		let edge = new Edge({
+			style: { '&': { 'stroke': 'black' } },
+			glyph1,
+			glyph2,
+			coordinateSystem: canvas
+		});
+		
+		
 		/* test box */
 		let box = new Box({
 			style: { '&': { 'fill': 'green', 'stroke': 'black' } },

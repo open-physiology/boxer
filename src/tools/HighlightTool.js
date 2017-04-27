@@ -1,13 +1,9 @@
-import $ from '../libs/jquery.js';
-import {assign, pick, isFunction, sum} from 'lodash-bound';
 import RxCSS from 'rxcss';
 
-import {withoutMod, stopPropagation} from 'utilities';
-import {emitWhenComplete} from '../util/misc.js';
+import {stopPropagation} from 'utilities';
 
-import {snap45, moveToFront, ID_MATRIX, M11, M12, M21, M22} from "../util/svg";
-
-import Tool, {handleBoxer} from './Tool';
+import Tool from './Tool';
+import {handleBoxer} from '../Coach.js';
 import {sineWave, animationFrames} from '../util/misc';
 
 const {floor, sin, PI, min, max} = Math;
@@ -15,16 +11,13 @@ const {floor, sin, PI, min, max} = Math;
 
 export class HighlightTool extends Tool {
 	
-	constructor({context}) {
-		super({ context, events: ['mouseenter', 'mouseleave'] });
+	init({coach}) {
+		super.init({ coach, events: ['mouseenter', 'mouseleave'] });
 		
-		
-		
-		
-		const greenWave = sineWave({ amplitude: 30, period:  3000               });
-		const blueWave  = sineWave({ amplitude: 30, period:  6000, phase: 1500  });
 		const redWave   = sineWave({ amplitude: 40, period: 10000               },
 		                           { amplitude: 30, period:   800, phase: 50*PI });
+		const greenWave = sineWave({ amplitude: 30, period:  3000               });
+		const blueWave  = sineWave({ amplitude: 30, period:  6000, phase: 1500  });
 		RxCSS({
 			'boxer-highlight-color': animationFrames.map(() => {
 				const t = Date.now();
@@ -36,7 +29,7 @@ export class HighlightTool extends Tool {
 			}),
 			'boxer-highlight-dash-offset': animationFrames.map(() => {
 				const t = Date.now();
-				return floor(1000 - t % 1000 / 1000 * 45);
+				return floor(t % 1000 / 1000 * 45);
 			})
 		});
 		
@@ -74,7 +67,7 @@ export class HighlightTool extends Tool {
 		// TODO: create 'selected' tool, and just use 'selected' to highlight
 		
 		let selectedHandler = null;
-		context.stateMachine.extend(({ enterState, subscribeDuringState }) => ({
+		coach.stateMachine.extend(({ enterState, subscribeDuringState }) => ({
 			'IDLE': () => [
 				this.e('mouseenter')
 					.do(stopPropagation)

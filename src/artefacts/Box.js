@@ -1,23 +1,21 @@
 import assert from 'power-assert';
 import $      from '../libs/jquery.js';
 import {isBoolean as _isBoolean} from 'lodash';
-import {entries, values, assign, isEmpty} from 'lodash-bound';
+import {entries, isEmpty} from 'lodash-bound';
 import {Observable} from 'rxjs';
 
-import {ID_MATRIX, SVGMatrix, setCTM, Point2D} from '../util/svg.js';
-import {property, flag, definePropertyByValue, definePropertiesByValue} from 'utilities';
+import {ID_MATRIX, Point2D} from '../util/svg.js';
+import {property, flag, definePropertiesByValue} from 'utilities';
 import {_isNonNegative} from '../util/misc.js';
-
-const {max} = Math;
 
 import {SvgTransformable} from './SvgTransformable.js';
 import {LineSegment}      from './LineSegment.js';
 import {BoxCorner}        from './BoxCorner.js';
-import {applyCSS} from '../libs/jquery';
+
+const {max} = Math;
 
 export const BORDER_WIDTH      = 2;
-export const CORNER_RADIUS     = 15;
-export const MIN_MIN_SIZE      = 2*max(CORNER_RADIUS, BORDER_WIDTH);
+export const MIN_MIN_SIZE      = 2*max(BoxCorner.RADIUS, BORDER_WIDTH);
 export const DEFAULT_INK_COLOR = 'cyan';
 
 /**
@@ -59,15 +57,15 @@ export class Box extends SvgTransformable {
 		super.create(options);
 		
 		const handleRect = $.svg('<rect>').attr({
-			rx:      CORNER_RADIUS,
-			ry:      CORNER_RADIUS,
+			rx:      BoxCorner.RADIUS,
+			ry:      BoxCorner.RADIUS,
 			stroke: 'none',
 			fill:   'none'
 		}).appendTo(this.svg.handles);
 		
 		const inkRect = $.svg('<rect>').attr({
-			rx:      CORNER_RADIUS,
-			ry:      CORNER_RADIUS,
+			rx:      BoxCorner.RADIUS,
+			ry:      BoxCorner.RADIUS,
 			stroke:  'transparent',
 			fill:    'inherit'
 		}).appendTo(this.svg.ink);
@@ -90,8 +88,8 @@ export class Box extends SvgTransformable {
 		]) {
 			this.borders[key] = new LineSegment({
 				coordinateSystem: this,
-				lengthen1: -CORNER_RADIUS,
-				lengthen2: -CORNER_RADIUS
+				lengthen1: -BoxCorner.RADIUS,
+				lengthen2: -BoxCorner.RADIUS
 			});
 			this.borders[key].svg.main.addClass('boxer-BoxBorder');
 			this.borders[key].handler = {
@@ -114,8 +112,7 @@ export class Box extends SvgTransformable {
 			['br', +1, +1, 'bottom', 'right']
 		]) {
 			this.corners[key] = new BoxCorner({
-				coordinateSystem: this,
-				size: CORNER_RADIUS
+				coordinateSystem: this
 			});
 			this.corners[key].handler = {
 				resizable: { artefact: this, directions: {x, y} },
@@ -193,7 +190,7 @@ export class Box extends SvgTransformable {
 			const left2   = this.borders.left  .inkPoint2.in(this.svg.main);
 			const cornerPath = (key) => {
 				const c = this.corners[key];
-				const s = c.size;
+				const s = BoxCorner.RADIUS;
 				const {x, y} = cornerPoints[key];
 				if (c.rounded) {
 					return `A ${s} ${s}, 0, 0, 1,`;
@@ -223,9 +220,7 @@ export class Box extends SvgTransformable {
 				dropzone:      { artefact: this },
 				highlightable: {
 					artefact: this,
-					effect: {
-						elements: this.svg.overlay
-					}
+					effect: { elements: this.svg.overlay }
 				}
 			};
 		}

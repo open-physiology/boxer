@@ -1,8 +1,7 @@
 import $ from '../libs/jquery.js';
 
-import {assign, isFunction} from 'lodash-bound';
-
-import Tool, {handleBoxer} from './Tool';
+import Tool from './Tool';
+import {handleBoxer} from '../Coach.js';
 import {withoutMod, stopPropagation} from 'utilities';
 import {emitWhenComplete} from '../util/misc.js';
 
@@ -21,17 +20,17 @@ import {snap45, moveToFront} from "../util/svg";
 
 export class DragDropTool extends Tool {
 	
-	constructor({ context }) {
-		super({ context, events: ['mousedown', 'mouseenter'] });
+	init({ coach }) {
+		super.init({ coach, events: ['mousedown', 'mouseenter'] });
 		
 		const mousemove = this.windowE('mousemove');
 		const mouseup   = this.windowE('mouseup');
 		
-		context.stateMachine.extend(({ enterState, subscribeDuringState }) => ({
+		coach.stateMachine.extend(({ enterState, subscribeDuringState }) => ({
 			'IDLE': () => this.e('mousedown')
 				.filter(withoutMod('ctrl', 'shift', 'meta'))
 				.do(stopPropagation)
-                // .withLatestFrom(context.p('selected')) // TODO: bring 'selected' back
+                // .withLatestFrom(coach.p('selected')) // TODO: bring 'selected' back
 				::handleBoxer('draggable')
 				::enterState('INSIDE_MOVE_THRESHOLD'),
 			'INSIDE_MOVE_THRESHOLD': (args) => [
@@ -67,7 +66,7 @@ export class DragDropTool extends Tool {
 				// const initial_dragged_transformation = artefact.transformation;
 				// const initial_dragged_parent         = artefact.parent;
 				mouseup
-					// .withLatestFrom(context.p('selected'))
+					// .withLatestFrom(coach.p('selected'))
 					.do((mouseUpEvent) => {
 					
 						const handler = $(mouseUpEvent.target).data('boxer-handler');

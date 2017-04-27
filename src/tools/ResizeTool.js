@@ -6,22 +6,23 @@ import {emitWhenComplete} from '../util/misc.js';
 
 import {snap45, moveToFront, ID_MATRIX, M11, M12, M21, M22} from "../util/svg";
 
-import Tool, {handleBoxer} from './Tool';
+import Tool from './Tool';
+import {handleBoxer} from '../Coach.js';
 
 const {min, max} = Math;
 
 
 export class ResizeTool extends Tool {
 	
-	constructor({context}) {
-		super({ context, events: ['mousedown', 'mouseenter'] });
+	init({coach}) {
+		super.init({ coach, events: ['mousedown', 'mouseenter'] });
 		
 		const mousemove = this.windowE('mousemove');
 		const mouseup   = this.windowE('mouseup');
 		
 		
 		
-		// context.registerCursor((handleArtifact) => { // TODO: cursors
+		// coach.registerCursor((handleArtifact) => { // TODO: cursors
 		// 	if (![BorderLine, CornerHandle].includes(handleArtifact.constructor)) { return false }
 		// 	if (!handleArtifact.parent.free)                                      { return false }
 		// 	let s = handleArtifact.resizes;
@@ -44,11 +45,11 @@ export class ResizeTool extends Tool {
 		// 	][Math.floor((angle + 180/8) % 180 / (180/4)) % 4];
 		// });
 		
-		context.stateMachine.extend(({ enterState, subscribeDuringState }) => ({
+		coach.stateMachine.extend(({ enterState, subscribeDuringState }) => ({
 			'IDLE': () => this.e('mousedown')
 				.filter(withoutMod('ctrl', 'shift', 'meta'))
 				.do(stopPropagation)
-                // .withLatestFrom(context.p('selected')) // TODO: bring 'selected' back
+                // .withLatestFrom(coach.p('selected')) // TODO: bring 'selected' back
 				::handleBoxer('resizable')
 		        ::enterState('INSIDE_RESIZE_THRESHOLD'),
 			'INSIDE_RESIZE_THRESHOLD': (args) => [

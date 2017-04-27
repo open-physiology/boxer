@@ -5,25 +5,23 @@ import {entries, values, isUndefined} from 'lodash-bound';
 
 import {ID_MATRIX, SVGMatrix, setCTM, Point2D} from '../util/svg.js';
 import {property, flag} from 'utilities';
-import {_isNonNegative} from '../util/misc.js';
 
 
-import {SvgTransformable                } from './SvgTransformable.js';
-import {CORNER_RADIUS, DEFAULT_INK_COLOR} from './Box.js';
+import {SvgTransformable} from './SvgTransformable.js';
 
 /**
  * Representation of an interactive rectangle in svg space.
  */
 export class BoxCorner extends SvgTransformable {
 	
-	@property({ isValid: _isNonNegative, initial: CORNER_RADIUS }) size;
-	@property({ isValid: _isBoolean,     initial: false })         rounded;
+	static RADIUS = 15;
+	
+	@flag({ initial: false }) rounded;
 
 	preCreate(options) {
 		super.preCreate(options);
 		
 		/* set properties if given */
-		if (!options.size   ::isUndefined()) { this.size    = options.size    }
 		if (!options.rounded::isUndefined()) { this.rounded = options.rounded }
 	}
 	
@@ -42,22 +40,15 @@ export class BoxCorner extends SvgTransformable {
 		const inkPath = $.svg(`<path>`).css({
 			fill:             'transparent',
 			stroke:           'inherit',
-			strokeWidth:       2,
+			strokeWidth:      'inherit',
 			strokeDasharray:  'inherit',
 			strokeDashoffset: 'inherit'
 		}).appendTo(this.svg.ink);
 		
-		// const overlayBgInkPath = $.svg(`<path>`).css({
-		// 	fill:             'transparent',
-		// 	stroke:           'black',
-		// 	strokeWidth:       2,
-		// 	strokeDasharray:  'none'
-		// }).appendTo(this.svg.overlay);
-		
 		const overlayFillPath = $.svg(`<path>`).css({
 			fill:            'inherit',
 			stroke:          'black',
-			strokeWidth:      2,
+			strokeWidth:     'inherit',
 			strokeDasharray: 'none'
 		}).appendTo(this.svg.overlay);
 		
@@ -70,14 +61,19 @@ export class BoxCorner extends SvgTransformable {
 		}).appendTo(this.svg.overlay);
 		
 		/* react to resizing and roundedness-toggling */
-		this.p(['size', 'rounded']).subscribe(([s, r]) => {
-			const corner      = r ? (`A ${s} ${s}, 0, 0, 0,`) : (`L 0 0 L`);
-			const x           = Math.sqrt(s*s/8);
-			const insideCurve = `A ${s/2} ${s/2}, 0, 0, 1, ${x} ${s/2+x} L ${s/2+x} ${x} A ${s/2} ${s/2}, 0, 0, 1, ${s} 0`;
-			$(handlePath).add(fillPath).attr({ d: `M ${s} 0 ${corner} 0 ${s} ${insideCurve} Z` });
-			overlayFillPath.attr({ d: `M ${s} 0 ${corner} 0 ${s} L ${s} 0 Z` });
-			overlayInkPath .attr({ d: `M 0 ${s} L ${s} 0` });
-			inkPath        .attr({ d: `M ${s} 0 ${corner} 0 ${s}` });
+		const s = BoxCorner.RADIUS;
+		const rightAngle  = `L 0 0 L`;
+		const arcAngle    = `A ${s} ${s}, 0, 0, 0,`;
+		const bl          = `0 ${s}`;
+		const tr          = `${s} 0`;
+		const outerCorner = r => `M ${tr} ${r ? arcAngle : rightAngle} ${bl}`;
+		const innerCorner = `M ${bl} L ${tr}`;
+		this.p('rounded').subscribe((r) => {
+			handlePath     .attr({ d: outerCorner(0)       });
+			inkPath        .attr({ d: outerCorner(r)       });
+			fillPath       .attr({ d: outerCorner(r)       });
+			overlayFillPath.attr({ d: outerCorner(r) + 'Z' });
+			overlayInkPath .attr({ d: innerCorner          });
 		});
 		
 	}

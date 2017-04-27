@@ -1,24 +1,21 @@
 import $ from '../libs/jquery.js';
 import CSSPrefix from 'cssprefix/src/cssprefix';
-import {assign, pick, isFunction, sum} from 'lodash-bound';
-import RxCSS from 'rxcss';
 
-import {withoutMod, stopPropagation} from 'utilities';
-import {emitWhenComplete} from '../util/misc.js';
+import {stopPropagation} from 'utilities';
 
-import {snap45, moveToFront, ID_MATRIX, M11, M12, M21, M22} from "../util/svg";
+import {M21, M22} from "../util/svg";
 
-import Tool, {handleBoxer} from './Tool';
-import {sineWave, animationFrames} from '../util/misc';
+import Tool from './Tool';
+import {handleBoxer} from '../Coach.js';
 import {plainDOM} from '../libs/jquery';
 
-const {floor, sin, PI, min, max} = Math;
+const {floor} = Math;
 
 
 export class MouseCursorTool extends Tool {
 	
-	constructor({context}) {
-		super({ context, events: ['mouseenter', 'mouseleave'] });
+	init({coach}) {
+		super.init({ coach, events: ['mouseenter', 'mouseleave'] });
 		
 		/* determining proper resizing cursor */
 		const borderCursor = (handler) => {
@@ -52,11 +49,11 @@ export class MouseCursorTool extends Tool {
 		const setCursor = (c, h) => {
 			cursor        = c;
 			cursorHandler = h;
-			$(context.coordinateSystem).css({ cursor });
+			$(coach.coordinateSystem).css({ cursor });
 		};
 		
 		/* use events */
-		context.stateMachine.extend(({ enterState, subscribeDuringState }) => ({
+		coach.stateMachine.extend(({ enterState, subscribeDuringState }) => ({
 			'IDLE': () => {
 				setCursor('');
 				this.e('mouseenter')
