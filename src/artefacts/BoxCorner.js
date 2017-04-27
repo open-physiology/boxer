@@ -29,7 +29,7 @@ export class BoxCorner extends SvgTransformable {
 		super.create(options);
 		
 		const handlePath = $.svg(`<path>`).css({
-			strokeWidth: 4
+			strokeWidth: 'inherit',
 		}).appendTo(this.svg.handles);
 		
 		const fillPath = $.svg(`<path>`).css({
@@ -48,11 +48,10 @@ export class BoxCorner extends SvgTransformable {
 		const overlayFillPath = $.svg(`<path>`).css({
 			fill:            'inherit',
 			stroke:          'black',
-			strokeWidth:     inkPath.css('stroke-width'),
 			strokeDasharray: 'none'
 		}).appendTo(this.svg.overlay);
 		
-		const overlayInkPath = $.svg(`<path>`).css({
+		const overlayStrokePath = $.svg(`<path>`).css({
 			fill:             'transparent',
 			stroke:           'inherit',
 			strokeWidth:      'inherit',
@@ -67,15 +66,26 @@ export class BoxCorner extends SvgTransformable {
 		const bl          = `0 ${s}`;
 		const tr          = `${s} 0`;
 		const outerCorner = r => `M ${tr} ${r ? arcAngle : rightAngle} ${bl}`;
-		const innerCorner = `M ${bl} L ${tr}`;
+		const innerCorner = `M ${tr} L ${bl}`;
 		this.p('rounded').subscribe((r) => {
-			handlePath     .attr({ d: outerCorner(0)       });
-			inkPath        .attr({ d: outerCorner(r)       });
-			fillPath       .attr({ d: outerCorner(r)       });
-			overlayFillPath.attr({ d: outerCorner(r) + 'Z' });
-			overlayInkPath .attr({ d: innerCorner          });
+			handlePath       .attr({ d: outerCorner(0)       });
+			inkPath          .attr({ d: outerCorner(r)       });
+			fillPath         .attr({ d: outerCorner(r)       });
+			overlayFillPath  .attr({ d: outerCorner(r) + 'Z' });
+			overlayStrokePath.attr({ d: innerCorner          });
 		});
 		
+	}
+	
+	postCreate(options = {}) {
+		super.postCreate(options);
+		
+		/* set the stroke-width of part of the overlay based on part of the ink */
+		// this is a special styling rule for BoxCorner
+		// that doesn't fit our css 'inherit' scheme
+		const source = this.svg.ink    .children('[style*="stroke: inherit"]');
+		const target = this.svg.overlay.children('[style*="stroke: black"]');
+		target.css({ strokeWidth: source.css('stroke-width') });
 	}
 	
 }

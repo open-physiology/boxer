@@ -49,13 +49,13 @@ export class MouseCursorTool extends Tool {
 		const setCursor = (c, h) => {
 			cursor        = c;
 			cursorHandler = h;
-			$(coach.coordinateSystem).css({ cursor });
+			$(coach.root.svg.main).css({ cursor });
 		};
 		
 		/* use events */
 		coach.stateMachine.extend(({ enterState, subscribeDuringState }) => ({
 			'IDLE': () => {
-				setCursor('');
+				setCursor('', null);
 				this.e('mouseenter')
 				    .do(stopPropagation)
 					::handleBoxer('resizable')

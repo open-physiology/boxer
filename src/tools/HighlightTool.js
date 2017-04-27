@@ -5,6 +5,7 @@ import {stopPropagation} from 'utilities';
 import Tool from './Tool';
 import {handleBoxer} from '../Coach.js';
 import {sineWave, animationFrames} from '../util/misc';
+import {plainDOM} from '../libs/jquery';
 
 const {floor, sin, PI, min, max} = Math;
 
@@ -31,7 +32,7 @@ export class HighlightTool extends Tool {
 				const t = Date.now();
 				return floor(t % 1000 / 1000 * 45);
 			})
-		});
+		}, this.coach.root.svg.main::plainDOM());
 		
 		const $$oldFill = Symbol('$$oldFill');
 		function turnOnColorCycle(handler) {

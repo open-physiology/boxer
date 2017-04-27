@@ -26,7 +26,7 @@ export class Glyph extends SvgTransformable {
 		
 		$.svg('<circle>').attr({
 			r: Glyph.RADIUS, cx: 0, cy: 0,
-			strokeWidth: 4
+			strokeWidth: 'inherit',
 		}).appendTo(this.svg.handles);
 		
 		$.svg('<circle>').attr({

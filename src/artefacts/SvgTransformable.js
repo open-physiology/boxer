@@ -13,13 +13,15 @@ import {Point2D} from '../util/svg';
 export class SvgTransformable extends SvgArtefact {
 	
 	@property({ initial: ID_MATRIX }) transformation;
+	@property({ initial: ID_MATRIX }) globalTransformation;
 		
 	preCreate(options = {}) {
 		super.preCreate(options);
 		
 		/* smoothly transitioning to a new coordinateSystem */
-		this.p('coordinateSystem')
+		this.p('parent')
 			.filter(p=>p)
+			.map(p => p.svg.children)
 			.pairwise()
 			.withLatestFrom(this.p('transformation'), ([prev, curr], t) => ID_MATRIX
 				.multiply(curr::plainDOM().getScreenCTM().inverse())
@@ -29,6 +31,11 @@ export class SvgTransformable extends SvgArtefact {
 		
 		/* keep transformation active on elements */
 		this.p('transformation').subscribe(this.svg.main::setCTM);
+		
+		/* keep track of the transformation of this artefact w.r.t. the canvas */
+		
+		this.p(['parent?.globalTransformation', 'transformation'], (pgt, t) => (pgt || ID_MATRIX).multiply(t))
+			.subscribe( this.p('globalTransformation') );
 	}
 	
 }

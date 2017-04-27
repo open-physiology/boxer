@@ -9,24 +9,16 @@ import {Point2D} from './util/svg';
 import {SvgArtefact} from './artefacts/SvgArtefact.js';
 
 
-
 const $$domEvents = Symbol('$$domEvents');
 
 export class Coach {
 	
-	tools = {};
+	tools        = {};
+	stateMachine = new Machine('IDLE');
 	
-	constructor({coordinateSystem} = {}) {
-		
-		this.coordinateSystem = coordinateSystem;
-		if (this.coordinateSystem instanceof SvgArtefact) {
-			this.coordinateSystem = this.coordinateSystem.svg.main;
-		}
-		
-		this.stateMachine = new Machine('IDLE');
-		
+	constructor({root} = {}) {
+		this.root = root;
 		this[$$domEvents] = {};
-		
 	}
 	
 	addTool(tool) {
@@ -38,12 +30,12 @@ export class Coach {
 		if (!this[$$domEvents][e]) {
 			this[$$domEvents][e] = Observable.merge(
 				Observable.fromEventPattern(
-					(handler) => { $(this.coordinateSystem).on (e, '.handles *', handler) },
-					(handler) => { $(this.coordinateSystem).off(e, '.handles *', handler) }
+					(handler) => { $(this.root.svg.main).on (e, '.boxer > .handles *', handler) },
+					(handler) => { $(this.root.svg.main).off(e, '.boxer > .handles *', handler) }
 				),
 				Observable.fromEventPattern(
-					(handler) => { $(this.coordinateSystem).on (e, handler) },
-					(handler) => { $(this.coordinateSystem).off(e, handler) }
+					(handler) => { $(this.root.svg.main).on (e, handler) },
+					(handler) => { $(this.root.svg.main).off(e, handler) }
 				)
 			).do(::this.enrichMouseEvent);
 		}
@@ -54,14 +46,14 @@ export class Coach {
 		event.point = new Point2D({
 			x:                event.pageX,
 			y:                event.pageY,
-			coordinateSystem: this.coordinateSystem
-		});//.transformedBy(coach.coordinateSystem.getScreenCTM().inverse());
+			coordinateSystem: this.root.svg.main
+		});//.transformedBy(this.root.svg.children::plainDOM().getScreenCTM().inverse());
 	}
 	
-	canvasE  (e) { return Observable.fromEvent($(this.coordinateSystem), e).do(::this.enrichMouseEvent) }
-	windowE  (e) { return Observable.fromEvent($(window), e)               .do(::this.enrichMouseEvent) }
-	documentE(e) { return Observable.fromEvent($(document), e)             .do(::this.enrichMouseEvent) }
-	e        (e) { return this[$$domEvents][e]                                                          }
+	canvasE  (e) { return Observable.fromEvent($(this.root.svg.main), e).do(::this.enrichMouseEvent) }
+	windowE  (e) { return Observable.fromEvent($(window), e)            .do(::this.enrichMouseEvent) }
+	documentE(e) { return Observable.fromEvent($(document), e)          .do(::this.enrichMouseEvent) }
+	e        (e) { return this[$$domEvents][e]                                                       }
 	
 }
 

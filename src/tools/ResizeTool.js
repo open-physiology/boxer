@@ -21,30 +21,6 @@ export class ResizeTool extends Tool {
 		const mouseup   = this.windowE('mouseup');
 		
 		
-		
-		// coach.registerCursor((handleArtifact) => { // TODO: cursors
-		// 	if (![BorderLine, CornerHandle].includes(handleArtifact.constructor)) { return false }
-		// 	if (!handleArtifact.parent.free)                                      { return false }
-		// 	let s = handleArtifact.resizes;
-		// 	let angle = 0;
-		// 	// if (s.top)             { angle =   0 }
-		// 	// if (s.bottom)          { angle =   0 }
-		// 	if (s.right)              { angle =  90 }
-		// 	if (s.left)               { angle =  90 }
-		// 	if (s.top    && s.left )  { angle = 135 }
-		// 	if (s.top    && s.right)  { angle =  45 }
-		// 	if (s.bottom && s.left )  { angle =  45 }
-		// 	if (s.bottom && s.right)  { angle = 135 }
-		// 	const m = handleArtifact.handle.getScreenCTM();
-		// 	angle += Math.atan2(m[M21], m[M22]) * 180 / Math.PI;
-		// 	return [
-		// 		'ns-resize',   // 0,   0:  |
-		// 		'nesw-resize', // 1,  45:  /
-		// 		'ew-resize',   // 2,  90:  -
-		// 		'nwse-resize'  // 3, 135:  \
-		// 	][Math.floor((angle + 180/8) % 180 / (180/4)) % 4];
-		// });
-		
 		coach.stateMachine.extend(({ enterState, subscribeDuringState }) => ({
 			'IDLE': () => this.e('mousedown')
 				.filter(withoutMod('ctrl', 'shift', 'meta'))
@@ -62,10 +38,14 @@ export class ResizeTool extends Tool {
 				    ::enterState('IDLE')
 			    // TODO: go IDLE on pressing escape
 			],
-			'RESIZING_RECTANGLE': ({point, artefact, directions, mouseDownIsOrigin}) => {
+			'RESIZING_RECTANGLE': (args) => {
+				const {point, artefact, before, after, directions, mouseDownIsOrigin} = args;
+				
 				/* start dragging */
 				artefact.handlesActive = false;
-				artefact.svg.main::moveToFront();
+				artefact.e('moveToFront').next({ direction: 'out', source: artefact });
+				// artefact.e('moveToFront').next({ direction: 'in'                    });
+				if (before::isFunction()) { before(args) }
 				
 				/* record start dimensions and mouse position */
 				const start = {
@@ -90,7 +70,10 @@ export class ResizeTool extends Tool {
 			
 				/* stop resizing */
 				mouseup
-					.do(() => { artefact.handlesActive = true })
+					.do(() => {
+						if (after::isFunction()) { after(args) }
+						artefact.handlesActive = true
+					})
 					::enterState('IDLE');
 			}
 		}));

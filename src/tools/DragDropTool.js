@@ -1,4 +1,5 @@
 import $ from '../libs/jquery.js';
+import {isFunction} from 'lodash-bound';
 
 import Tool from './Tool';
 import {handleBoxer} from '../Coach.js';
@@ -43,12 +44,16 @@ export class DragDropTool extends Tool {
 				    ::enterState('IDLE')
 				// TODO: go IDLE on pressing escape
 			],
-			'MOVING': ({point, artefact, referencePoint}) =>  {
-				/* start dragging */
-				artefact.handlesActive = false;
-				artefact.svg.main::moveToFront();
+			'MOVING': (args) =>  {
+				const {point, artefact, before, after, referencePoint} = args;
 				
-				/* record start dimensions */
+				/* start dragging */
+				if (before::isFunction()) { before(args) }
+				artefact.handlesActive = false;
+				artefact.moveToFront();
+				// artefact.e('moveToFront').next({ direction: 'in'                    });
+				
+				/* record start transformation */
 				const transformationStart = artefact.transformation;
 				
 				/* move while dragging */
@@ -72,7 +77,7 @@ export class DragDropTool extends Tool {
 						const handler = $(mouseUpEvent.target).data('boxer-handler');
 						if (handler) {
 							const dropzone = handler.dropzone;
-							artefact.coordinateSystem = dropzone.artefact;
+							artefact.parent = dropzone.artefact;
 						}
 					
 						// TODO: allow dropzone to reject artefact;
@@ -80,6 +85,8 @@ export class DragDropTool extends Tool {
 						
 						/* stop dragging */
 						artefact.handlesActive = true;
+						artefact.moveToFront();
+						if (after::isFunction()) { after(args) }
 				    })
 					::enterState('IDLE');
 			}

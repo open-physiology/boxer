@@ -87,13 +87,18 @@ export class Box extends SvgTransformable {
 			['left',  -1,  0]
 		]) {
 			this.borders[key] = new LineSegment({
-				coordinateSystem: this,
+				parent: this,
 				lengthen1: -BoxCorner.RADIUS,
 				lengthen2: -BoxCorner.RADIUS
 			});
 			this.borders[key].svg.main.addClass('boxer-BoxBorder');
 			this.borders[key].handler = {
-				resizable: { artefact: this, directions: {x, y} },
+				resizable: {
+					artefact: this,
+					directions: {x, y},
+					before: () => { this.handlesActive = false },
+					after:  () => { this.handlesActive = true  }
+				},
 				highlightable: {
 					artefact: this,
 					effect: {
@@ -112,15 +117,18 @@ export class Box extends SvgTransformable {
 			['br', +1, +1, 'bottom', 'right']
 		]) {
 			this.corners[key] = new BoxCorner({
-				coordinateSystem: this
+				parent: this
 			});
 			this.corners[key].handler = {
-				resizable: { artefact: this, directions: {x, y} },
+				resizable: {
+					artefact: this,
+					directions: {x, y},
+					before: () => { this.handlesActive = false },
+					after:  () => { this.handlesActive = true  }
+				},
 				highlightable: {
 					artefact: this,
 					effect: {
-						// elements: this.svg.overlay
-						//               .add(this.corners[key].svg.overlay)
 						elements: this.corners[key].svg.overlay
 			                           .add(this.borders[s1].svg.overlay)
 			                           .add(this.borders[s2].svg.overlay)
@@ -145,10 +153,10 @@ export class Box extends SvgTransformable {
 			bl: { x: -1, y: +1, r: 270 },
 		};
 		let borderPoints = {
-			top:    [cornerPoints.tr, cornerPoints.tl],
-			right:  [cornerPoints.br, cornerPoints.tr],
-			bottom: [cornerPoints.bl, cornerPoints.br],
-			left:   [cornerPoints.tl, cornerPoints.bl]
+			top:    [cornerPoints.tl, cornerPoints.tr],
+			right:  [cornerPoints.tr, cornerPoints.br],
+			bottom: [cornerPoints.br, cornerPoints.bl],
+			left:   [cornerPoints.bl, cornerPoints.tl]
 		};
 		
 		/* resizing */
@@ -160,7 +168,7 @@ export class Box extends SvgTransformable {
 				cp.p = new Point2D({
 					x:                cp.x * w / 2,
 					y:                cp.y * h / 2,
-					coordinateSystem: this.svg.main
+					coordinateSystem: this.svg.children
 				});
 				this.corners[key].transformation = ID_MATRIX.translate(...cp.p.xy).rotate(cp.r);
 			}
@@ -193,19 +201,19 @@ export class Box extends SvgTransformable {
 				const s = BoxCorner.RADIUS;
 				const {x, y} = cornerPoints[key];
 				if (c.rounded) {
-					return `A ${s} ${s}, 0, 0, 1,`;
+					return `A ${s} ${s}, 0, 0, 0,`;
 				} else {
-					if (x*y === +1) { return `v ${y*s} L` }
+					if (x*y === -1) { return `v ${y*s} L` }
 					else            { return `h ${x*s} L` }
 				}
 			};
 			overlayPath.attr({
 				d: `M
-					${top1.xy}    L ${top2.xy}    ${cornerPath('tr')}
-					${right1.xy}  L ${right2.xy}  ${cornerPath('br')}
-					${bottom1.xy} L ${bottom2.xy} ${cornerPath('bl')}
-					${left1.xy}   L ${left2.xy}   ${cornerPath('tl')}
-					${top1.xy}
+					${left1.xy}   L ${left2.xy}   ${cornerPath('bl')}
+					${bottom1.xy} L ${bottom2.xy} ${cornerPath('br')}
+					${right1.xy}  L ${right2.xy}  ${cornerPath('tr')}
+					${top1.xy}    L ${top2.xy}    ${cornerPath('tl')}
+					${left1.xy}
 				Z`
 			});
 		});

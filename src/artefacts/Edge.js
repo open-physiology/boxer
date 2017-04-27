@@ -1,10 +1,14 @@
-import {isEmpty} from 'lodash-bound';
+import assert from 'power-assert';
+import {Observable} from 'rxjs';
+
+import {isEmpty, merge} from 'lodash-bound';
 
 import {Point2D} from '../util/svg.js';
 import {property} from 'utilities';
 
 import {LineSegment} from './LineSegment.js';
 import {Glyph}       from './Glyph.js';
+import {moveToFront} from '../util/svg';
 
 
 /**
@@ -18,22 +22,32 @@ export class Edge extends LineSegment {
 	preCreate(options = {}) {
 		super.preCreate(options);
 		
-		/* initialize endpoint glyphs */
-		if (options.glyph1) { this.glyph1 = options.glyph1 }
-		if (options.glyph2) { this.glyph2 = options.glyph2 }
-		
 		/* make the line segment ends touch the edges of the glyphs */
 		this.lengthen1 = this.lengthen2 = -Glyph.RADIUS;
 		
-		/* smoothly transitioning to a new coordinateSystem */
 		for (let g of [1, 2]) {
-			this.p([`glyph${g}.coordinateSystem`, `glyph${g}.transformation`])
-			    .map(([cs, t]) => Point2D.fromMatrixTranslation(t, cs))
-			    .subscribe(this.p(`point${g}`));
+			/* initializing glyphs */
+			assert(options[`glyph${g}`]);
+			this[`glyph${g}`] = options[`glyph${g}`];
+			
+			/* moving the line segment when the glyphs move */
+			this.p([`glyph${g}?.globalTransformation`], ['root'])
+			    .map(([gt, root]) => Point2D.fromMatrixTranslation(gt, root.svg.main))
+			    .subscribe( this.p(`point${g}`) );
+			
+			/* propagate moveToFront  */
+			this.e(`glyph${g}.moveToFront`).subscribe( this.e('moveToFront') );
+			
+			/* as a special exception for Edge, inward moveToFront also brings svg to front */
+			// outward moveToFront already does this (see SvgArtefact.js)
+			this.e(`glyph${g}.moveToFront`)
+				.filter(({direction}) => direction === 'in')
+				.subscribe(this.svg.main::moveToFront);
 		}
 	}
 	
 	postCreate(options = {}) {
+		
 		/* set standard handler */
 		if (this.handler::isEmpty()) {
 			this.handler = {
@@ -42,6 +56,21 @@ export class Edge extends LineSegment {
 					effect: { elements: this.svg.overlay }
 				}
 			};
+		}
+		
+		/* set glyph handlers */
+		for (let g of [1, 2]) {
+			this[`glyph${g}`].handler::merge({
+				draggable: {
+					before: () => {
+						// this.svg.main::moveToFront();
+						this.handlesActive = false;
+					},
+					after: () => {
+						this.handlesActive = true;
+					}
+				}
+			});
 		}
 		
 		/***/

@@ -52,7 +52,7 @@ export class TestApp {
 		
 		
 		/* coach / tools */
-		const coach = new Coach({ coordinateSystem: canvas });
+		const coach = new Coach({ root: canvas });
 		coach.addTool(new HelperTool     );
 		coach.addTool(new DragDropTool   );
 		coach.addTool(new ResizeTool     );
@@ -63,7 +63,7 @@ export class TestApp {
 		/* test box */
 		let bigBox = new Box({
 			style: { '&': { 'fill': 'cyan', 'stroke': 'black' } },
-			coordinateSystem: canvas,
+			parent: canvas,
 			width:  400,
 			height: 400
 		});
@@ -73,14 +73,14 @@ export class TestApp {
 		/* test glyph 1 */
 		let glyph1 = new Glyph({
 			style: { '&': { 'fill': 'purple', 'stroke': 'black' } },
-			coordinateSystem: bigBox
+			parent: bigBox
 		});
 		glyph1.transformation = ID_MATRIX.translate(-100, -100);
 		
 		/* test glyph 2 */
 		let glyph2 = new Glyph({
 			style: { '&': { 'fill': 'purple', 'stroke': 'black' } },
-			coordinateSystem: canvas
+			parent: canvas
 		});
 		glyph2.transformation = ID_MATRIX.translate(10, 10);
 		
@@ -89,14 +89,14 @@ export class TestApp {
 			style: { '&': { 'stroke': 'black' } },
 			glyph1,
 			glyph2,
-			coordinateSystem: canvas
+			parent: canvas
 		});
 		
 		
 		/* test box */
 		let box = new Box({
 			style: { '&': { 'fill': 'green', 'stroke': 'black' } },
-			coordinateSystem: bigBox,
+			parent: bigBox,
 			width: 100,
 			height: 80
 		});
@@ -108,7 +108,7 @@ export class TestApp {
 		/* test box */
 		let innerBox = new Box({
 			style: { '&': { 'fill': 'red', 'stroke': 'black' } },
-			coordinateSystem: box,
+			parent: box,
 			width:  25,
 			height: 25
 		});

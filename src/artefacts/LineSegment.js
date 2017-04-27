@@ -23,16 +23,16 @@ export class LineSegment extends SvgArtefact {
 	preCreate(options = {}) {
 		super.preCreate(options);
 		
-		if (options.point1)    { this.point1    = options.point1.in(this.coordinateSystem) }
-		if (options.point2)    { this.point2    = options.point2.in(this.coordinateSystem) }
-		if (options.lengthen1) { this.lengthen1 = options.lengthen1                        }
-		if (options.lengthen2) { this.lengthen2 = options.lengthen2                        }
+		if (options.point1)    { this.point1    = options.point1.in(this.parent.svg.children) }
+		if (options.point2)    { this.point2    = options.point2.in(this.parent.svg.children) }
+		if (options.lengthen1) { this.lengthen1 = options.lengthen1                           }
+		if (options.lengthen2) { this.lengthen2 = options.lengthen2                           }
 		
 		/* smoothly transitioning to a new coordinateSystem */
-		this.p('coordinateSystem').filter(p=>p).subscribe((coordinateSystem) => {
+		this.p('parent').filter(p=>p).subscribe((parent) => {
 			if (this.point1 && this.point2) {
-				this.point1 = this.point1.in(coordinateSystem);
-				this.point2 = this.point2.in(coordinateSystem);
+				this.point1 = this.point1.in(parent.svg.children);
+				this.point2 = this.point2.in(parent.svg.children);
 			}
 		});
 	}
@@ -41,25 +41,27 @@ export class LineSegment extends SvgArtefact {
 		
 		const inkLine = $.svg('<line>').css({
 			stroke:           'inherit',
-			strokeWidth:       2,
+			strokeWidth:      'inherit',
 			strokeDasharray:  'inherit',
 			strokeDashoffset: 'inherit'
 		}).appendTo(this.svg.ink);
+		
 		const overlayLine = $.svg('<line>').css({
 			stroke:           'inherit',
 			strokeWidth:      'inherit',
 			strokeDasharray:  'inherit',
 			strokeDashoffset: 'inherit'
 		}).appendTo(this.svg.overlay);
+		
 		const handleLine = $.svg('<line>').css({
-			strokeWidth: 6
+			strokeWidth: 'inherit',
 		}).appendTo(this.svg.handles);
 		
 		this.p(['point1', 'point2', 'lengthen1', 'lengthen2'])
 		    .filter(([p1, p2]) => p1 && p2)
 		    .subscribe(([p1, p2, l1, l2]) => {
-				p1 = p1.in(this.coordinateSystem);
-				p2 = p2.in(this.coordinateSystem);
+				p1 = p1.in(this.parent.svg.children);
+				p2 = p2.in(this.parent.svg.children);
 				$().add(inkLine)
 				   .add(overlayLine)
 				   .add(handleLine)
