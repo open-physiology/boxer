@@ -48,7 +48,7 @@ export class BoxCorner extends SvgTransformable {
 		const overlayFillPath = $.svg(`<path>`).css({
 			fill:            'inherit',
 			stroke:          'black',
-			strokeWidth:     'inherit',
+			strokeWidth:     inkPath.css('stroke-width'),
 			strokeDasharray: 'none'
 		}).appendTo(this.svg.overlay);
 		
