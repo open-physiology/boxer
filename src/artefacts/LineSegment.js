@@ -57,11 +57,11 @@ export class LineSegment extends SvgArtefact {
 			strokeWidth: 'inherit',
 		}).appendTo(this.svg.handles);
 		
-		this.p(['point1', 'point2', 'lengthen1', 'lengthen2'])
-		    .filter(([p1, p2]) => p1 && p2)
-		    .subscribe(([p1, p2, l1, l2]) => {
-				p1 = p1.in(this.parent.svg.children);
-				p2 = p2.in(this.parent.svg.children);
+		this.p(['parent', 'point1', 'point2', 'lengthen1', 'lengthen2'])
+		    .filter(([parent, p1, p2]) => parent && p1 && p2)
+		    .subscribe(([parent, p1, p2, l1, l2]) => {
+				p1 = p1.in(parent.svg.children);
+				p2 = p2.in(parent.svg.children);
 				$().add(inkLine)
 				   .add(overlayLine)
 				   .add(handleLine)

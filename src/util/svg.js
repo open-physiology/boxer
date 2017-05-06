@@ -5,7 +5,7 @@ import assert from 'power-assert';
 
 import {humanMsg} from 'utilities';
 
-const {abs, sqrt} = Math;
+const {abs, sqrt, atan2, PI} = Math;
 
 /* constants to use as keys to get matrix values */
 export const M11 = 'a';
@@ -138,7 +138,7 @@ export class Vector2D {
 	 */
 	angle(): number {
 		const l = this.length;
-		return Math.atan2(this.x/l, this.y/l) * 180 / Math.PI;
+		return atan2(this.y/l, this.x/l) * 180 / PI;
 	}
 
 	get length(): number {
@@ -290,7 +290,9 @@ export function rotateAroundPoint({x, y}, a) {
 
 export function moveToFront() {
 	const plainThis = this::plainDOM();
-	plainThis.parentElement.appendChild(plainThis);
+	if (plainThis.parentElement) {
+		plainThis.parentElement.appendChild(plainThis);
+	}
 }
 
 export function snap45(mouseVector, referenceArtefact, referencePoint) {

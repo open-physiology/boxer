@@ -1,4 +1,7 @@
 import {SvgArtefact} from './SvgArtefact.js';
+import {SvgTransformable} from './SvgTransformable';
+import {subclassOf} from '../util/misc';
+import {predicate, smartMerge} from '../Coach';
 
 /**
  * Representation of an svg canvas used to house Boxer artefacts.
@@ -6,16 +9,25 @@ import {SvgArtefact} from './SvgArtefact.js';
 export class Canvas extends SvgArtefact {
 	
 	postCreate(options = {}) {
-		if (!options.handler) {
-			this.handler = { dropzone: { artefact: this } };
-		}
+		this.registerHandlers({
+			dropzone: {
+				artefact: this,
+				accepts: () => true
+			},
+			drawzone: {
+				artefact: this,
+				@predicate('conjunctive') accepts({ class: cls }) {
+					return cls::subclassOf(SvgTransformable);
+				}
+			}
+		});
 		super.postCreate(options);
 	}
 	
-	set handler(handler: Object) {
+	registerHandlers(handlers: Object = {}) {
 		// Canvas is special: its handler element is this.svg.main
-		this.svg.main.data('boxer-handler', handler);
-		super.handler = handler;
+		super.registerHandlers(handlers);
+		this.svg.main.data('boxer-handlers', this.handlers);
 	}
 	
 }

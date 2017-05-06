@@ -46,16 +46,17 @@ export class Glyph extends SvgTransformable {
 	}
 	
 	postCreate(options = {}) {
-		/* set standard handler */
-		if (this.handler::isEmpty()) {
-			this.handler = {
-				draggable:     { artefact: this },
-				highlightable: {
-					artefact: this,
-					effect: { elements: this.svg.overlay }
-				}
-			};
-		}
+		/* set standard handlers */
+		this.registerHandlers({
+			movable:       { artefact: this },
+			highlightable: {
+				artefact: this,
+				effect: { elements: this.svg.overlay }
+			},
+			deletable: {
+				artefact: this
+			}
+		});
 		
 		/***/
 		super.postCreate(options);

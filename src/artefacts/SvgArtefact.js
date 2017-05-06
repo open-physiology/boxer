@@ -7,8 +7,9 @@ import {Observable} from 'rxjs';
 import {ID_MATRIX, SVGMatrix, setCTM} from '../util/svg.js';
 import {ValueTracker, property, flag, humanMsg, event}       from 'utilities';
 import {moveToFront} from '../util/svg';
+import {smartMerge} from '../Coach';
 
-const $$handler = Symbol('$$handler');
+const $$handlers = Symbol('$$handlers');
 
 
 /**
@@ -16,9 +17,11 @@ const $$handler = Symbol('$$handler');
  */
 export class SvgArtefact extends ValueTracker {
 	
-	@property({ initial: null, isValid(v) { return !v || v instanceof SvgArtefact } }) parent;
+	@property({ initial: null, isValid: (v) => (!v || v instanceof SvgArtefact) }) parent;
+	@flag({ initial: false })                                                      deleted;
 	
 	@event() moveToFrontEvent;
+	@event() clickEvent;
 	
 	@flag({ initial: true }) handlesActive;
 	
@@ -27,6 +30,8 @@ export class SvgArtefact extends ValueTracker {
 	 */
 	constructor(options = {}) {
 		super();
+		
+		this.setValueTrackerOptions({ takeUntil: this.p('deleted').filter(v=>!!v) });
 		
 		this.preCreate (options);
 		this.create    (options);
@@ -37,6 +42,9 @@ export class SvgArtefact extends ValueTracker {
 		
 		/* set parent if given */
 		if (options.parent) { this.parent = options.parent }
+		
+		/* when parent is deleted, this is deleted */
+		this.p('parent.deleted').filter(d=>!!d).take(1).subscribe( this.p('deleted') );
 		
 		/* set main grouping elements */
 		this.svg = { main: options.svg };
@@ -91,10 +99,28 @@ export class SvgArtefact extends ValueTracker {
 	create(options = {}) {}
 	
 	postCreate(options = {}) {
-		/* set handler if given */
-		if (this.handler::isEmpty() && options.handler) {
-			this.handler = options.handler;
-		}
+		/* what to do when this is deleted */
+		this.p('deleted').filter(d=>!!d).take(1).subscribe(() => {
+			
+			if (!this) {
+				
+			}
+			
+			this.svg.main.remove();
+			this.parent = null;
+		});
+		
+		/* add handler stuff that's given with the constructor */
+		this.registerHandlers(options.handlers);
+		
+		/* add handlers */
+		this.registerHandlers({
+			clickable: {
+				artefact: this,
+				handle: (val) => { this.e('click').next(val) }
+			}
+		});
+		
 		
 		/* set css inheritance chains */
 		const inheritedProperties = {
@@ -126,21 +152,31 @@ export class SvgArtefact extends ValueTracker {
 		});
 		
 		/* set css styling if given, which should override any of the stuff above */
-		if (options.style) {
-			this.setStyle(options.style);
+		if (options.css) {
+			this.setCSS(options.css);
 		}
 	}
 	
-	setStyle(style: Object) {
-		this.svg.main::applyCSS(style);
+	delete() {
+		this.p('deleted').next(true);
 	}
 	
-	set handler(handler: Object) {
-		this.svg.handles.find('*').data('boxer-handler', handler);
-		this[$$handler] = handler;
+	setCSS(css: Object) {
+		this.svg.main::applyCSS(css);
 	}
-	get handler(): Object {
-		return this[$$handler] || {};
+	
+	registerHandlers(handlers: Object = {}) {
+		if (!this[$$handlers]) {
+			this[$$handlers] = {};
+			this.svg.handles.find('*').data('boxer-handlers', this[$$handlers]);
+		}
+		this[$$handlers]::smartMerge(handlers);
+	}
+	get handlers(): Object {
+		if (!this[$$handlers]) {
+			this.registerHandlers({});
+		}
+		return this[$$handlers];
 	}
 	
 	moveToFront() {

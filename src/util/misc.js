@@ -29,3 +29,11 @@ export function sineWave(...waves) {
 }
 
 export const animationFrames = Observable.interval(1000/30, Scheduler.animationFrame);
+
+export function strictSubclassOf(cls) {
+	return this.prototype instanceof cls;
+}
+
+export function subclassOf(cls) {
+	return this === cls || this::strictSubclassOf(cls);
+}

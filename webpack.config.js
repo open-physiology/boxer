@@ -7,9 +7,7 @@ module.exports = {
 	devtool: 'source-map',
 	context: __dirname + '/src',
 	entry: {
-		'test-app/index':   [ 'babel-polyfill', 'zone.js/dist/zone.js', './test-app/index.js' ],
-		'project-template': [ 'babel-polyfill', 'zone.js/dist/zone.js', './index.js' ],
-		'project-template-minimal':                                   [ './index.js' ]
+		'test-app/index':   [ 'babel-polyfill', './test-app/index.js' ]
 	},
 	output: {
 		path: __dirname + '/dist',

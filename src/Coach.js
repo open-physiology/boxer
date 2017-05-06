@@ -1,20 +1,23 @@
-import {camelCase}   from 'lodash-bound';
-import {Observable}  from 'rxjs';
-import $             from './libs/jquery.js';
+import {camelCase, mergeWith, isFunction, entries} from 'lodash-bound';
+import {Observable}                       from 'rxjs';
+import $                                  from './libs/jquery.js';
+import assert                             from 'power-assert';
 
 import Machine from './util/Machine';
 
 import {Point2D} from './util/svg';
 
 import {SvgArtefact} from './artefacts/SvgArtefact.js';
+import {match} from 'utilities';
 
 
-const $$domEvents = Symbol('$$domEvents');
+const $$domEvents   = Symbol('$$domEvents');
+const $$tools       = Symbol('$$tools');
+const $$initialized = Symbol('$$initialized');
 
 export class Coach {
 	
-	tools        = {};
-	stateMachine = new Machine('IDLE');
+	stateMachine = new Machine('Coach', { state: 'IDLE', log: 'warn' });
 	
 	constructor({root} = {}) {
 		this.root = root;
@@ -22,32 +25,62 @@ export class Coach {
 	}
 	
 	addTool(tool) {
+		assert(!this[$$initialized], "You can't add tools to a Coach after starting it.");
 		this[tool.constructor.name::camelCase()] = tool;
+		if (!this[$$tools]) { this[$$tools] = new Set }
+		this[$$tools].add(tool);
 		tool.init({ coach: this });
+		return this;
 	}
 	
-	registerArtefactEvent(e) {
-		if (!this[$$domEvents][e]) {
-			this[$$domEvents][e] = Observable.merge(
-				Observable.fromEventPattern(
-					(handler) => { $(this.root.svg.main).on (e, '.boxer > .handles *', handler) },
-					(handler) => { $(this.root.svg.main).off(e, '.boxer > .handles *', handler) }
-				),
-				Observable.fromEventPattern(
-					(handler) => { $(this.root.svg.main).on (e, handler) },
-					(handler) => { $(this.root.svg.main).off(e, handler) }
-				)
-			).do(::this.enrichMouseEvent);
+	activateExclusiveTools(chosenTools) {
+		chosenTools = [...chosenTools];
+		for (let tool of this[$$tools]) {
+			let makeActive =
+				chosenTools.includes(tool)                  ||
+				chosenTools.includes(tool.constructor)      ||
+				chosenTools.includes(tool.constructor.name) ||
+				chosenTools.includes(tool.constructor.name::camelCase());
+			if (makeActive !== tool.active) {
+				tool.active = makeActive;
+			}
+		}
+	}
+	
+	start() {
+		this[$$initialized] = true;
+		for (let tool of this[$$tools]) {
+			if (tool.postInit::isFunction()) {
+				tool.postInit({ coach: this });
+			}
+		}
+	}
+	
+	registerArtefactEvent(...events) {
+		for (let e of events) {
+			if (!this[$$domEvents][e]) {
+				this[$$domEvents][e] = Observable.merge(
+					Observable.fromEventPattern(
+						(fn) => { $(this.root.svg.main).on (e, '.boxer > .handles *', fn) },
+						(fn) => { $(this.root.svg.main).off(e, '.boxer > .handles *', fn) }
+					),
+					Observable.fromEventPattern(
+						(fn) => { $(this.root.svg.main).on (e, fn) },
+						(fn) => { $(this.root.svg.main).off(e, fn) }
+					)
+				).do(::this.enrichMouseEvent);
+			}
 		}
 	}
 
 	enrichMouseEvent(event) {
+		event.stopPropagation(); // TODO: do we always want to do this here?
 		event.controller = $(event.currentTarget).data('boxer-controller');
 		event.point = new Point2D({
 			x:                event.pageX,
 			y:                event.pageY,
 			coordinateSystem: this.root.svg.main
-		});//.transformedBy(this.root.svg.children::plainDOM().getScreenCTM().inverse());
+		});
 	}
 	
 	canvasE  (e) { return Observable.fromEvent($(this.root.svg.main), e).do(::this.enrichMouseEvent) }
@@ -59,21 +92,74 @@ export class Coach {
 
 export function handleBoxer(key) {
 	return this
-		.map(event => [event, $(event.target).data('boxer-handler')[key]])
-	    .filter(v=>!!v[1])
-		.map(([event, handler]) => {
-			
+		.map(event => [event, $(event.target).data('boxer-handlers')[key]])
+	    .filter(v => key === '*' || !!v[1])
+		.map(([event, handlers]) => {
 			let element = $(event.target);
 			let originalArtefact = null;
 			do {
 				originalArtefact = element.data('boxer-controller');
 				element = element.parent();
 			} while (!originalArtefact);
-			
+			handlers = (key === '*' ? {} : handlers);
 			return {
-				...handler,
+				...handlers,
+				handlerType: key,
 				originalArtefact,
+				artefact: handlers && handlers.artefact || originalArtefact,
 				point: event.point
 			}
 		});
+}
+
+// export function setEffectStyle(css) {
+// 	if (this.effect.elements) {
+// 		this.effect.elements.css(css);
+// 	}
+// 	if (this.effect.selector) {
+// 		this.artefact.setCSS({
+// 			[this.effect.selector]: css
+// 		});
+// 	}
+// }
+
+export function smartMerge(other) {
+	this::mergeWith(other, (val1, val2) => {
+		if (val1::isFunction()) {
+			const pred = predicateInfo.get(val1) || predicateInfo.get(val2);
+			if (pred) {
+				let result = (...args) => pred(this::val1(...args), this::val2(...args));
+				predicateInfo.set(result, pred);
+				return result;
+			} else {
+				return (...args) => {
+					let result = this::val1(...args);
+					this::val2(...args);
+					return result;
+				};
+			}
+		}
+	});
+}
+
+
+const predicateInfo = new WeakMap;
+export function predicate(accumulate) {
+	return (target, key, descriptor) => {
+		accumulate = match(accumulate)({
+			conjunctive: ()=> (a, b) => (a && b),
+			disjunctive: ()=> (a, b) => (a || b),
+			default:     ()=> accumulate
+		});
+		if (descriptor.initializer::isFunction()) {
+			const oldInitializer = descriptor.initializer;
+			descriptor.initializer = (...args) => {
+				let result = descriptor::oldInitializer(...args);
+				predicateInfo.set(result, accumulate);
+				return result;
+			}
+		} else if (descriptor.value::isFunction()) {
+			predicateInfo.set(descriptor.value, accumulate);
+		}
+	};
 }

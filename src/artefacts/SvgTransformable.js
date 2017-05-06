@@ -18,6 +18,9 @@ export class SvgTransformable extends SvgArtefact {
 	preCreate(options = {}) {
 		super.preCreate(options);
 		
+		/* set transformation if given */
+		if (options.transformation) { this.transformation = options.transformation }
+		
 		/* smoothly transitioning to a new coordinateSystem */
 		this.p('parent')
 			.filter(p=>p)

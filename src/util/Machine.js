@@ -1,69 +1,68 @@
 import {entries, isArray, isUndefined, isFunction, isString, constant, toPairs} from 'lodash-bound';
+import {ValueTracker, property} from 'utilities';
 
-export default class Machine {
+export default class Machine extends ValueTracker {
 	
+	@property({ initial: null }) state;
+	
+	name          = null;
 	subscriptions = [];
-	desc          = {};
-	state         = null;
 	data          = null;
-	interceptors  = {};
 	
-	constructor(initialState, initialData) {
-		this.state = initialState;
-		this.data  = initialData;
+	constructor(name, {state, data, log}) {
+		super();
+		this.name  = name;
+		this.state = state;
+		this.data  = data;
+		if (log === true)         { this.log = ::console.info }
+		else if (log::isString()) { this.log = ::console[log] }
+		else                      { this.log = ()=>{}         }
 	}
 	
-	registerInterceptor(state, interceptor) {
-		if (interceptor::isString())   { interceptor = [interceptor, {}]       }
-		if (interceptor::isArray())    { interceptor = interceptor::constant() }
-		if (!this.interceptors[state]) { this.interceptors[state] = []         }
-		this.interceptors[state].push(interceptor);
-	}
-	
-	runInterceptor(state, data) {
-		while (this.interceptors[state]::isArray()) {
-			let interceptor = this.interceptors[state].pop();
-			if (!interceptor::isFunction()) { break }
-			let result = interceptor(data);
-			if (!result::isArray()) { break }
-			console.info(`intercepting state: '${state}'`, [data]);
-			[state, data] = result;
+	link(...links) {
+		if (!links[0]::isArray()) { links = [links] }
+		for (let [localState1, otherState, localState2] of links) {
+			this.extend(({ enterState }) => ({
+				[localState1]: () => {
+					otherState::enterState(localState2)
+				}
+			}));
 		}
-		return [state, data];
+		/* return machine itself */
+		return this;
 	}
 	
-	extend(descFn) {
+	extend(descFn, runCondition = ()=>true) {
 		/* define bound convenience functions */
 		const thisMachine = this;
 		const boundFunctions = {
-			enterState: function (nextState, data, newInterceptors) {
+			enterState(nextState, data) {
 				if (this::isUndefined()) {
-					return thisMachine.enterState(nextState, data, newInterceptors);
+					return thisMachine.enterState(nextState, data);
 				} else {
 					return this::(boundFunctions.subscribeDuringState)((data) => {
-						thisMachine.enterState(nextState, data, newInterceptors);
+						thisMachine.enterState(nextState, data);
 					});
 				}
 			},
-			subscribeDuringState: function (...args) {
+			subscribeDuringState(...args) {
 				const sub = this.subscribe(...args);
 				thisMachine.subscriptions.push(sub);
 				return sub;
-			},
-			intercept: function (...args) {
-				thisMachine.registerInterceptor(...args);
 			}
 		};
 		/* extend descriptions */
 		let result = descFn(boundFunctions);
 		for (let [key, fn] of result::toPairs()) {
-			if (thisMachine.desc[key]::isUndefined()) {
-				thisMachine.desc[key] = new Set();
+			if (this[key]::isUndefined()) {
+				this[key] = this.newEvent(key);
 			}
-			thisMachine.desc[key].add(fn);
+			this.e(key).filter(runCondition).subscribe((data) => {
+				this.enterSpecifiedState(fn);
+			});
 		}
 		/* run if it says something about the current state */
-		if (this.state in result) {
+		if (this.state in result && runCondition()) {
 			this.enterSpecifiedState(result[this.state]);
 		}
 		/* return machine itself */
@@ -77,16 +76,12 @@ export default class Machine {
 		this.subscriptions = [];
 	}
 	
-	enterState(state, data, newInterceptors) {
+	enterState(state, data) {
 		this.unsubscribe();
-		[state, data] = this.runInterceptor(state, data);
-		for (let newInterceptor of newInterceptors::toPairs()) {
-			this.registerInterceptor(...newInterceptor);
-		}
-		console.info(`entering state: '${state}'`, [data]);
+		this.log(`${this.name} - entering state: '${state}'`, [data]);
 		this.state = state;
 		this.data  = data;
-		this.desc[state].forEach( ::this.enterSpecifiedState );
+		this.e(state).next(data);
 	}
 	
 	enterSpecifiedState(specifiedStateFn) {

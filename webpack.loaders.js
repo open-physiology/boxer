@@ -13,7 +13,7 @@ module.exports = [
 		loader: 'json-loader'
 	},
 	{
-		test: /icons[\/\\]\w+\.png$/,
+		test: /images[\/\\][\w\-]+\.png$/,
 		loader: 'url-loader?limit=20000'
 	}
 ];

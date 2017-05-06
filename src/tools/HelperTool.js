@@ -17,9 +17,7 @@ export class HelperTool extends Tool {
 			'pointer-events': 'none'
 		}).appendTo(this.coach.root.svg.main);
 		
-		setTimeout(() => {
-			indicator.remove();
-		}, 500);
+		setTimeout(::indicator.remove, 500);
 		
 	}
 	

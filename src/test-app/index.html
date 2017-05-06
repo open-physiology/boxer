@@ -1,9 +1,43 @@
 <!DOCTYPE html>
-<html style="height: 100%">
+<html style="">
   <head>
     <title>Test App</title>
+    <style>
+      html {
+        height: 100%;
+        width: 100%;
+        padding: 0;
+        margin: 0;
+      }
+      body {
+        height: 100%;
+        width: 100%;
+        padding: 0;
+        margin: 0;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+      }
+      #canvas {
+        height: 100%;
+        width: 100%;
+        padding: 0;
+        margin: 0;
+      }
+      #buttons {
+        position: fixed;
+        left:     10px;
+        bottom:   10px;
+      }
+      #buttons > button {
+        margin: 0 10px 0 0;
+      }
+    </style>
   </head>
   <body>
+    <svg id="canvas"></svg>
+    <div id="buttons"></div>
     <script src="./index.js"></script>
   </body>
 </html>

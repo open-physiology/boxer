@@ -11,6 +11,8 @@ import {_isNonNegative} from '../util/misc.js';
 import {SvgTransformable} from './SvgTransformable.js';
 import {LineSegment}      from './LineSegment.js';
 import {BoxCorner}        from './BoxCorner.js';
+import {predicate} from '../Coach';
+import {subclassOf} from '../util/misc';
 
 const {max} = Math;
 
@@ -92,7 +94,7 @@ export class Box extends SvgTransformable {
 				lengthen2: -BoxCorner.RADIUS
 			});
 			this.borders[key].svg.main.addClass('boxer-BoxBorder');
-			this.borders[key].handler = {
+			this.borders[key].registerHandlers({
 				resizable: {
 					artefact: this,
 					directions: {x, y},
@@ -105,7 +107,7 @@ export class Box extends SvgTransformable {
 						elements: this.borders[key].svg.overlay
 					}
 				}
-			};
+			});
 		}
 		
 		/* corners */
@@ -119,7 +121,7 @@ export class Box extends SvgTransformable {
 			this.corners[key] = new BoxCorner({
 				parent: this
 			});
-			this.corners[key].handler = {
+			this.corners[key].registerHandlers({
 				resizable: {
 					artefact: this,
 					directions: {x, y},
@@ -134,7 +136,7 @@ export class Box extends SvgTransformable {
 			                           .add(this.borders[s2].svg.overlay)
 					}
 				}
-			};
+			});
 		}
 		
 		/* better corner accessibility */
@@ -221,17 +223,25 @@ export class Box extends SvgTransformable {
 	}
 	
 	postCreate(options = {}) {
-		/* set standard handler */
-		if (this.handler::isEmpty()) {
-			this.handler = {
-				draggable:     { artefact: this },
-				dropzone:      { artefact: this },
-				highlightable: {
-					artefact: this,
-					effect: { elements: this.svg.overlay }
+		/* set standard handlers */
+		this.registerHandlers({
+			movable:   { artefact: this },
+			rotatable: { artefact: this },
+			dropzone:  { artefact: this },
+			drawzone: {
+				artefact: this,
+				@predicate('conjunctive') accepts({ class: cls }) {
+					return cls::subclassOf(SvgTransformable);
 				}
-			};
-		}
+			},
+			highlightable: {
+				artefact: this,
+				effect: { elements: this.svg.overlay }
+			},
+			deletable: {
+				artefact: this
+			}
+		});
 		
 		/***/
 		super.postCreate(options);

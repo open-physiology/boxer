@@ -1,4 +1,4 @@
-import {ValueTracker, flag} from 'utilities';
+import {ValueTracker, flag, property} from 'utilities';
 import $                    from '../libs/jquery.js';
 import {isUndefined}        from 'lodash-bound';
 import {Observable}         from 'rxjs';
@@ -6,11 +6,10 @@ import {Observable}         from 'rxjs';
 
 export default class Tool extends ValueTracker {
 	
-	@flag({ initial: true }) active;
+	@property({ initial: true }) active;
 	
 	constructor({active} = {}) {
 		super();
-		
 		if (!active::isUndefined()) { this.active = active }
 	}
 	
@@ -28,4 +27,3 @@ export default class Tool extends ValueTracker {
 	e        (e) { return this.myE(this.coach.e        (e)) }
 	
 }
-

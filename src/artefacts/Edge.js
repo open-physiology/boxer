@@ -1,7 +1,7 @@
 import assert from 'power-assert';
 import {Observable} from 'rxjs';
 
-import {isEmpty, merge} from 'lodash-bound';
+import {isEmpty} from 'lodash-bound';
 
 import {Point2D} from '../util/svg.js';
 import {property} from 'utilities';
@@ -9,6 +9,7 @@ import {property} from 'utilities';
 import {LineSegment} from './LineSegment.js';
 import {Glyph}       from './Glyph.js';
 import {moveToFront} from '../util/svg';
+import {smartMerge} from '../Coach';
 
 
 /**
@@ -20,10 +21,11 @@ export class Edge extends LineSegment {
 	@property({ isValid: v => v instanceof Glyph }) glyph2;
 	
 	preCreate(options = {}) {
-		super.preCreate(options);
-		
-		/* make the line segment ends touch the edges of the glyphs */
-		this.lengthen1 = this.lengthen2 = -Glyph.RADIUS;
+		super.preCreate({
+			lengthen1: -Glyph.RADIUS,
+			lengthen2: -Glyph.RADIUS,
+			...options
+		});
 		
 		for (let g of [1, 2]) {
 			/* initializing glyphs */
@@ -48,30 +50,32 @@ export class Edge extends LineSegment {
 	
 	postCreate(options = {}) {
 		
-		/* set standard handler */
-		if (this.handler::isEmpty()) {
-			this.handler = {
-				highlightable: {
-					artefact: this,
-					effect: { elements: this.svg.overlay }
-				}
-			};
-		}
+		/* set standard handlers */
+		this.registerHandlers({
+			highlightable: {
+				artefact: this,
+				effect: { elements: this.svg.overlay }
+			},
+			deletable: {
+				artefact: this
+			}
+		});
+		
+		/* delete this when either glyph is deleted */
+		Observable.merge(
+			this.p('glyph1.deleted').filter(d=>!!d),
+			this.p('glyph2.deleted').filter(d=>!!d)
+		).take(1).subscribe( this.p('deleted') );
 		
 		/* set glyph handlers */
-		for (let g of [1, 2]) {
-			this[`glyph${g}`].handler::merge({
-				draggable: {
-					before: () => {
-						// this.svg.main::moveToFront();
-						this.handlesActive = false;
-					},
-					after: () => {
-						this.handlesActive = true;
-					}
-				}
-			});
-		}
+		const handlers = {
+			movable: {
+				before: () => { this.handlesActive = false },
+				after:  () => { this.handlesActive = true  }
+			}
+		};
+		this.glyph1.registerHandlers(handlers);
+		this.glyph2.registerHandlers(handlers);
 		
 		/***/
 		super.postCreate(options);

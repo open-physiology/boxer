@@ -14,7 +14,11 @@ module.exports = {
 	},
 	target: 'node',
 	externals: [
-		require('webpack-node-externals')(),
+		require('webpack-node-externals')({
+			whitelist: ['utilities']
+		})
+	],
+	plugins: [
 		new webpack.ContextReplacementPlugin(
 			/angular[\\\/]core[\\\/](esm[\\\/]src|src)[\\\/]linker/,
 			path.resolve('./src'),
