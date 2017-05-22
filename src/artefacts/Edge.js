@@ -1,7 +1,7 @@
 import assert from 'power-assert';
 import {Observable} from 'rxjs';
 
-import {isEmpty} from 'lodash-bound';
+import {isEmpty, isUndefined} from 'lodash-bound';
 
 import {Point2D} from '../util/svg.js';
 import {property} from 'utilities';
@@ -27,25 +27,44 @@ export class Edge extends LineSegment {
 			...options
 		});
 		
+		
+		/* initializing glyphs */
 		for (let g of [1, 2]) {
-			/* initializing glyphs */
 			assert(options[`glyph${g}`]);
 			this[`glyph${g}`] = options[`glyph${g}`];
-			
+		}
+		
+		/* re-parenting this Edge when either of the glyphs re-parent */
+		this.p(['glyph1', 'glyph2']).filter(([g1, g2]) => g1 && g2).switchMap(([g1, g2]) => Observable.combineLatest(
+			g1.p('depth').filter(d => !d::isUndefined()),
+			g2.p('depth').filter(d => !d::isUndefined())
+		).map(() => g1.closestCommonAncestorWith(g2))).subscribe(this.p('parent'));
+		
+		for (let g of [1, 2]) {
 			/* moving the line segment when the glyphs move */
 			this.p([`glyph${g}?.globalTransformation`], ['root'])
 			    .map(([gt, root]) => Point2D.fromMatrixTranslation(gt, root.svg.main))
 			    .subscribe( this.p(`point${g}`) );
-			
-			/* propagate moveToFront  */
-			this.e(`glyph${g}.moveToFront`).subscribe( this.e('moveToFront') );
-			
-			/* as a special exception for Edge, inward moveToFront also brings svg to front */
-			// outward moveToFront already does this (see SvgArtefact.js)
-			this.e(`glyph${g}.moveToFront`)
-				.filter(({direction}) => direction === 'in')
-				.subscribe(this.svg.main::moveToFront);
 		}
+		
+		// TODO: There's a bug when dragging a node into a new parent box.
+		//     : Its connected edges will stop following it, but will still follow its old parent.
+		//     :
+		
+		/* propagate moveToFront  */
+		const thisArtefact = this;
+		function direction(d)    { return this.filter(({direction}) => (direction === d))   }
+		function doNotTurnBack() { return this.filter(info => info.source !== thisArtefact) }
+		for (let g of [1, 2]) {
+			this.e(`glyph${g}.moveToFront`)
+				::doNotTurnBack()
+				.subscribe((info) => { this.e('moveToFront').next({ ...info, direction: 'in' }) });
+		}
+		// As a special exception for Edge, inward moveToFront also brings svg to front.
+		// Outward moveToFront already does this (see SvgArtefact.js)
+		this.e(`moveToFront`)
+			::direction('in')
+			.subscribe(this.svg.main::moveToFront);
 	}
 	
 	postCreate(options = {}) {

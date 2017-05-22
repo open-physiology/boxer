@@ -1,15 +1,16 @@
 import $ from '../libs/jquery.js';
-import {assign, pick, isFunction} from 'lodash-bound';
+import {assign, isFunction} from 'lodash-bound';
+import {Observable} from 'rxjs';
 
-import {withoutMod, stopPropagation} from 'utilities';
-import {emitWhenComplete} from '../util/misc.js';
+import {withoutMod, match} from 'utilities';
 
-import {snap45, moveToFront, ID_MATRIX, M11, M12, M21, M22} from "../util/svg";
+import {M21, M22} from "../util/svg";
 
-import Tool from './Tool';
 import {handleBoxer} from '../Coach.js';
 import {MouseTool} from './MouseTool';
 import {plainDOM} from '../libs/jquery';
+import Machine from '../util/Machine';
+import {callIfFunction} from '../util/misc';
 
 const {min, max, floor} = Math;
 
@@ -19,17 +20,25 @@ export class ResizeTool extends MouseTool {
 	init({coach}) {
 		super.init({ coach });
 		
-		/* determining proper resize highlighting */
-		coach.highlightTool.register(['IDLE'],         ['resizable'], () => this.active, () => coach.highlightTool.HIGHLIGHT_DEFAULT);
-		coach.highlightTool.register(['RESIZING_BOX'], ['previous resizable'],  () => this.active, () => coach.highlightTool.HIGHLIGHT_DEFAULT);
+		/* extend state machine */
+		const mousemove = this.windowE('mousemove');
+		const threshold = this.mouseMachine.THRESHOLD
+			.filter(() => this.active)
+			.filter(withoutMod('shift', 'ctrl', 'alt'))
+			::handleBoxer('resizable');
+		const dragging = this.mouseMachine.DRAGGING
+			.filter(() => this.active)
+			::handleBoxer('resizable');
+		const dropping = this.mouseMachine.DROPPING;
+		const escaping = this.mouseMachine.ESCAPING;
 		
 		/* determining proper resizing cursor */
 		const borderCursor = (handler) => {
-			if (!handler.directions) { return }
+			if (!handler) { return null }
 			
 			let m = handler.artefact.svg.main::plainDOM().getScreenCTM();
 			let angle = Math.atan2(m[M21], m[M22]) * 180 / Math.PI;
-			
+
 			let {x, y} = handler.directions;
 			x = (x === -1) ? '-' : (x === 1) ? '+' : '0';
 			y = (y === -1) ? '-' : (y === 1) ? '+' : '0';
@@ -51,25 +60,25 @@ export class ResizeTool extends MouseTool {
 				'nwse-resize'  // 3, 135°:  \
 			][floor((angle + 180/8) % 180 / (180/4)) % 4];
 		};
-		coach.mouseCursorTool.register(['IDLE'], ['resizable'], () => this.active, borderCursor);
-		coach.mouseCursorTool.register(['RESIZING_BOX'], ['*'], () => this.active, borderCursor);
 		
-		/* extend state machine */
-		const mousemove = this.windowE('mousemove');
-		const mouseup   = this.windowE('mouseup');
-		const dragging = this.mouseMachine.DRAGGING
-			.filter(() => this.active)
-			.filter(withoutMod('shift', 'ctrl', 'alt'))
-			::handleBoxer('resizable');
-		const dropping = this.mouseMachine.DROPPING;
-		coach.stateMachine.link('IDLE', dragging, 'RESIZING_BOX');
-		coach.stateMachine.extend(({ enterState, subscribeDuringState }) => ({
-			'RESIZING_BOX': (args) => {
-				const {point, artefact, before, after, directions} = args;
+		/* main state machine of this tool */
+		const localMachine = new Machine('ResizeTool', { state: 'IDLE' });
+		localMachine.extend(({ enterState, subscribeDuringState }) => ({
+			'IDLE': () => {
+				threshold::enterState('THRESHOLD');
+				coach.selectTool.reacquire();
+			},
+			'THRESHOLD': () => {
+				dragging::enterState('DRAGGING');
+				this.mouseMachine.IDLE::enterState('IDLE');
+			},
+			'DRAGGING': (args) => {
+				const {point, artefact, before, after, cancel, directions} = args;
 				
-				/* start resizing */
+				/* drag initialization */
 				artefact.handlesActive = false;
-				artefact.e('moveToFront').next({ direction: 'out', source: artefact });
+				coach.selectTool.reacquire();
+				artefact.moveToFront();
 				if (before::isFunction()) { before(args) }
 				
 				/* record start dimensions and mouse position */
@@ -92,15 +101,70 @@ export class ResizeTool extends MouseTool {
 							height:         start.height + directions.y * yDiff
 						});
 					});
-			
-				/* stop resizing */
-				dropping
-					.do(() => {
-						if (after::isFunction()) { after(args) }
-						artefact.handlesActive = true
+				
+				/* cancel or stop dragging */
+				Observable.merge(
+					escaping.concatMap(Observable.throw()),
+					dropping.map(({point, target}) => ({
+						dropzone: $(target).data('boxer-handlers').dropzone,
+						point
+					})).do(({dropzone}) => {
+						// artefact.parent = dropzone.artefact; // TODO: Maybe we'll need this to snap borders
+						dropzone.after::callIfFunction(args);
 					})
-					::enterState('IDLE');
+				).catch((error, caught) => {
+					/* cancel dragging */
+					artefact.transformation = start.transformation;
+					artefact.width  = start.width;
+					artefact.height = start.height;
+					cancel::callIfFunction(args);
+					return Observable.of({});
+                }).map(({point}) => {
+					/* stop dragging */
+					artefact.handlesActive = true;
+					artefact.moveToFront();
+					coach.selectTool.reacquire(point);
+					after::callIfFunction(); // TODO: pass args?
+					return { ...args, point };
+				})::enterState('IDLE');
+				
 			}
-		}), () => this.active);
+		}));
+		
+		/* mutual exclusion between this machine and other machines, coordinated by coach.stateMachine */
+		localMachine.extend(() => ({ 'OTHER_TOOL': ()=>{} }));
+		coach.stateMachine.extend(() => ({ 'IDLE': ()=>{}, 'BUSY': ()=>{} }));
+		localMachine.link('IDLE',       coach.stateMachine.BUSY.filter(({tool}) => tool !== this).map(()=>localMachine.data), 'OTHER_TOOL');
+		localMachine.link('OTHER_TOOL', coach.stateMachine.IDLE.filter(({tool}) => tool !== this).map(()=>localMachine.data), 'IDLE');
+		coach.stateMachine.link('IDLE', localMachine.DRAGGING.map(() => ({ tool: this })), 'BUSY');
+		coach.stateMachine.link('BUSY', localMachine.IDLE    .map(() => ({ tool: this })), 'IDLE');
+		
+		/* prep for highlighting and mouse cursors */
+		const handlerOrNull = (key) => (a) => (a && a.handlers[key] && a.handlers['highlightable']) ? a.handlers[key] : null;
+		const resizableArtefact = coach.p('selectedArtefact').map((originalArtefact) => {
+			let handler = handlerOrNull('resizable')(originalArtefact);
+			if (!handler) { return null }
+			return { originalArtefact, ...handler };
+		});
+		
+		/* highlighting */
+		coach.highlightTool.register(this, localMachine.p(['state', 'data']).switchMap(([state, data]) => match(state)({
+			'IDLE':       resizableArtefact,
+			'THRESHOLD':  Observable.of(data),
+			'DRAGGING':   Observable.of(data),
+			'OTHER_TOOL': Observable.of(null)
+		})).map((handler) => handler && {
+			...coach.highlightTool.HIGHLIGHT_DEFAULT,
+			artefact: handler.originalArtefact
+		}));
+		 
+		/* mouse cursors */
+		coach.mouseCursorTool.register(this, localMachine.p(['state', 'data']).switchMap(([state, data]) => match(state)({
+			'IDLE':       resizableArtefact.map(borderCursor),
+			'THRESHOLD':  Observable.of(borderCursor(data)),
+			'DRAGGING':   Observable.of(borderCursor(data)),
+			'OTHER_TOOL': Observable.of(null)
+		})));
+		
 	}
 }

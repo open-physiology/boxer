@@ -10,7 +10,7 @@ import {property, flag} from 'utilities';
 import {SvgTransformable} from './SvgTransformable.js';
 
 /**
- * Representation of an interactive rectangle in svg space.
+ * Representation of a Box corner.
  */
 export class BoxCorner extends SvgTransformable {
 	

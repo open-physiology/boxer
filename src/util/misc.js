@@ -1,4 +1,5 @@
 import {isFinite as _isFinite} from 'lodash';
+import {isFunction} from 'lodash-bound';
 import {Observable, Scheduler} from 'rxjs';
 
 export * from 'utilities';
@@ -11,6 +12,18 @@ export const _isNonNegative = (v) =>
 
 export function emitWhenComplete(value) {
 	return this.ignoreElements().concat(Observable.of(value));
+}
+
+export function withLatestFrom(stream, combinator = (a, b) => [a, b]) {
+	return Observable.create((observer) => {
+		let value;
+		const subscription1 = stream.subscribe((v) => { value = v });
+		const subscription2 = this.map(v => combinator(v, value)).subscribe(observer);
+		return () => {
+			subscription1.unsubscribe();
+			subscription2.unsubscribe();
+		};
+	}).share();
 }
 
 export function sineWave(...waves) {
@@ -36,4 +49,10 @@ export function strictSubclassOf(cls) {
 
 export function subclassOf(cls) {
 	return this === cls || this::strictSubclassOf(cls);
+}
+
+export function callIfFunction(...args) {
+	if (this::isFunction()) {
+		return this(...args);
+	}
 }

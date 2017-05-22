@@ -1,12 +1,9 @@
-import $ from '../libs/jquery.js';
-import {isFunction} from 'lodash-bound';
+import {pick} from 'lodash-bound';
 
 import Tool from './Tool';
-import {handleBoxer} from '../Coach.js';
-import {withoutMod, stopPropagation, which} from 'utilities';
+import {which} from 'utilities';
 import {emitWhenComplete} from '../util/misc.js';
 
-import {snap45, moveToFront} from "../util/svg";
 import Machine from '../util/Machine';
 import KeyCode from 'keycode-js';
 const {KEY_ESCAPE} = KeyCode;
@@ -22,15 +19,28 @@ export class MouseTool extends Tool {
 		const mouseup   = this.windowE('mouseup');
 		const keydown   = this.windowE('keydown');
 		
-		this.mouseMachine = new Machine('Mouse', { state: 'IDLE', log: 'info' });
+		this.mouseMachine = new Machine('Mouse', { state: 'IDLE' });
+		
+		let selectedArtefact = null; // TODO: Why is this needed? .withLatestFrom() isn't working.
+		coach.p('selectedArtefact').subscribe((a) => { selectedArtefact = a });
 		
 		this.mouseMachine.extend(({ enterState }) => ({
 			'IDLE': () => [
-		        this.e('mousedown')::enterState('INSIDE_DRAG_THRESHOLD'),
+		        this.e('mousedown')
+		            .filter(() => this.active)
+		            .map(e => [e, selectedArtefact])
+		            .filter(([e, a]) => !!a)
+		            .map(([e, artefact]) => ({
+			            point:    e.point,
+				        artefact: artefact,
+			            ...e::pick('shiftKey', 'ctrlKey', 'altKey')
+			        }))
+			        ::enterState('THRESHOLD'),
 		        keydown::which(KEY_ESCAPE)::enterState('ESCAPING')
 			],
-			'INSIDE_DRAG_THRESHOLD': (args) => [
+			'THRESHOLD': (args) => [
 				mousemove
+					.filter(() => this.active)
 					.take(MouseTool.DRAG_THRESHOLD)
 					.ignoreElements()
 					::emitWhenComplete(args)
@@ -48,8 +58,7 @@ export class MouseTool extends Tool {
 			'CLICKING': () => { enterState('IDLE') },
 			'DROPPING': () => { enterState('IDLE') },
 			'ESCAPING': () => { enterState('IDLE') }
-		}), () => this.active);
+		}));
 	}
 	
 }
-

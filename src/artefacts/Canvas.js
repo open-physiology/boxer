@@ -16,8 +16,8 @@ export class Canvas extends SvgArtefact {
 			},
 			drawzone: {
 				artefact: this,
-				@predicate('conjunctive') accepts({ class: cls }) {
-					return cls::subclassOf(SvgTransformable);
+				@predicate('conjunctive') accepts({ artefact }) {
+					return artefact instanceof SvgTransformable;
 				}
 			}
 		});

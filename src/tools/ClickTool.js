@@ -16,7 +16,7 @@ export class ClickTool extends MouseTool {
 	init({ coach }) {
 		super.init({ coach });
 		
-		coach.highlightTool.register(['IDLE'], ['clickable'], () => this.active, () => coach.highlightTool.HIGHLIGHT_DEFAULT);
+		// coach.highlightTool.register(['IDLE'], ['clickable'], () => this.active, () => coach.highlightTool.HIGHLIGHT_DEFAULT);
 		
 		this.mouseMachine.CLICKING.filter(() => this.active)::handleBoxer('clickable').subscribe((handler) => {
 			if (handler.handle::isFunction()) {

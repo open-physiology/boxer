@@ -8,20 +8,30 @@ import Machine from './util/Machine';
 import {Point2D} from './util/svg';
 
 import {SvgArtefact} from './artefacts/SvgArtefact.js';
-import {match} from 'utilities';
+import {match, ValueTracker} from 'utilities';
 
 
 const $$domEvents   = Symbol('$$domEvents');
 const $$tools       = Symbol('$$tools');
 const $$initialized = Symbol('$$initialized');
 
-export class Coach {
+export class Coach extends ValueTracker {
 	
-	stateMachine = new Machine('Coach', { state: 'IDLE', log: 'warn' });
+	stateMachine = new Machine('Coach', { state: 'IDLE' });
 	
 	constructor({root} = {}) {
+		super();
 		this.root = root;
 		this[$$domEvents] = {};
+		
+		// /* keep track of canvas offset */
+		// this._offset = {
+		// 	left: 0,
+		// 	top: 0
+		// };
+		// setInterval(() => {
+		// 	this._offset = this.root.svg.main.offset();
+		// }, 1000);
 	}
 	
 	addTool(tool) {
@@ -74,8 +84,7 @@ export class Coach {
 	}
 
 	enrichMouseEvent(event) {
-		event.stopPropagation(); // TODO: do we always want to do this here?
-		event.controller = $(event.currentTarget).data('boxer-controller');
+		event.stopPropagation();
 		event.point = new Point2D({
 			x:                event.pageX,
 			y:                event.pageY,
@@ -90,24 +99,45 @@ export class Coach {
 	
 }
 
+export function elementController(element) {
+	element = $(element instanceof $.Event ? element.target : element); // take an event or an element
+	let controller = null;
+	do {
+		controller = element.data('boxer-controller');
+		element = element.parent();
+	} while (!controller && element.length > 0);
+	return controller;
+}
+
+export function getHandler(key) {
+	if (this) { return this.handlers[key] }
+	return (artefact) => artefact.handlers[key];
+}
+
 export function handleBoxer(key) {
 	return this
-		.map(event => [event, $(event.target).data('boxer-handlers')[key]])
-	    .filter(v => key === '*' || !!v[1])
-		.map(([event, handlers]) => {
-			let element = $(event.target);
-			let originalArtefact = null;
-			do {
-				originalArtefact = element.data('boxer-controller');
-				element = element.parent();
-			} while (!originalArtefact);
+		.map((event)=> {
+			if (event instanceof $.Event) {
+				return [event.point, elementController(event), $(event.target).data('boxer-handlers')[key]];
+			} else if (event) {
+				const controller = event.artefact;
+				if (!controller) {
+					console.log(controller);
+					debugger;
+				}
+				return [event.point, controller, controller.handlers[key]];
+			}
+		})
+	    .filter(v => key === '*' || !!v[2])
+		.map(([point, controller, handlers]) => {
+			let originalArtefact = controller;
 			handlers = (key === '*' ? {} : handlers);
 			return {
 				...handlers,
 				handlerType: key,
 				originalArtefact,
 				artefact: handlers && handlers.artefact || originalArtefact,
-				point: event.point
+				point
 			}
 		});
 }

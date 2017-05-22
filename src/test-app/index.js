@@ -1,23 +1,24 @@
 import $ from 'jquery';
 import {assign, entries, keys} from 'lodash-bound';
-import KeyCode from 'keycode-js';
-const {KEY_ESCAPE} = KeyCode;
+import {BehaviorSubject} from 'rxjs';
 
 import {Box, Glyph, Edge, LineSegment, BoxCorner, Canvas, Coach} from '../index.js';
 import {ID_MATRIX, Point2D} from '../util/svg.js';
 
 import {HelperTool}      from '../tools/HelperTool.js';
-import {MoveTool}    from '../tools/MoveTool.js';
+import {MoveTool}        from '../tools/MoveTool.js';
 import {ResizeTool}      from '../tools/ResizeTool.js';
 import {HighlightTool}   from '../tools/HighlightTool.js'
 import {MouseCursorTool} from '../tools/MouseCursorTool.js';
-import {ClickTool} from '../tools/ClickTool';
-import {RotateTool} from '../tools/RotateTool';
-import {DrawTool} from '../tools/DrawTool';
-import {BehaviorSubject} from 'rxjs';
-import {DeleteTool} from '../tools/DeleteTool';
-import {which} from 'utilities';
+import {ClickTool}       from '../tools/ClickTool';
+import {RotateTool}      from '../tools/RotateTool';
+import {DrawTool}        from '../tools/DrawTool';
+import {DeleteTool}      from '../tools/DeleteTool';
+import {SelectTool}      from '../tools/SelectTool';
 
+import {which} from 'utilities';
+import KeyCode from 'keycode-js';
+const {KEY_ESCAPE} = KeyCode;
 
 /* canvas artefact */
 let canvas = new Canvas({
@@ -28,6 +29,7 @@ let canvas = new Canvas({
 /* coach / tools */
 const coach = new Coach({ root: canvas });
 coach
+	.addTool(new SelectTool     )
 	.addTool(new MouseCursorTool)
 	.addTool(new HighlightTool  )
 	.addTool(new HelperTool     )
@@ -37,14 +39,14 @@ coach
 	.addTool(new RotateTool     )
 	.addTool(new DeleteTool     )
 	.addTool(new DrawTool({
-		css:    { '&': { 'fill': 'white', 'stroke': 'black' } }
+		css: { '&': { 'fill': 'white', 'stroke': 'black' } }
 	}))
 	.start();
 
 
 
 /* define modes */
-const staples = [MouseCursorTool, HighlightTool, HelperTool];
+const staples = [SelectTool, HighlightTool, MouseCursorTool, HelperTool];
 const modes = {
 	'Manipulate': [[...staples, ClickTool, MoveTool, ResizeTool, RotateTool]                     ],
 	'Delete':     [[...staples, DeleteTool]                                                      ],
@@ -72,19 +74,6 @@ for (let label of modes::keys()) {
 		button.css('font-weight', active ? 'bold' : 'normal');
 	});
 }
-
-
-
-// [   ['Manipulate', { drawTool: { active: false                              }, moveTool: { active: true  }, deleteTool: { active: false }, resizeTool: { active: true  }, rotateTool: { active: true  }, clickTool: { active: true  } }],
-// 	['Delete',     { drawTool: { active: false                              }, moveTool: { active: false }, deleteTool: { active: true  }, resizeTool: { active: false }, rotateTool: { active: false }, clickTool: { active: false } }],
-// 	['Draw Box',   { drawTool: { active: true, mode: DrawTool.DRAWING_BOX   }, moveTool: { active: false }, deleteTool: { active: false }, resizeTool: { active: true  }, rotateTool: { active: false }, clickTool: { active: false } }],
-// 	['Draw Glyph', { drawTool: { active: true, mode: DrawTool.DRAWING_GLYPH }, moveTool: { active: false }, deleteTool: { active: false }, resizeTool: { active: true  }, rotateTool: { active: false }, clickTool: { active: false } }],
-// 	['Draw Edge',  { drawTool: { active: true, mode: DrawTool.DRAWING_EDGE  }, moveTool: { active: false }, deleteTool: { active: false }, resizeTool: { active: true  }, rotateTool: { active: false }, clickTool: { active: false } }]
-// ].forEach(([label, toolSettings]) => {
-//
-// });
-
-
 
 
 /* test box */
@@ -120,7 +109,7 @@ let box = new Box({
 	parent: bigBox,
 	width: 100,
 	height: 80,
-	transformation: ID_MATRIX.translate(70, 70).rotate(45)
+	transformation: ID_MATRIX.translate(70, 70)//.rotate(45)
 });
 box.corners.top.left .rounded = true;
 box.corners.top.right.rounded = true;

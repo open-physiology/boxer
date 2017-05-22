@@ -20,6 +20,7 @@ export class SvgArtefact extends ValueTracker {
 	@property({ initial: null, isValid: (v) => (!v || v instanceof SvgArtefact) }) parent;
 	@flag({ initial: false })                                                      deleted;
 	
+	
 	@event() moveToFrontEvent;
 	@event() clickEvent;
 	
@@ -72,6 +73,13 @@ export class SvgArtefact extends ValueTracker {
 			source: this.p('parent').switchMap(p => p ? p.p('root') : Observable.of(this))
 		});
 		
+		/* keep track of nesting depth */
+		this.newProperty('depth', {
+			source: this.p('parent').switchMap(p => p ? p.p('depth').map(d=>d+1) : Observable.of(0)),
+			isEqual: () => false, // always re-emit depth when parent changes
+			allowSynchronousAccess: true
+		});
+		
 		/* propagate moveToFront event */
 		const thisArtefact = this;
 		function direction(d)     { return this.filter(({direction}) => (direction === d)) }
@@ -101,11 +109,6 @@ export class SvgArtefact extends ValueTracker {
 	postCreate(options = {}) {
 		/* what to do when this is deleted */
 		this.p('deleted').filter(d=>!!d).take(1).subscribe(() => {
-			
-			if (!this) {
-				
-			}
-			
 			this.svg.main.remove();
 			this.parent = null;
 		});
@@ -120,7 +123,6 @@ export class SvgArtefact extends ValueTracker {
 				handle: (val) => { this.e('click').next(val) }
 			}
 		});
-		
 		
 		/* set css inheritance chains */
 		const inheritedProperties = {
@@ -181,6 +183,26 @@ export class SvgArtefact extends ValueTracker {
 	
 	moveToFront() {
 		this.e('moveToFront').next({ direction: 'out', source: this });
+		this.e('moveToFront').next({ direction: 'in',  source: this });
+	}
+	
+	get depth() {
+		if (this.parent) { return this.parent.depth + 1 }
+		else             { return 0 }
+	} // TODO: ValueTracked doesn't allow synchronous access using .newProperty() yet
+	
+	closestCommonAncestorWith(other: SvgArtefact): SvgArtefact {
+		if (this.depth < other.depth) { return other.closestCommonAncestorWith(this) }
+		let thisAncestor = this;
+		let otherAncestor = other;
+		while (thisAncestor.depth > otherAncestor.depth) {
+			thisAncestor = thisAncestor.parent;
+		}
+		while (thisAncestor !== otherAncestor) {
+			thisAncestor  = thisAncestor.parent;
+			otherAncestor = otherAncestor.parent;
+		}
+		return thisAncestor;
 	}
 	
 }

@@ -1,7 +1,7 @@
 import assert from 'power-assert';
 import $      from '../libs/jquery.js';
 import {isBoolean as _isBoolean} from 'lodash';
-import {entries, isEmpty} from 'lodash-bound';
+import {entries, isEmpty, isArray, pull} from 'lodash-bound';
 import {Observable} from 'rxjs';
 
 import {ID_MATRIX, Point2D} from '../util/svg.js';
@@ -13,6 +13,8 @@ import {LineSegment}      from './LineSegment.js';
 import {BoxCorner}        from './BoxCorner.js';
 import {predicate} from '../Coach';
 import {subclassOf} from '../util/misc';
+import {MX, MY} from '../util/svg';
+import {BoxBorder} from './BoxBorder';
 
 const {max} = Math;
 
@@ -31,10 +33,7 @@ export class Box extends SvgTransformable {
 	@property({ isValid: _isNonNegative, initial: MIN_MIN_SIZE, transform(w) { return max(w || MIN_MIN_SIZE, this.minWidth  || MIN_MIN_SIZE) } }) width;
 	@property({ isValid: _isNonNegative, initial: MIN_MIN_SIZE, transform(h) { return max(h || MIN_MIN_SIZE, this.minHeight || MIN_MIN_SIZE) } }) height;
 	
-	@flag({ isValid: _isBoolean, initial: false }) tlRoundedCorner;
-	@flag({ isValid: _isBoolean, initial: false }) trRoundedCorner;
-	@flag({ isValid: _isBoolean, initial: false }) blRoundedCorner;
-	@flag({ isValid: _isBoolean, initial: false }) brRoundedCorner;
+	@property() stuckToBorder; // TODO: more elegant solution
 	
 	preCreate(options) {
 		super.preCreate(options);
@@ -88,12 +87,12 @@ export class Box extends SvgTransformable {
 			['bottom', 0, +1],
 			['left',  -1,  0]
 		]) {
-			this.borders[key] = new LineSegment({
+			this.borders[key] = new BoxBorder({
 				parent: this,
 				lengthen1: -BoxCorner.RADIUS,
-				lengthen2: -BoxCorner.RADIUS
+				lengthen2: -BoxCorner.RADIUS,
+				side:      {key, x, y}
 			});
-			this.borders[key].svg.main.addClass('boxer-BoxBorder');
 			this.borders[key].registerHandlers({
 				resizable: {
 					artefact: this,
@@ -105,6 +104,19 @@ export class Box extends SvgTransformable {
 					artefact: this,
 					effect: {
 						elements: this.borders[key].svg.overlay
+					}
+				},
+				dropzone: {
+					artefact: this, // TODO: change to border artefact
+					after: ({artefact}) => {
+						if (artefact instanceof Box) {
+							artefact.parent = this;
+							if (!artefact.stuckToBorder::isArray()) {
+								artefact.stuckToBorder = [];
+							}
+							artefact.stuckToBorder = [...artefact.stuckToBorder, {x, y}];
+							// TODO: more elegant and universal implementation
+						}
 					}
 				}
 			});
@@ -132,8 +144,8 @@ export class Box extends SvgTransformable {
 					artefact: this,
 					effect: {
 						elements: this.corners[key].svg.overlay
-			                           .add(this.borders[s1].svg.overlay)
-			                           .add(this.borders[s2].svg.overlay)
+                                      .add(this.borders[s1].svg.overlay)
+                                      .add(this.borders[s2].svg.overlay)
 					}
 				}
 			});
@@ -179,6 +191,23 @@ export class Box extends SvgTransformable {
 				this.borders[s].point1 = cp1.p;
 				this.borders[s].point2 = cp2.p;
 			}
+		});
+		
+		/* parent resizing */
+		this.p(['width', 'height', 'parent.width', 'parent.height', 'stuckToBorder']).subscribe(([w, h, pw, ph, stb]) => {
+			if (!stb || stb.length === 0) { return }
+			const stX = [...new Set(stb.map(({x}) => x))];
+			const stY = [...new Set(stb.map(({y}) => y))];
+			if (stX.length > 1) { stX::pull(0) }
+			if (stY.length > 1) { stY::pull(0) }
+			if (stX.length === 2) { w = pw }
+			if (stY.length === 2) { h = ph }
+			const [x, y] = [stX[0], stY[0]];
+			const oldX = this.transformation[MX];
+			const oldY = this.transformation[MY];
+			this.transformation = ID_MATRIX.translate(!x * oldX + x*(pw-w)/2, !y * oldY + y*(ph-h)/2).rotate(0);  // TODO
+			this.width = w;
+			this.height = h;
 		});
 		
 		/* keep overlay outline updated */
@@ -227,11 +256,16 @@ export class Box extends SvgTransformable {
 		this.registerHandlers({
 			movable:   { artefact: this },
 			rotatable: { artefact: this },
-			dropzone:  { artefact: this },
+			dropzone:  {
+				artefact: this,
+				after: ({artefact}) => {
+					artefact.parent = this;
+				}
+			},
 			drawzone: {
 				artefact: this,
-				@predicate('conjunctive') accepts({ class: cls }) {
-					return cls::subclassOf(SvgTransformable);
+				@predicate('conjunctive') accepts({ artefact }) {
+					return artefact instanceof SvgTransformable;
 				}
 			},
 			highlightable: {

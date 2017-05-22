@@ -4,10 +4,10 @@ import {ValueTracker, property} from 'utilities';
 export default class Machine extends ValueTracker {
 	
 	@property({ initial: null }) state;
+	@property({ initial: null }) data;
 	
 	name          = null;
 	subscriptions = [];
-	data          = null;
 	
 	constructor(name, {state, data, log}) {
 		super();
@@ -53,20 +53,26 @@ export default class Machine extends ValueTracker {
 		};
 		/* extend descriptions */
 		let result = descFn(boundFunctions);
+		let subscribers = [];
 		for (let [key, fn] of result::toPairs()) {
 			if (this[key]::isUndefined()) {
 				this[key] = this.newEvent(key);
 			}
-			this.e(key).filter(runCondition).subscribe((data) => {
+			const subscriber = this.e(key).filter(runCondition).subscribe((data) => {
 				this.enterSpecifiedState(fn);
 			});
+			subscribers.push(subscriber);
 		}
 		/* run if it says something about the current state */
 		if (this.state in result && runCondition()) {
 			this.enterSpecifiedState(result[this.state]);
 		}
-		/* return machine itself */
-		return this;
+		/* return a way to undo the extension */
+		return () => {
+			for (const sub of subscribers) {
+				sub.unsubscribe();
+			}
+		};
 	}
 	
 	unsubscribe() {
@@ -79,8 +85,7 @@ export default class Machine extends ValueTracker {
 	enterState(state, data) {
 		this.unsubscribe();
 		this.log(`${this.name} - entering state: '${state}'`, [data]);
-		this.state = state;
-		this.data  = data;
+		[this.state, this.data] = [state, data];
 		this.e(state).next(data);
 	}
 	

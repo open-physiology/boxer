@@ -1,17 +1,17 @@
-import $ from '../libs/jquery.js';
 import {isFunction} from 'lodash-bound';
 
 import {TweenLite} from 'gsap/TweenLite';
 
-import Tool from './Tool';
 import {handleBoxer} from '../Coach.js';
-import {withoutMod, stopPropagation, withMod} from 'utilities';
-import {emitWhenComplete} from '../util/misc.js';
+import {withoutMod, withMod, match} from 'utilities';
 
-import {snap45, moveToFront, rotateAroundPoint, M21, M22, MX, MY, Point2D} from "../util/svg";
+import {M21, M22, Point2D} from "../util/svg";
 import {MouseTool} from './MouseTool';
 import {plainDOM} from '../libs/jquery';
 import {Observable} from 'rxjs';
+import {callIfFunction} from '../util/misc';
+import Machine from '../util/Machine';
+import CSSPrefix from 'cssprefix/src/cssprefix';
 
 const {floor, abs, round, atan2, PI} = Math;
 
@@ -23,40 +23,54 @@ export class RotateTool extends MouseTool {
 	init({ coach }) {
 		super.init({ coach });
 		
+		/* relevant mouse events */
 		const mousemove = this.windowE('mousemove');
-		const mouseup   = this.windowE('mouseup');
-		
+		const threshold = this.mouseMachine.THRESHOLD
+			.filter(() => this.active)
+			.filter(withMod('shift')).filter(withoutMod('ctrl', 'alt'))
+			::handleBoxer('rotatable');
 		const dragging = this.mouseMachine.DRAGGING
 			.filter(() => this.active)
-			.filter(withMod('shift'));
+			::handleBoxer('rotatable');
 		const dropping = this.mouseMachine.DROPPING;
-		coach.stateMachine
-		     .link('IDLE', dragging::handleBoxer('rotatable'), 'ROTATING');
+		const escaping = this.mouseMachine.ESCAPING;
 		
-		coach.stateMachine.extend(({ enterState, subscribeDuringState }) => ({
-			'ROTATING': (args) =>  {
-				const {point, artefact, before, after, referencePoint = point} = args;
+		/* main state machine of this tool */
+		const localMachine = new Machine(this.constructor.name, { state: 'IDLE' });
+		localMachine.extend(({ enterState, subscribeDuringState }) => ({
+			'IDLE': () => {
+				threshold::enterState('THRESHOLD');
+				coach.selectTool.reacquire();
+			},
+			'THRESHOLD': () => {
+				dragging::enterState('DRAGGING');
+				this.mouseMachine.IDLE::enterState('IDLE');
+			},
+			'DRAGGING': (args) => {
+				const {point, artefact, before, after, cancel, referencePoint = point} = args;
 				
-				/* start rotating */
-				if (before::isFunction()) { before(args) }
+				/* drag initialization */
 				artefact.handlesActive = false;
+				coach.selectTool.reacquire();
 				artefact.moveToFront();
+				if (before::isFunction()) { before(args) }
 				
 				/* pre-processing */
-				const initialTransformation = artefact.transformation;
-				const startAngle            = atan2(initialTransformation[M21], initialTransformation[M22]) * 180 / PI;
-				const nonRotatedMatrix      = initialTransformation.rotate(-startAngle); // TODO: faster way to get non-rotated version of matrix (resetting M21 and M22?)
-				const center                = Point2D.fromMatrixTranslation(nonRotatedMatrix, artefact.svg.main.parent()::plainDOM());
-				const initialMouseAngle     = referencePoint.minus(center).angle();
+				const start = {};
+				start.transformation           = artefact.transformation;
+				start.angle                    = atan2(start.transformation[M21], start.transformation[M22]) * 180 / PI;
+				start.nonRotatedTransformation = start.transformation.rotate(-start.angle); // TODO: faster way to get non-rotated version of matrix (resetting M21 and M22?)
+				start.center                   = Point2D.fromMatrixTranslation(start.nonRotatedTransformation, artefact.svg.main.parent()::plainDOM());
+				start.mouseAngle               = referencePoint.minus(start.center).angle() - start.angle;
 				
 				/* rotate while dragging */
 				let tracking = {
 					snapping: false,
-					angle:    startAngle
+					angle:    start.angle
 				};
 				mousemove.map((moveEvent) => {
-					let angle = moveEvent.point.minus(center).angle();
-					angle -= initialMouseAngle - startAngle;
+					let angle = moveEvent.point.minus(start.center).angle();
+					angle -= start.mouseAngle;
 					tracking.snapping = moveEvent.ctrlKey;
 					if (tracking.snapping) {
 						angle = round(angle / RotateTool.SNAP_ANGLE) * RotateTool.SNAP_ANGLE;
@@ -66,37 +80,79 @@ export class RotateTool extends MouseTool {
 					if (tracking.snapping) {
 						let diff = angle - tracking.angle;
 						while (diff < -180) { angle += 360; diff += 360; }
-						while (diff > +180) { angle -= 360; diff -= 360 }
+						while (diff > +180) { angle -= 360; diff -= 360; }
 						return Observable.create((obs) => TweenLite.to(
 							tracking,
 							abs(diff) / 45 * 0.2,
 							{
-								angle: angle,
+								angle,
 								ease: TweenLite.Power3.easeOut,
 								onUpdate: ::obs.next,
-								onComplete: () => {
-									tracking.angle = (tracking.angle % 360 + 360) % 360;
-								}
+								onComplete: () => { tracking.angle = (tracking.angle % 360 + 360) % 360 }
 							}
-						)).map(()=>tracking.angle);
+						)).share().map(()=>tracking.angle);
 					} else {
 						return Observable.of(angle);
 					}
 				})::subscribeDuringState((angle) => {
-					artefact.transformation = nonRotatedMatrix.rotate(angle);
+					artefact.transformation = start.nonRotatedTransformation.rotate(angle);
 				});
 				
-				/* stop rotating on mouseup */
-				dropping
-					.do(() => {
-						artefact.handlesActive = true;
-						artefact.moveToFront();
-						if (after::isFunction()) { after(args) }
-					})
-					::enterState('IDLE');
+				/* cancel or stop dragging */
+				Observable.merge(
+					escaping.concatMap(Observable.throw()),
+					dropping
+				).catch((error, caught) => {
+					/* cancel dragging */
+					artefact.transformation = start.transformation;
+					cancel::callIfFunction(args);
+					return Observable.of({});
+                }).do(({point}) => {
+					/* stop dragging */
+					artefact.handlesActive = true;
+					coach.selectTool.reacquire(point);
+					after::callIfFunction(); // TODO: pass args?
+				})::enterState('IDLE');
 				
 			}
-		}), () => this.active);
+		}));
+		
+		/* mutual exclusion between this machine and other machines, coordinated by coach.stateMachine */
+		localMachine.extend(() => ({ 'OTHER_TOOL': ()=>{} }));
+		coach.stateMachine.extend(() => ({ 'IDLE': ()=>{}, 'BUSY': ()=>{} }));
+		localMachine.link('IDLE',       coach.stateMachine.BUSY.filter(({tool}) => tool !== this).map(()=>localMachine.data), 'OTHER_TOOL');
+		localMachine.link('OTHER_TOOL', coach.stateMachine.IDLE.filter(({tool}) => tool !== this).map(()=>localMachine.data), 'IDLE');
+		coach.stateMachine.link('IDLE', localMachine.DRAGGING.map(() => ({ tool: this })), 'BUSY');
+		coach.stateMachine.link('BUSY', localMachine.IDLE    .map(() => ({ tool: this })), 'IDLE');
+		
+		/* prep for highlighting and mouse cursors */
+		const handlerOrNull = (key) => (a) => (a && a.handlers[key] && a.handlers['highlightable']) ? a.handlers[key].artefact : null;
+		const rotatableArtefact = coach.p('selectedArtefact').map((originalArtefact) => {
+			let handler = handlerOrNull('rotatable')(originalArtefact);
+			if (!handler) { return null }
+			return { originalArtefact, ...handler };
+		});
+		
+		/* highlighting */
+		coach.highlightTool.register(this, localMachine.p(['state', 'data']).switchMap(([state, data]) => match(state)({
+			'IDLE':       rotatableArtefact,
+			'THRESHOLD':  Observable.of(data),
+			'DRAGGING':   Observable.of(data),
+			'OTHER_TOOL': Observable.of(null)
+		})).map(handler => handler && {
+			...coach.highlightTool.HIGHLIGHT_DEFAULT,
+			artefact: handler.originalArtefact
+		}));
+		
+		/* mouse cursors */
+		const grabCursor     = CSSPrefix.getValue('cursor', 'grab'    );
+		const grabbingCursor = CSSPrefix.getValue('cursor', 'grabbing');
+		coach.mouseCursorTool.register(this, localMachine.p('state').startWith(null).pairwise().switchMap(([prev, next]) => match(next)({
+			'IDLE':       rotatableArtefact.map(ma => ma && grabCursor).startWith(prev && grabCursor),
+			'THRESHOLD':  Observable.of(grabbingCursor),
+			'DRAGGING':   Observable.of(grabbingCursor),
+			'OTHER_TOOL': Observable.of(null)
+		})));
 		
 	}
 	
