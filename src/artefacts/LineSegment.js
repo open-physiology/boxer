@@ -66,8 +66,8 @@ export class LineSegment extends SvgArtefact {
 				   .add(overlayLine)
 				   .add(handleLine)
 				   .attr({
-						...p1.withDistanceTo(-l1, p2).obj('x1', 'y1'),
-						...p2.withDistanceTo(-l2, p1).obj('x2', 'y2')
+						...p1.withDistanceTo(-l2, p2).obj('x1', 'y1'),
+						...p2.withDistanceTo(-l1, p1).obj('x2', 'y2')
 					});
 			});
 		
@@ -75,11 +75,11 @@ export class LineSegment extends SvgArtefact {
 	}
 	
 	get inkPoint1() {
-		return this.point1.withDistanceTo(-this.lengthen1, this.point2);
+		return this.point1.withDistanceTo(-this.lengthen2, this.point2);
 	}
 	
 	get inkPoint2() {
-		return this.point2.withDistanceTo(-this.lengthen2, this.point1);
+		return this.point2.withDistanceTo(-this.lengthen1, this.point1);
 	}
 	
 }

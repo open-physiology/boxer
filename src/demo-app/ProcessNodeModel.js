@@ -12,12 +12,14 @@ export class ProcessNodeModel extends Model {
 	
 	@property()                                         parent;
 	@property({ isValid: v => v instanceof SVGMatrix }) transformation;
+	@flag({ initial: false })                           internal;
 	
 	toJSON() {
 		return {
 			...super.toJSON(),
 			parent: this.parent && this.parent.id,
-			transformation: this.transformation::at('a', 'b', 'c', 'd', 'e', 'f')
+			transformation: this.transformation::at('a', 'b', 'c', 'd', 'e', 'f'),
+			internal: this.internal
 		};
 	}
 	
@@ -31,6 +33,7 @@ export class ProcessNodeModel extends Model {
 		`);
 		result.parent = json.parent && modelsById[json.parent];
 		result.transformation = createSVGMatrix(...json.transformation);
+		result.internal = json.internal;
 		return result;
 	}
 	

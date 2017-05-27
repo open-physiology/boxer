@@ -108,11 +108,6 @@ export class LyphModel extends Model {
 	}
 	
 	setFromData(data) {
-		
-		
-		console.info('----', data.name);
-		
-		
 		if (data.name)     { this.name     = data.name     }
 		if (data.external) { this.external = data.external }
 		if (data.topology) {

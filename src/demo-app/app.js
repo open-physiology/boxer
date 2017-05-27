@@ -349,10 +349,6 @@ export class DemoApp {
 			delete this.artefactsById[newModel.id];
 		});
 		
-		
-		console.log(newModel.name);
-		
-		
 		/* register + delete handling */
 		const models = isLyph ? this.lyphModels : isGlyph ? this.nodeModels : this.processModels;
 		Observable.of(null)

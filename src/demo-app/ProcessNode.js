@@ -56,5 +56,23 @@ export class ProcessNode extends Glyph {
 			.subscribe( this.p('parent') );
 	}
 	
+	postCreate(options = {}) {
+		super.postCreate(options);
+		
+		/* toggle internal node status */
+		this.e('click').subscribe(() => {
+			this.model.internal = !this.model.internal;
+		});
+		
+		/* reflect internal node status visually */
+		this.p('model.internal').subscribe((internal) => {
+			this.radius = internal ? 4 : 6;
+			this.setCSS({
+				'&': { fill: internal ? 'black' : 'white' }
+			});
+		});
+		
+	}
+	
 	
 }

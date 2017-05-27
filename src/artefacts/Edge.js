@@ -23,8 +23,8 @@ export class Edge extends LineSegment {
 	
 	preCreate(options = {}) {
 		super.preCreate({
-			lengthen1: -Glyph.RADIUS,
-			lengthen2: -Glyph.RADIUS,
+			// lengthen1: -Glyph.RADIUS,
+			// lengthen2: -Glyph.RADIUS,
 			...options
 		});
 		
@@ -47,9 +47,12 @@ export class Edge extends LineSegment {
 			    .subscribe( this.p(`point${g}`) );
 		}
 		
-		// TODO: There's a bug when dragging a node into a new parent box.
-		//     : Its connected edges will stop following it, but will still follow its old parent.
-		//     :
+		/* lengthen/shorten the line segment when the glyph radii change */
+		for (let g of [1, 2]) {
+			this.p(`glyph${g}.radius`)
+			    .map(r => -r)
+			    .subscribe( this.p(`lengthen${g}`) );
+		}
 		
 		/* propagate moveToFront  */
 		const thisArtefact = this;
@@ -82,8 +85,8 @@ export class Edge extends LineSegment {
 				p1 = p1.in(parent.svg.children);
 				p2 = p2.in(parent.svg.children);
 				$(inkLineOutline).attr({
-					...p1.withDistanceTo(-l1, p2).obj('x1', 'y1'),
-					...p2.withDistanceTo(-l2, p1).obj('x2', 'y2')
+					...p1.withDistanceTo(-l2, p2).obj('x1', 'y1'),
+					...p2.withDistanceTo(-l1, p1).obj('x2', 'y2')
 				});
 			});
 		

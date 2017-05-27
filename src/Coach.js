@@ -99,6 +99,7 @@ export class Coach extends ValueTracker {
 	
 }
 
+
 export function elementController(element) {
 	element = $(element instanceof $.Event ? element.target : element); // take an event or an element
 	let controller = null;
@@ -109,10 +110,12 @@ export function elementController(element) {
 	return controller;
 }
 
+
 export function getHandler(key) {
 	if (this) { return this.handlers[key] }
 	return (artefact) => artefact.handlers[key];
 }
+
 
 export function handleBoxer(key) {
 	return this
@@ -121,10 +124,6 @@ export function handleBoxer(key) {
 				return [event.point, elementController(event), $(event.target).data('boxer-handlers')[key]];
 			} else if (event) {
 				const controller = event.artefact;
-				if (!controller) {
-					console.log(controller);
-					debugger;
-				}
 				return [event.point, controller, controller.handlers[key]];
 			}
 		})
@@ -142,16 +141,6 @@ export function handleBoxer(key) {
 		});
 }
 
-// export function setEffectStyle(css) {
-// 	if (this.effect.elements) {
-// 		this.effect.elements.css(css);
-// 	}
-// 	if (this.effect.selector) {
-// 		this.artefact.setCSS({
-// 			[this.effect.selector]: css
-// 		});
-// 	}
-// }
 
 export function smartMerge(other) {
 	this::mergeWith(other, (val1, val2) => {

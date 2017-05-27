@@ -14,8 +14,8 @@ import {SvgTransformable} from './SvgTransformable.js';
  */
 export class Glyph extends SvgTransformable {
 	
-	static RADIUS = 6;
-
+	@property({ initial: 6 }) radius;
+	
 	preCreate(options) {
 		super.preCreate(options);
 		
@@ -24,21 +24,21 @@ export class Glyph extends SvgTransformable {
 	create(options = {}) {
 		super.create(options);
 		
-		$.svg('<circle>').attr({
-			r: Glyph.RADIUS + 2,
+		const handle = $.svg('<circle>').attr({
+			// r: Glyph.RADIUS + 2,
 			cx: 0, cy: 0,
 			strokeWidth: 'inherit',
 		}).appendTo(this.svg.handles);
 		
-		$.svg('<circle>').attr({
-			r: Glyph.RADIUS,
+		const ink = $.svg('<circle>').attr({
+			// r: Glyph.RADIUS,
 			cx: 0, cy: 0,
 			stroke:      'inherit',
 			fill:        'inherit'
 		}).appendTo(this.svg.ink);
 		
-		$.svg('<circle>').attr({
-			r: Glyph.RADIUS,
+		const overlay = $.svg('<circle>').attr({
+			// r: Glyph.RADIUS,
 			cx: 0, cy: 0,
 			stroke:           'inherit',
 			strokeWidth:      'inherit',
@@ -46,6 +46,13 @@ export class Glyph extends SvgTransformable {
 			strokeDashoffset: 'inherit',
 			fill:             'transparent'
 		}).appendTo(this.svg.overlay);
+		
+		this.p('radius').subscribe((r) => {
+			handle.attr('r', r + 2);
+			$().add(ink).add(overlay).attr('r', r);
+		});
+		
+		
 	}
 	
 	postCreate(options = {}) {
