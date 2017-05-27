@@ -143,7 +143,7 @@ export class LyphModel extends Model {
 		}
 		
 		this.layerCount = data.layers ? data.layers.length : 0;
-		for (let i = 0; i < this.layerCount; ++i) {
+		for (let i = this.layerCount - 1; i >= 0; --i) {
 			let layerModel = new LyphModel();
 			layerModel.parent = this;
 			layerModel.layerNr = i;

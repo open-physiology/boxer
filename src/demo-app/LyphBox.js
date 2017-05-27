@@ -218,6 +218,10 @@ export class LyphBox extends Box {
 			            ...this.borders,
 			            ...this.corners
 			        }::values()) { outline.handlesActive = false }
+			        if (layerNr !== 0) {
+				        this.corners.bl.svg.main.css({ opacity: 0 });
+				        this.corners.br.svg.main.css({ opacity: 0 });
+			        }
 			    }
 		    });
 		
@@ -239,7 +243,7 @@ export class LyphBox extends Box {
 				this.height         = ph / plc;
 			    this.transformation = ID_MATRIX.translate(
 			    	0,
-				    ln * this.height + this.height/2 - ph/2
+				    ph/2 - ln * this.height - this.height/2
 			    );
 			});
 		
