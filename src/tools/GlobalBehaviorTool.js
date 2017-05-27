@@ -1,6 +1,6 @@
 import $ from '../libs/jquery.js';
 
-import {Observable} from 'rxjs';
+import {Observable} from '../libs/expect-rxjs.js';
 
 import {keys, entries, values, isEmpty, isUndefined} from 'lodash-bound';
 
@@ -48,8 +48,8 @@ export class GlobalBehaviorTool extends Tool {
 		
 		Observable.combineLatest(...(this[$$values] || []))
 			// .debounceTime(0) // <-- to skip inconsistent intermediate combination states
-			.subscribe((vals) => {
-				
+			.subscribe((vals) => { try {
+			
 				vals = vals.filter(v=>!!v);
 				
 				let newValue;
@@ -64,8 +64,8 @@ export class GlobalBehaviorTool extends Tool {
 				if (newValue)     { this.activateBehavior(newValue)       }
 				
 				currentValue = newValue;
-				
-			}, ::console.error);
+					
+			} catch (err) { console.error(err) }}, ::console.error);
 		
 	}
 	

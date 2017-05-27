@@ -32,11 +32,6 @@ export class BoxCorner extends SvgTransformable {
 			strokeWidth: 'inherit',
 		}).appendTo(this.svg.handles);
 		
-		const fillPath = $.svg(`<path>`).css({
-			fill:       'inherit',
-			strokeWidth: 0
-		}).appendTo(this.svg.ink);
-		
 		const inkPath = $.svg(`<path>`).css({
 			fill:             'transparent',
 			stroke:           'inherit',
@@ -70,7 +65,6 @@ export class BoxCorner extends SvgTransformable {
 		this.p('rounded').subscribe((r) => {
 			handlePath       .attr({ d: outerCorner(0)       });
 			inkPath          .attr({ d: outerCorner(r)       });
-			fillPath         .attr({ d: outerCorner(r)       });
 			overlayFillPath  .attr({ d: outerCorner(r) + 'Z' });
 			overlayStrokePath.attr({ d: innerCorner          });
 		});
@@ -80,12 +74,12 @@ export class BoxCorner extends SvgTransformable {
 	postCreate(options = {}) {
 		super.postCreate(options);
 		
-		/* set the stroke-width of part of the overlay based on part of the ink */
-		// this is a special styling rule for BoxCorner
-		// that doesn't fit our css 'inherit' scheme
-		const source = this.svg.ink    .children('[style*="stroke: inherit"]');
-		const target = this.svg.overlay.children('[style*="stroke: black"]');
-		target.css({ strokeWidth: source.css('stroke-width') });
+		setTimeout(() => {
+			/* set the stroke-width of part of the overlay based on part of the ink */
+			const source = this.svg.ink    .children('[style*="stroke: inherit"]');
+			const target = this.svg.overlay.children('[style*="stroke: black"]');
+			target.css({ strokeWidth: getComputedStyle(source[0])['stroke-width'] });
+		});
 	}
 	
 }

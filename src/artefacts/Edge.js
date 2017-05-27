@@ -1,5 +1,6 @@
 import assert from 'power-assert';
-import {Observable} from 'rxjs';
+import $      from '../libs/jquery.js';
+import {Observable} from '../libs/expect-rxjs.js';
 
 import {isEmpty, isUndefined} from 'lodash-bound';
 
@@ -27,22 +28,21 @@ export class Edge extends LineSegment {
 			...options
 		});
 		
-		
 		/* initializing glyphs */
 		for (let g of [1, 2]) {
-			assert(options[`glyph${g}`]);
+			// assert(options[`glyph${g}`]);
 			this[`glyph${g}`] = options[`glyph${g}`];
 		}
 		
 		/* re-parenting this Edge when either of the glyphs re-parent */
 		this.p(['glyph1', 'glyph2']).filter(([g1, g2]) => g1 && g2).switchMap(([g1, g2]) => Observable.combineLatest(
-			g1.p('depth').filter(d => !d::isUndefined()),
-			g2.p('depth').filter(d => !d::isUndefined())
-		).map(() => g1.closestCommonAncestorWith(g2))).subscribe(this.p('parent'));
+			g1.p('depth').filter(d => !d::isUndefined() && !g1.deleted),
+			g2.p('depth').filter(d => !d::isUndefined() && !g2.deleted)
+		).map(() => g1.closestCommonAncestorWith(g2))).subscribe( this.p('parent') );
 		
+		/* moving the line segment when the glyphs move */
 		for (let g of [1, 2]) {
-			/* moving the line segment when the glyphs move */
-			this.p([`glyph${g}?.globalTransformation`], ['root'])
+			this.p([`glyph${g}.globalTransformation`], ['root'])
 			    .map(([gt, root]) => Point2D.fromMatrixTranslation(gt, root.svg.main))
 			    .subscribe( this.p(`point${g}`) );
 		}
@@ -62,9 +62,31 @@ export class Edge extends LineSegment {
 		}
 		// As a special exception for Edge, inward moveToFront also brings svg to front.
 		// Outward moveToFront already does this (see SvgArtefact.js)
-		this.e(`moveToFront`)
+		this.e('moveToFront')
 			::direction('in')
 			.subscribe(this.svg.main::moveToFront);
+	}
+	
+	create(options = {}) {
+		super.create(options);
+		
+		
+		const inkLineOutline = $.svg('<line>').css({
+			stroke:           'black',
+			strokeWidth:      '4'
+		}).prependTo(this.svg.ink);
+		
+		this.p(['parent', 'point1', 'point2', 'lengthen1', 'lengthen2'])
+		    .filter(([parent, p1, p2]) => parent && p1 && p2)
+		    .subscribe(([parent, p1, p2, l1, l2]) => {
+				p1 = p1.in(parent.svg.children);
+				p2 = p2.in(parent.svg.children);
+				$(inkLineOutline).attr({
+					...p1.withDistanceTo(-l1, p2).obj('x1', 'y1'),
+					...p2.withDistanceTo(-l2, p1).obj('x2', 'y2')
+				});
+			});
+		
 	}
 	
 	postCreate(options = {}) {
@@ -93,8 +115,9 @@ export class Edge extends LineSegment {
 				after:  () => { this.handlesActive = true  }
 			}
 		};
-		this.glyph1.registerHandlers(handlers);
-		this.glyph2.registerHandlers(handlers);
+		this.p('glyph1').filter(g=>!!g).subscribe((glyph1) => { glyph1.registerHandlers(handlers) });
+		this.p('glyph2').filter(g=>!!g).subscribe((glyph2) => { glyph2.registerHandlers(handlers) });
+		// this.glyph2.registerHandlers(handlers);
 		
 		/***/
 		super.postCreate(options);

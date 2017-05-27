@@ -1,7 +1,7 @@
 import $ from 'jquery';
 import Tool from './Tool';
 import {handleBoxer} from '../Coach.js';
-import {Observable} from 'rxjs';
+import {Observable} from '../libs/expect-rxjs.js';
 import {withMod, flag} from 'utilities';
 import {elementController} from '../Coach';
 import {Point2D} from '../util/svg';
@@ -46,15 +46,13 @@ export class SelectTool extends Tool {
 				if (!artefact) {
 					observer.next(null);
 				} else {
-					if (!artefact.svg) {
-						console.log(artefact);
-						debugger;
-					}
 					const element = artefact.svg.handles.find('*')[0];
-					observer.next({
-						artefact: elementController(element),
-						point: new Point2D({ x: 0, y: 0, coordinateSystem: element })
-					});
+					if (element) {
+						observer.next({
+							artefact: elementController(element),
+							point: new Point2D({ x: 0, y: 0, coordinateSystem: element })
+						});
+					}
 				}
 			};
 			return () => {

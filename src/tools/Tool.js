@@ -1,7 +1,7 @@
 import {ValueTracker, flag, property} from 'utilities';
 import $                    from '../libs/jquery.js';
 import {isUndefined}        from 'lodash-bound';
-import {Observable}         from 'rxjs';
+import {Observable}         from '../libs/expect-rxjs.js';
 
 
 export default class Tool extends ValueTracker {

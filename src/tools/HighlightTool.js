@@ -42,20 +42,18 @@ export class HighlightTool extends GlobalBehaviorTool {
 		this.currentValue = null;
 		/* set styling */
 		const handler = previous.artefact.handlers.highlightable;
+		if (!handler) { return }
 		const css = { opacity: 0 };
-		if (handler.effect.elements) { handler.effect.elements.css(css)                 }
-		if (handler.effect.selector) { artefact.setCSS({ [this.effect.selector]: css }) }
+		if (handler.effect.elements) { handler.effect.elements.css(css)                    }
+		if (handler.effect.selector) { artefact.setCSS({ [handler.effect.selector]: css }) }
 	}
 	
 	activateBehavior(current) {
 		/* set value */
 		this.currentValue = current;
 		/* set styling */
-		if (!current.artefact || !current.artefact.handlers) {
-			console.log(current);
-			debugger;
-		}
 		const handler = current.artefact.handlers.highlightable;
+		if (!handler) { return }
 		const css = {
 			strokeWidth:      4,
 			opacity:          1,

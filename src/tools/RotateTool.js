@@ -8,7 +8,7 @@ import {withoutMod, withMod, match} from 'utilities';
 import {M21, M22, Point2D} from "../util/svg";
 import {MouseTool} from './MouseTool';
 import {plainDOM} from '../libs/jquery';
-import {Observable} from 'rxjs';
+import {Observable} from '../libs/expect-rxjs.js';
 import {callIfFunction} from '../util/misc';
 import Machine from '../util/Machine';
 import CSSPrefix from 'cssprefix/src/cssprefix';

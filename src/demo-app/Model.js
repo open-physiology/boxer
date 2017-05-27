@@ -1,19 +1,50 @@
 import {ValueTracker, property, flag} from 'utilities';
 import chroma from 'chroma-js';
+import {isUndefined, pick, parseInt} from 'lodash-bound';
+import {uniqueId as _uniqueId} from 'lodash';
 
 export class Model extends ValueTracker {
 	
-	@property({ initial: ""      }) name: string;
+	////////////////////////////////////////////////////////////////////////////
 	
-	@property({ initial: 'white' }) color: string;
+	@property() id;
+	@property() name;
+	@property({ initial: 'white' }) color;
 	
+	@flag({ initial: false }) deleted;
 	@flag({ initial: false }) selected;
 	
-	constructor({name, color} = {}) {
+	////////////////////////////////////////////////////////////////////////////
+	
+	constructor({id} = {}) {
 		super();
-		if (name)  { this.name  = name  }
-		if (color) { this.color = color }
+		
+		this.setValueTrackerOptions({
+			takeUntil: this.p('deleted').filter(v=>!!v)
+		});
+		
+		this.id = !id::isUndefined() ? id : _uniqueId()::parseInt();
 	}
+	
+	delete() { this.deleted = true }
+	
+	toJSON() {
+		return {
+			'class': this.constructor.name,
+			...this::pick('id', 'name', 'color')
+		};
+	}
+	
+	static fromJSON(json, {modelClasses} = {}) {
+		const cls = modelClasses[json.class];
+		const result = new cls();
+		result.id    = json.id;
+		result.name  = json.name;
+		result.color = json.color;
+		return result;
+	}
+	
+	////////////////////////////////////////////////////////////////////////////
 	
 	get contrastingColor() {
 		const c = chroma(this.color);
@@ -25,7 +56,9 @@ export class Model extends ValueTracker {
 	}
 	
 	get darkenedColor() {
-		return chroma(this.color).darken(4).hex();
+		return chroma(this.color).darken(2).hex();
 	}
+	
+	////////////////////////////////////////////////////////////////////////////
 	
 }

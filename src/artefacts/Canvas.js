@@ -10,9 +10,12 @@ export class Canvas extends SvgArtefact {
 	
 	postCreate(options = {}) {
 		this.registerHandlers({
-			dropzone: {
+			dropzone:  {
 				artefact: this,
-				accepts: () => true
+				accepts: () => true,
+				after: ({artefact}) => {
+					artefact.parent = this;
+				}
 			},
 			drawzone: {
 				artefact: this,

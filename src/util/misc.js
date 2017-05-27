@@ -1,6 +1,6 @@
 import {isFinite as _isFinite} from 'lodash';
 import {isFunction} from 'lodash-bound';
-import {Observable, Scheduler} from 'rxjs';
+import {Observable, Scheduler} from '../libs/expect-rxjs.js';
 
 export * from 'utilities';
 

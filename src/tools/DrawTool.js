@@ -1,6 +1,6 @@
 import $ from '../libs/jquery.js';
 import {assign, pick, isFunction, includes} from 'lodash-bound';
-import {Observable} from 'rxjs';
+import {Observable} from '../libs/expect-rxjs.js';
 import CSSPrefix from 'cssprefix/src/cssprefix';
 
 import {withoutMod, stopPropagation, property, match, which, event} from 'utilities';
@@ -44,17 +44,33 @@ export class DrawTool extends MouseTool {
 	
 	@property({ initial: null }) artefactCreated;
 	
-	mode: string = DRAWING_BOX;
+	@property({ initial: DRAWING_BOX }) mode;
 	
 	data: Object = {};
 	
-	factory: Class | () => SvgArtefact;
+	boxFactory:   Class | () => Box;
+	glyphFactory: Class | () => Glyph;
+	edgeFactory:  Class | () => Edge;
+	
+	factoryOptions:      Object = {};
+	boxFactoryOptions:   Object = {};
+	glyphFactoryOptions: Object = {};
+	edgeFactoryOptions:  Object = {};
 	
 	constructor(options = {}) {
 		super(options);
-		if (options.factory) { this.factory = options.factory }
-		if (options.css)     { this.css     = options.css     }
-		if (options.data)    { this.data    = options.data    }
+		for (let key of [
+			'boxFactory',
+			'glyphFactory',
+			'edgeFactory',
+			'factoryOptions',
+			'boxFactoryOptions',
+			'glyphFactoryOptions',
+			'edgeFactoryOptions',
+			'data'
+		]) {
+			if (options[key]) { this[key] = options[key] }
+		}
 	}
 	
 	init({coach}) {
@@ -70,14 +86,19 @@ export class DrawTool extends MouseTool {
 		const threshold = this.mouseMachine.THRESHOLD
 			::handleBoxer('drawzone');
 		
-		const factory = (dfault) => {
-			const fn = this.factory::isFunction() ? this.factory : dfault;
-			return (...args) =>
-				fn::subclassOf(SvgArtefact)
-					? new fn(...args)
-					: fn(...args);
+		/* artefact factory functions */
+		const f = (key, classOptionsKey, baseClass) => (options = {}) => {
+			const fn = this[key]::isFunction() ? this[key] : baseClass;
+			const finalOptions = { ...this.factoryOptions, ...this[classOptionsKey], ...options };
+			return fn::subclassOf(SvgArtefact)
+				? new fn(finalOptions)
+				:     fn(finalOptions);
 		};
+		const boxFactory   = f('boxFactory',   'boxFactoryOptions',   Box  );
+		const glyphFactory = f('glyphFactory', 'glyphFactoryOptions', Glyph);
+		const edgeFactory  = f('edgeFactory',  'edgeFactoryOptions',  Edge );
 		
+		/* local state machine */
 		const localMachine = new Machine(this.constructor.name, { state: 'IDLE' });
 		for (let mode of MODES) {
 			localMachine.link('IDLE', threshold.filter(() => this.mode === mode), mode);
@@ -89,8 +110,7 @@ export class DrawTool extends MouseTool {
 				/* create new box */
 				const drawZone = args.drawZone = args.artefact;
 				const point = args.point.in(drawZone.svg.children);
-				const artefact = args.artefact = factory(Box)({
-					css:            this.css,
+				const artefact = args.artefact = boxFactory({
 					transformation: ID_MATRIX.translate(...point.xy)
 				});
 				
@@ -157,8 +177,7 @@ export class DrawTool extends MouseTool {
 				/* create new glyph */
 				const drawZone = args.drawZone = args.artefact;
 				const point = args.point.in(drawZone.svg.children);
-				const artefact = args.artefact = factory(Glyph)({
-					css:            this.css,
+				const artefact = args.artefact = glyphFactory({
 					transformation: ID_MATRIX.translate(...point.xy)
 				});
 				
@@ -169,6 +188,9 @@ export class DrawTool extends MouseTool {
 					return;
 				}
 				artefact.parent = drawZone;
+				
+				/* notify the outside world */
+				this.p('artefactCreated').next(artefact);
 				
 				/* start drawing */
 				artefact.handlesActive = false;
@@ -184,8 +206,10 @@ export class DrawTool extends MouseTool {
 				
 				/* cancel or stop dragging */
 				Observable.merge(
-					this.p('active').filter(a=>!a).concatMap(Observable.throw()),
-					escaping                      .concatMap(Observable.throw()),
+					escaping,
+					this.p('active').filter(a=>!a),
+					this.p('mode').filter(m => m !== DRAWING_EDGE),
+				).concatMap(Observable.throw()).merge(
 					droppingOrClicking.do(() => {
 						artefact.handlesActive = true;
 						artefact.moveToFront();
@@ -213,8 +237,7 @@ export class DrawTool extends MouseTool {
 				} else {
 					const drawZone1 = args1.artefact;
 					const point1 = args1.point.in(drawZone1.svg.children);
-					glyph1 = args1.artefact = factory(Glyph)({
-						css:            this.css,
+					glyph1 = args1.artefact = glyphFactory({
 						transformation: ID_MATRIX.translate(...point1.xy)
 					});
 					/* allow the draw zone to reject */
@@ -224,6 +247,9 @@ export class DrawTool extends MouseTool {
 						return;
 					}
 					glyph1.parent = drawZone1;
+				
+					/* notify the outside world */
+					this.p('artefactCreated').next(glyph1);
 				}
 				
 				/* start drawing */
@@ -238,14 +264,42 @@ export class DrawTool extends MouseTool {
 				// };
 				// TODO: allow move following initial mousedown
 				
+				
 				/* escape / cancel */
 				Observable.merge(
 					this.p('active').filter(a=>!a),
-					escaping,
+					this.p('mode').filter(m => m !== DRAWING_EDGE),
+					escaping
 				).merge(this.p('active').filter(a=>!a)).do(() => {
 					if (cancel::isFunction()) { cancel(args1) }
 					glyph1.handlesActive = true;
 				})::enterState('IDLE');
+				/* cancel or stop dragging */
+				Observable.merge(
+					escaping,
+					this.p('active').filter(a=>!a),
+					this.p('mode').filter(m => m !== DRAWING_EDGE),
+				).concatMap(Observable.throw()).merge(
+					droppingOrClicking.do(() => {
+						artefact.handlesActive = true;
+						artefact.moveToFront();
+					})
+				).catch(() => {
+					/* cancel drawing */
+					artefact.delete();
+					cancel::callIfFunction(args);
+					return Observable.of({ deleted: true });
+                }).do(({point}) => {
+					/* stop drawing */
+					coach.selectTool.reacquire(point);
+					after::callIfFunction(); // TODO: pass args?
+				});
+				
+				
+				droppingOrClicking.do(() => {
+					glyph1.handlesActive = true;
+					glyph1.moveToFront();
+				});
 				
 				/***/
 				threshold.do((args2) => {
@@ -259,8 +313,7 @@ export class DrawTool extends MouseTool {
 					} else {
 						const drawZone2 = args2.artefact;
 						const point2 = args2.point.in(drawZone2.svg.children);
-						glyph2 = args2.artefact = factory(Glyph)({
-							css:            this.css,
+						glyph2 = args2.artefact = glyphFactory({
 							transformation: ID_MATRIX.translate(...point2.xy)
 						});
 						/* allow the draw zone to reject */
@@ -270,12 +323,13 @@ export class DrawTool extends MouseTool {
 							return;
 						}
 						glyph2.parent = drawZone2;
+				
+						/* notify the outside world */
+						this.p('artefactCreated').next(glyph2);
 					}
 					
 					/* create edge */
-					let edge = new Edge({
-						css:    this.css,
-						// parent: glyph1.closestCommonAncestorWith(glyph2),
+					let edge = edgeFactory({
 						glyph1,
 						glyph2
 					});

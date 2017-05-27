@@ -2,7 +2,7 @@ import {handleBoxer} from '../Coach.js';
 import {MouseTool}   from './MouseTool';
 import {sineWave}    from '../util/misc';
 
-import {Observable} from 'rxjs';
+import {Observable} from '../libs/expect-rxjs.js';
 import {match} from 'utilities';
 
 const {min, max, floor, PI} = Math;

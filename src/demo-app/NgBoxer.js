@@ -20,6 +20,8 @@ import {property, which} from 'utilities';
 
 import KeyCode from 'keycode-js';
 import {LyphBox} from './LyphBox';
+import {ProcessChain} from './ProcessChain';
+import {ProcessNode}  from './ProcessNode';
 const {KEY_ESCAPE} = KeyCode;
 
 
@@ -40,9 +42,7 @@ export class NgBoxer extends Coach {
 	constructor({nativeElement}: ElementRef) {
 		/* initialize coach with svg element */
 		super({
-			root: new Canvas({
-				svg: $(nativeElement)
-			})
+			root: new Canvas({ svg: $(nativeElement) })
 		});
 		
 		/* standard tools */
@@ -56,7 +56,9 @@ export class NgBoxer extends Coach {
 			.addTool(new RotateTool     )
 			.addTool(new DeleteTool     )
 			.addTool(new DrawTool({
-				css: { '&': { 'fill': 'white', 'stroke': 'black' } }
+				boxFactory:   LyphBox,
+				edgeFactory:  ProcessChain,
+				glyphFactory: ProcessNode
 			}))
 			.start();
 		
@@ -65,8 +67,8 @@ export class NgBoxer extends Coach {
 		this.addStapleTools(SelectTool, HighlightTool, MouseCursorTool, HelperTool);
 		this.addToolMode('Manipulate', [ClickTool, MoveTool, ResizeTool, RotateTool]);
 		this.addToolMode('Delete',     [DeleteTool]);
-		this.addToolMode('Draw Lyph',  [DrawTool], () => { this.drawTool.mode = DrawTool.DRAWING_BOX; this.drawTool.factory = LyphBox; });
-		this.addToolMode('Draw Node',  [DrawTool], () => { this.drawTool.mode = DrawTool.DRAWING_GLYPH });
+		this.addToolMode('Draw Lyph',  [DrawTool], () => { this.drawTool.mode = DrawTool.DRAWING_BOX   });
+		// this.addToolMode('Draw Node',  [DrawTool], () => { this.drawTool.mode = DrawTool.DRAWING_GLYPH });
 		this.addToolMode('Draw Edge',  [DrawTool], () => { this.drawTool.mode = DrawTool.DRAWING_EDGE  });
 		
 		/* start and escape to Manipulate */

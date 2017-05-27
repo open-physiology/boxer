@@ -1,6 +1,6 @@
 import $ from '../libs/jquery.js';
 import {assign, isFunction} from 'lodash-bound';
-import {Observable} from 'rxjs';
+import {Observable} from '../libs/expect-rxjs.js';
 
 import {withoutMod, match} from 'utilities';
 

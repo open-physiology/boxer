@@ -14,7 +14,7 @@ import {SvgTransformable} from './SvgTransformable.js';
  */
 export class Glyph extends SvgTransformable {
 	
-	static RADIUS = 10;
+	static RADIUS = 6;
 
 	preCreate(options) {
 		super.preCreate(options);
@@ -25,18 +25,21 @@ export class Glyph extends SvgTransformable {
 		super.create(options);
 		
 		$.svg('<circle>').attr({
-			r: Glyph.RADIUS, cx: 0, cy: 0,
+			r: Glyph.RADIUS + 2,
+			cx: 0, cy: 0,
 			strokeWidth: 'inherit',
 		}).appendTo(this.svg.handles);
 		
 		$.svg('<circle>').attr({
-			r: Glyph.RADIUS, cx: 0, cy: 0,
+			r: Glyph.RADIUS,
+			cx: 0, cy: 0,
 			stroke:      'inherit',
 			fill:        'inherit'
 		}).appendTo(this.svg.ink);
 		
 		$.svg('<circle>').attr({
-			r: Glyph.RADIUS, cx: 0, cy: 0,
+			r: Glyph.RADIUS,
+			cx: 0, cy: 0,
 			stroke:           'inherit',
 			strokeWidth:      'inherit',
 			strokeDasharray:  'inherit',
@@ -54,6 +57,9 @@ export class Glyph extends SvgTransformable {
 				effect: { elements: this.svg.overlay }
 			},
 			deletable: {
+				artefact: this
+			},
+			drawzone: {
 				artefact: this
 			}
 		});

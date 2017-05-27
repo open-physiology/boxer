@@ -12,9 +12,9 @@ import {Point2D} from '../util/svg';
  */
 export class SvgTransformable extends SvgArtefact {
 	
-	@property({ initial: ID_MATRIX }) transformation;
-	@property({ initial: ID_MATRIX }) globalTransformation;
-		
+	@property({ initial: ID_MATRIX, isValid: v => v instanceof SVGMatrix }) transformation;
+	@property({ initial: ID_MATRIX, isValid: v => v instanceof SVGMatrix }) globalTransformation;
+	
 	preCreate(options = {}) {
 		super.preCreate(options);
 		

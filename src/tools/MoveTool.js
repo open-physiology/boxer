@@ -2,7 +2,7 @@ import $ from '../libs/jquery.js';
 import {isFunction} from 'lodash-bound';
 import CSSPrefix from 'cssprefix/src/cssprefix';
 
-import {Observable} from 'rxjs';
+import {Observable} from '../libs/expect-rxjs.js';
 
 import {handleBoxer} from '../Coach.js';
 import {withoutMod, match} from 'utilities';
@@ -32,14 +32,23 @@ export class MoveTool extends MouseTool {
 		const localMachine = new Machine('MoveTool', { state: 'IDLE' });
 		localMachine.extend(({ enterState, subscribeDuringState }) => ({
 			'IDLE': () => {
+						
+				// console.log('(((IDLE)))');
+				
 				threshold::enterState('THRESHOLD');
 				coach.selectTool.reacquire();
 			},
 			'THRESHOLD': () => {
+						
+				// console.log('(((THRESHOLD)))');
+			
 				dragging::enterState('DRAGGING');
 				this.mouseMachine.IDLE::enterState('IDLE');
 			},
 			'DRAGGING': (args) => {
+						
+				// console.log('(((DRAGGING)))');
+			
 				const {point, artefact, before, after, cancel, referencePoint = point} = args;
 				
 				/* drag initialization */
@@ -75,15 +84,25 @@ export class MoveTool extends MouseTool {
 					cancel::callIfFunction(args);
 					return Observable.of({});
                 }).do(({point}) => {
-					/* stop dragging */
-					artefact.handlesActive = true;
-					artefact.moveToFront();
-					coach.selectTool.reacquire(point);
-					after::callIfFunction(args);
+					// try {
+						/* stop dragging */
+						artefact.handlesActive = true;
+						artefact.moveToFront();
+						coach.selectTool.reacquire(point);
+						after::callIfFunction(args);
+						
+					// 	console.log('(((DRAGGING -> IDLE)))');
+					// } catch (err) {
+					// 	console.error(err);
+					// }
 				})::enterState('IDLE');
 				
 			}
 		}));
+		
+		// localMachine.p('state').subscribe((s) => console.log('---', s)); // TODO: remove
+		// coach.p('selectedArtefact').subscribe((s) => console.log('---', s)); // TODO: remove
+		
 		
 		/* mutual exclusion between this machine and other machines, coordinated by coach.stateMachine */
 		localMachine.extend(() => ({ 'OTHER_TOOL': ()=>{} }));
@@ -94,13 +113,13 @@ export class MoveTool extends MouseTool {
 		coach.stateMachine.link('BUSY', localMachine.IDLE    .map(() => ({ tool: this })), 'IDLE');
 		
 		/* prep for highlighting and mouse cursors */
-		const handlerArtefactOrNull = (key) => (a) => (a && a.handlers[key] && a.handlers['highlightable']) ? a : null;
+		const handlerArtefactOrNull = (key) => (a) => (a && a.handlers[key]) ? a.handlers[key].artefact : null;
 		const movableArtefact  = coach.p('selectedArtefact').map(handlerArtefactOrNull('movable'));
 		const dropzoneArtefact = coach.p('selectedArtefact').map(handlerArtefactOrNull('dropzone'));
 		
 		/* highlighting */
 		coach.highlightTool.register(this, localMachine.p('state').switchMap(state => match(state)({
-			'IDLE':       movableArtefact,
+			'IDLE':       movableArtefact,//.do((ma) => { console.log('---', ma && ma.constructor.name) }),
 			'THRESHOLD':  movableArtefact,
 			'DRAGGING':   dropzoneArtefact.startWith(null),
 			'OTHER_TOOL': Observable.of(null)

@@ -2,7 +2,7 @@ import assert        from 'power-assert';
 import {entries, isEmpty}      from 'lodash-bound';
 import $, {applyCSS, plainDOM} from '../libs/jquery.js';
 
-import {Observable} from 'rxjs';
+import {Observable} from '../libs/expect-rxjs.js';
 
 import {ID_MATRIX, SVGMatrix, setCTM} from '../util/svg.js';
 import {ValueTracker, property, flag, humanMsg, event}       from 'utilities';
@@ -17,14 +17,22 @@ const $$handlers = Symbol('$$handlers');
  */
 export class SvgArtefact extends ValueTracker {
 	
-	@property({ initial: null, isValid: (v) => (!v || v instanceof SvgArtefact) }) parent;
-	@flag({ initial: false })                                                      deleted;
+	@property({ isValid: (v) => (!v || v instanceof SvgArtefact) }) parent;
+	@flag({ initial: false })                                       deleted;
 	
 	
 	@event() moveToFrontEvent;
 	@event() clickEvent;
 	
 	@flag({ initial: true }) handlesActive;
+	
+	static inheritedProperties = {
+		strokeDasharray:  'inherit',
+		strokeDashoffset: 'inherit',
+	    fill:             'inherit',
+	    stroke:           'inherit',
+		strokeWidth:      'inherit'
+	};
 	
 	/**
 	 * @param {SVGMatrix} [options.transformation] - the initial transformation of this artefact
@@ -62,7 +70,7 @@ export class SvgArtefact extends ValueTracker {
 		/* move svg on parent change */
 		this.p('parent').startWith(null).pairwise().subscribe(([prev, curr]) => {
 			if (!!curr) {
-				this.svg.main.appendTo(curr.svg.children);
+				this.svg.main.appendTo(curr.getSvgContainerFor(this));
 			} else if (!!prev) {
 				this.svg.main.detach();
 			}
@@ -125,19 +133,12 @@ export class SvgArtefact extends ValueTracker {
 		});
 		
 		/* set css inheritance chains */
-		const inheritedProperties = {
-			strokeDasharray:  'inherit',
-			strokeDashoffset: 'inherit',
-		    fill:             'inherit',
-		    stroke:           'inherit',
-			strokeWidth:      'inherit'
-		};
-		this.svg.main             .css({ 'pointer-events': 'inherit', ...inheritedProperties });
-		this.svg.ink              .css({ 'pointer-events': 'none',    ...inheritedProperties });
-		this.svg.overlay          .css({ 'pointer-events': 'none',                           });
-		this.svg.children         .css({ 'pointer-events': 'inherit', ...inheritedProperties });
-		this.svg.handles          .css({ 'pointer-events': 'inherit'                         });
-		this.svg.handles.find('*').css({ 'pointer-events': 'inherit'                         });
+		this.svg.main             .css({ 'pointer-events': 'inherit', ...SvgArtefact.inheritedProperties });
+		this.svg.ink              .css({ 'pointer-events': 'none',    ...SvgArtefact.inheritedProperties });
+		this.svg.overlay          .css({ 'pointer-events': 'none',                                       });
+		this.svg.children         .css({ 'pointer-events': 'inherit', ...SvgArtefact.inheritedProperties });
+		this.svg.handles          .css({ 'pointer-events': 'inherit'                                     });
+		this.svg.handles.find('*').css({ 'pointer-events': 'inherit'                                     });
 		
 		/* set category specific styling */
 		this.svg.handles.css({
@@ -191,7 +192,7 @@ export class SvgArtefact extends ValueTracker {
 		else             { return 0 }
 	} // TODO: ValueTracked doesn't allow synchronous access using .newProperty() yet
 	
-	closestCommonAncestorWith(other: SvgArtefact): SvgArtefact {
+	closestCommonAncestorWith(other: SvgArtefact): ?SvgArtefact {
 		if (this.depth < other.depth) { return other.closestCommonAncestorWith(this) }
 		let thisAncestor = this;
 		let otherAncestor = other;
@@ -204,5 +205,9 @@ export class SvgArtefact extends ValueTracker {
 		}
 		return thisAncestor;
 	}
+	
+	getSvgContainerFor(artefact) {
+		return this.svg.children;
+	} // override if necessary
 	
 }

@@ -1,19 +1,16 @@
 import assert from 'power-assert';
 import $      from '../libs/jquery.js';
-import {isBoolean as _isBoolean} from 'lodash';
 import {entries, isEmpty, isArray, pull} from 'lodash-bound';
-import {Observable} from 'rxjs';
+import {Observable} from '../libs/expect-rxjs.js';
 
 import {ID_MATRIX, Point2D} from '../util/svg.js';
 import {property, flag, definePropertiesByValue} from 'utilities';
 import {_isNonNegative} from '../util/misc.js';
 
 import {SvgTransformable} from './SvgTransformable.js';
-import {LineSegment}      from './LineSegment.js';
 import {BoxCorner}        from './BoxCorner.js';
 import {predicate} from '../Coach';
-import {subclassOf} from '../util/misc';
-import {MX, MY} from '../util/svg';
+import {MX, MY, setCTM} from '../util/svg';
 import {BoxBorder} from './BoxBorder';
 
 const {max} = Math;
@@ -33,7 +30,17 @@ export class Box extends SvgTransformable {
 	@property({ isValid: _isNonNegative, initial: MIN_MIN_SIZE, transform(w) { return max(w || MIN_MIN_SIZE, this.minWidth  || MIN_MIN_SIZE) } }) width;
 	@property({ isValid: _isNonNegative, initial: MIN_MIN_SIZE, transform(h) { return max(h || MIN_MIN_SIZE, this.minHeight || MIN_MIN_SIZE) } }) height;
 	
-	@property() stuckToBorder; // TODO: more elegant solution
+	@property({ initial: [] }) stuckToBorder; // TODO: more elegant solution
+	
+	
+	getSvgContainerFor(artefact) {
+		// TODO: if still needed, move this functionality to the dropzone handler
+		if (artefact instanceof BoxBorder || artefact instanceof BoxCorner) {
+			return this.svg.outline;
+		}
+		// return this.svg.content;
+		return this.svg.children;
+	}
 	
 	preCreate(options) {
 		super.preCreate(options);
@@ -57,14 +64,18 @@ export class Box extends SvgTransformable {
 	create(options = {}) {
 		super.create(options);
 		
-		const handleRect = $.svg('<rect>').attr({
+		this.svg.outline = $.svg('<g class="outline">')
+			.css(this.constructor.inheritedProperties)
+			.insertAfter(this.svg.children);
+		
+		const handlePath = $.svg('<path>').attr({
 			rx:      BoxCorner.RADIUS,
 			ry:      BoxCorner.RADIUS,
 			stroke: 'none',
 			fill:   'none'
 		}).appendTo(this.svg.handles);
 		
-		const inkRect = $.svg('<rect>').attr({
+		const inkPath = $.svg('<path>').attr({
 			rx:      BoxCorner.RADIUS,
 			ry:      BoxCorner.RADIUS,
 			stroke:  'transparent',
@@ -111,9 +122,6 @@ export class Box extends SvgTransformable {
 					after: ({artefact}) => {
 						if (artefact instanceof Box) {
 							artefact.parent = this;
-							if (!artefact.stuckToBorder::isArray()) {
-								artefact.stuckToBorder = [];
-							}
 							artefact.stuckToBorder = [...artefact.stuckToBorder, {x, y}];
 							// TODO: more elegant and universal implementation
 						}
@@ -144,8 +152,8 @@ export class Box extends SvgTransformable {
 					artefact: this,
 					effect: {
 						elements: this.corners[key].svg.overlay
-                                      .add(this.borders[s1].svg.overlay)
-                                      .add(this.borders[s2].svg.overlay)
+							  .add(this.borders[s1].svg.overlay)
+							  .add(this.borders[s2].svg.overlay)
 					}
 				}
 			});
@@ -173,27 +181,69 @@ export class Box extends SvgTransformable {
 			left:   [cornerPoints.bl, cornerPoints.tl]
 		};
 		
-		/* resizing */
-		this.p(['width', 'height']).subscribe(([w, h]) => {
-			inkRect    .attr({ width: w, height: h, x: -w/2, y: -h/2 });
-			handleRect .attr({ width: w, height: h, x: -w/2, y: -h/2 });
-			
+		/* keep outline updated */
+		Observable.combineLatest(
+			this.p('width'),
+			this.p('height'),
+			this.corners.tr.p('rounded'),
+			this.corners.br.p('rounded'),
+			this.corners.bl.p('rounded'),
+			this.corners.tl.p('rounded')
+		).subscribe(([w, h]) => {
+			/* place the four corners */
 			for (let [key, cp] of cornerPoints::entries()) {
 				cp.p = new Point2D({
 					x:                cp.x * w / 2,
 					y:                cp.y * h / 2,
-					coordinateSystem: this.svg.children
+					coordinateSystem: this.svg.main
 				});
 				this.corners[key].transformation = ID_MATRIX.translate(...cp.p.xy).rotate(cp.r);
 			}
-			
-			for (let [s, [cp1, cp2]] of borderPoints::entries()) {
-				this.borders[s].point1 = cp1.p;
-				this.borders[s].point2 = cp2.p;
+			/* place the borders */
+			for (let [key, [{p:p1}, {p:p2}]] of borderPoints::entries()) {
+				this.borders[key].point1 = p1.in(this.svg.main);
+				this.borders[key].point2 = p2.in(this.svg.main);
 			}
+			
+			/* generate outline */
+			const top1    = this.borders.top   .inkPoint1;
+			const top2    = this.borders.top   .inkPoint2;
+			const right1  = this.borders.right .inkPoint1;
+			const right2  = this.borders.right .inkPoint2;
+			const bottom1 = this.borders.bottom.inkPoint1;
+			const bottom2 = this.borders.bottom.inkPoint2;
+			const left1   = this.borders.left  .inkPoint1;
+			const left2   = this.borders.left  .inkPoint2;
+			const cornerPath = (key) => {
+				const c = this.corners[key];
+				const s = BoxCorner.RADIUS;
+				const {x, y} = cornerPoints[key];
+				if (c.rounded) {
+					return `A ${s} ${s}, 0, 0, 0,`;
+				} else {
+					if (x*y === -1) { return `v ${y*s} L` }
+					else            { return `h ${x*s} L` }
+				}
+			};
+			$().add(inkPath)
+			   .add(handlePath)
+			   .add(overlayPath).attr({
+				d: `M
+					${left1.xy}   L ${left2.xy}   ${cornerPath('bl')}
+					${bottom1.xy} L ${bottom2.xy} ${cornerPath('br')}
+					${right1.xy}  L ${right2.xy}  ${cornerPath('tr')}
+					${top1.xy}    L ${top2.xy}    ${cornerPath('tl')}
+					${left1.xy}
+				Z`
+			});
 		});
 		
-		/* parent resizing */
+		/* when parent changes, 'unstuck' all borders */
+		this.p('parent').subscribe(() => {
+			this.stuckToBorder = [];
+		});
+		
+		/* parent resizing when stuck to border */
 		this.p(['width', 'height', 'parent.width', 'parent.height', 'stuckToBorder']).subscribe(([w, h, pw, ph, stb]) => {
 			if (!stb || stb.length === 0) { return }
 			const stX = [...new Set(stb.map(({x}) => x))];
@@ -210,43 +260,20 @@ export class Box extends SvgTransformable {
 			this.height = h;
 		});
 		
-		/* keep overlay outline updated */
-		Observable.combineLatest([
-			this.p('width'),
-			this.p('height'),
-			this.corners.tr.p('rounded'),
-			this.corners.br.p('rounded'),
-			this.corners.bl.p('rounded'),
-			this.corners.tl.p('rounded')
-		]).subscribe(() => {
-			const top1    = this.borders.top   .inkPoint1.in(this.svg.main);
-			const top2    = this.borders.top   .inkPoint2.in(this.svg.main);
-			const right1  = this.borders.right .inkPoint1.in(this.svg.main);
-			const right2  = this.borders.right .inkPoint2.in(this.svg.main);
-			const bottom1 = this.borders.bottom.inkPoint1.in(this.svg.main);
-			const bottom2 = this.borders.bottom.inkPoint2.in(this.svg.main);
-			const left1   = this.borders.left  .inkPoint1.in(this.svg.main);
-			const left2   = this.borders.left  .inkPoint2.in(this.svg.main);
-			const cornerPath = (key) => {
-				const c = this.corners[key];
-				const s = BoxCorner.RADIUS;
-				const {x, y} = cornerPoints[key];
-				if (c.rounded) {
-					return `A ${s} ${s}, 0, 0, 0,`;
-				} else {
-					if (x*y === -1) { return `v ${y*s} L` }
-					else            { return `h ${x*s} L` }
-				}
-			};
-			overlayPath.attr({
-				d: `M
-					${left1.xy}   L ${left2.xy}   ${cornerPath('bl')}
-					${bottom1.xy} L ${bottom2.xy} ${cornerPath('br')}
-					${right1.xy}  L ${right2.xy}  ${cornerPath('tr')}
-					${top1.xy}    L ${top2.xy}    ${cornerPath('tl')}
-					${left1.xy}
-				Z`
-			});
+		/* when stuck to borders, deactivate the appropriate outline handles */
+		this.p('stuckToBorder').subscribe((stb) => {
+			const stX = new Set(stb.map(({x}) => x));
+			const stY = new Set(stb.map(({y}) => y));
+			// borders
+			this.borders.left.handlesActive   = !stX.has(-1);
+			this.borders.right.handlesActive  = !stX.has(+1);
+			this.borders.top.handlesActive    = !stY.has(-1);
+			this.borders.bottom.handlesActive = !stY.has(+1);
+			// corners
+			this.corners.tl.handlesActive = !stY.has(-1) && !stX.has(-1);
+			this.corners.tr.handlesActive = !stY.has(-1) && !stX.has(+1);
+			this.corners.bl.handlesActive = !stY.has(+1) && !stX.has(-1);
+			this.corners.br.handlesActive = !stY.has(+1) && !stX.has(+1);
 		});
 		
 	}
@@ -254,8 +281,22 @@ export class Box extends SvgTransformable {
 	postCreate(options = {}) {
 		/* set standard handlers */
 		this.registerHandlers({
-			movable:   { artefact: this },
-			rotatable: { artefact: this },
+			movable:   {
+				artefact: this,
+				after: () => {
+					/* when dropped, reapply relevant border stucknesses */
+					this.stuckToBorder = [...this.stuckToBorder];
+				}
+			},
+			rotatable: {
+				artefact: this,
+				after: () => {
+					/* after rotating, reapply relevant border stucknesses */
+					//  which, if present, would undo rotation
+					this.stuckToBorder = [...this.stuckToBorder];
+					// TODO: simply disallow rotation when stuck
+				}
+			},
 			dropzone:  {
 				artefact: this,
 				after: ({artefact}) => {

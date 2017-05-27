@@ -1,5 +1,5 @@
 import {camelCase, mergeWith, isFunction, entries} from 'lodash-bound';
-import {Observable}                       from 'rxjs';
+import {Observable}                       from './libs/expect-rxjs.js';
 import $                                  from './libs/jquery.js';
 import assert                             from 'power-assert';
 

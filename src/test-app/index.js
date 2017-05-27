@@ -1,6 +1,6 @@
 import $ from 'jquery';
 import {assign, entries, keys} from 'lodash-bound';
-import {BehaviorSubject} from 'rxjs';
+import {BehaviorSubject} from '../libs/provide-rxjs.js';
 
 import {Box, Glyph, Edge, LineSegment, BoxCorner, Canvas, Coach} from '../index.js';
 import {ID_MATRIX, Point2D} from '../util/svg.js';
