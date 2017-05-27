@@ -1,5 +1,6 @@
 var webpack = require('webpack');
 var loaders = require('./webpack.loaders.js');
+var path    = require('path');
 
 module.exports = {
 	devtool: 'source-map',
@@ -12,5 +13,21 @@ module.exports = {
 		devtoolFallbackModuleFilenameTemplate: '[absolute-resource-path]?[hash]'
 	},
 	target: 'node',
-	externals: [require('webpack-node-externals')()]
+	externals: [
+		require('webpack-node-externals')({
+			whitelist: ['utilities']
+		})
+	],
+	plugins: [
+		new webpack.ContextReplacementPlugin(
+			/angular[\\\/]core[\\\/](esm[\\\/]src|src)[\\\/]linker/,
+			path.resolve('./src'),
+			{}
+		),
+		new webpack.ContextReplacementPlugin(
+			/power-assert-formatter[\\\/]lib/,
+			path.resolve('./src'),
+			{}
+		)
+	]
 };

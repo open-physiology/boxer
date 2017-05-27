@@ -1,14 +1,14 @@
 var webpack           = require('webpack');
 var CopyWebpackPlugin = require('copy-webpack-plugin');
 var loaders           = require('./webpack.loaders.js');
+var path              = require('path');
 
 module.exports = {
 	devtool: 'source-map',
 	context: __dirname + '/src',
 	entry: {
-		'test-app/index':   [ 'babel-polyfill', 'zone.js/dist/zone.js', './test-app/index.js' ],
-		'project-template': [ 'babel-polyfill', 'zone.js/dist/zone.js', './index.js' ],
-		'project-template-minimal':                                   [ './index.js' ]
+		'test-app/index':   [ 'babel-polyfill', './test-app/index.js' ],
+		'demo-app/index':   [ 'babel-polyfill', 'zone.js/dist/zone.js', './demo-app/index.js' ]
 	},
 	output: {
 		path: __dirname + '/dist',
@@ -26,7 +26,18 @@ module.exports = {
 	plugins: [
 		new webpack.optimize.OccurrenceOrderPlugin(),
 		new CopyWebpackPlugin([
-			{ from: 'test-app/index.html', to: 'test-app/index.html' }
-		])
+			{ from: 'test-app/index.html', to: 'test-app/index.html' },
+			{ from: 'demo-app/index.html', to: 'demo-app/index.html' }
+		]),
+		new webpack.ContextReplacementPlugin(
+			/angular[\\\/]core[\\\/](esm[\\\/]src|src)[\\\/]linker/,
+			path.resolve('./src'),
+			{}
+		),
+		new webpack.ContextReplacementPlugin(
+			/power-assert-formatter[\\\/]lib/,
+			path.resolve('./src'),
+			{}
+		)
 	]
 };

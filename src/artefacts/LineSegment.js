@@ -23,47 +23,63 @@ export class LineSegment extends SvgArtefact {
 	preCreate(options = {}) {
 		super.preCreate(options);
 		
-		if (options.point1)    { this.point1    = options.point1.in(this.coordinateSystem) }
-		if (options.point2)    { this.point2    = options.point2.in(this.coordinateSystem) }
-		if (options.lengthen1) { this.lengthen1 = options.lengthen1                        }
-		if (options.lengthen2) { this.lengthen2 = options.lengthen2                        }
+		if (options.point1)    { this.point1    = options.point1.in(this.parent.svg.children) }
+		if (options.point2)    { this.point2    = options.point2.in(this.parent.svg.children) }
+		if (options.lengthen1) { this.lengthen1 = options.lengthen1                           }
+		if (options.lengthen2) { this.lengthen2 = options.lengthen2                           }
 		
 		/* smoothly transitioning to a new coordinateSystem */
-		this.p('coordinateSystem').filter(p=>p).subscribe((coordinateSystem) => {
+		this.p('parent').filter(p=>p).subscribe((parent) => {
 			if (this.point1 && this.point2) {
-				this.point1 = this.point1.in(coordinateSystem);
-				this.point2 = this.point2.in(coordinateSystem);
+				this.point1 = this.point1.in(parent.svg.children);
+				this.point2 = this.point2.in(parent.svg.children);
 			}
 		});
-			// .withLatestFrom(this.p('point1.transformation'), this.p('point2.transformation'), ([prev, curr], t) =>
-			// 	t.multiply(prev.transformation).multiply(curr.transformation.inverse()))
-			// .subscribe( this.p('transformation') );
 	}
 	
 	create(options = {}) {
 		
 		const inkLine = $.svg('<line>').css({
-			stroke:     'black',
-			strokeWidth: 2
+			stroke:           'inherit',
+			strokeWidth:      'inherit',
+			strokeDasharray:  'inherit',
+			strokeDashoffset: 'inherit'
 		}).appendTo(this.svg.ink);
+		
+		const overlayLine = $.svg('<line>').css({
+			stroke:           'inherit',
+			strokeWidth:      'inherit',
+			strokeDasharray:  'inherit',
+			strokeDashoffset: 'inherit'
+		}).appendTo(this.svg.overlay);
+		
 		const handleLine = $.svg('<line>').css({
-			strokeWidth: 4
+			strokeWidth: 'inherit',
 		}).appendTo(this.svg.handles);
 		
-		this.p(['point1', 'point2', 'lengthen1', 'lengthen2'])
-		    .filter(([p1, p2]) => p1 && p2)
-		    .subscribe(([p1, p2, l1, l2]) => {
-				p1 = p1.in(this.coordinateSystem);
-				p2 = p2.in(this.coordinateSystem);
+		this.p(['parent', 'point1', 'point2', 'lengthen1', 'lengthen2'])
+		    .filter(([parent, p1, p2]) => parent && p1 && p2)
+		    .subscribe(([parent, p1, p2, l1, l2]) => {
+				p1 = p1.in(parent.svg.children);
+				p2 = p2.in(parent.svg.children);
 				$().add(inkLine)
+				   .add(overlayLine)
 				   .add(handleLine)
 				   .attr({
-						...p1.withDistanceTo(-l1, p2).obj('x1', 'y1'),
-						...p2.withDistanceTo(-l2, p1).obj('x2', 'y2')
+						...p1.withDistanceTo(-l2, p2).obj('x1', 'y1'),
+						...p2.withDistanceTo(-l1, p1).obj('x2', 'y2')
 					});
 			});
 		
 		
+	}
+	
+	get inkPoint1() {
+		return this.point1.withDistanceTo(-this.lengthen2, this.point2);
+	}
+	
+	get inkPoint2() {
+		return this.point2.withDistanceTo(-this.lengthen1, this.point1);
 	}
 	
 }

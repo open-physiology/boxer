@@ -2,12 +2,14 @@ var webpack           = require('webpack');
 var path              = require('path');
 var CopyWebpackPlugin = require('copy-webpack-plugin');
 var loaders           = require('./webpack.loaders.js');
+var path              = require('path');
 
 module.exports = {
 	devtool: 'cheap-eval-source-map',
 	context: path.resolve(__dirname, 'src/'),
 	entry: {
-		'test-app/index': [ 'babel-polyfill', 'zone.js/dist/zone.js', './test-app/index.js' ]
+		'test-app/index': [ 'babel-polyfill', './test-app/index.js' ],
+		'demo-app/index': [ 'babel-polyfill', 'zone.js/dist/zone.js', './demo-app/index.js' ]
 	},
 	output: {
 		path: path.resolve(__dirname, 'dist/'),
@@ -24,6 +26,16 @@ module.exports = {
 	},
 	plugins: [
 		new webpack.optimize.OccurrenceOrderPlugin(),
-		new webpack.HotModuleReplacementPlugin()
+		new webpack.HotModuleReplacementPlugin(),
+		new webpack.ContextReplacementPlugin(
+			/angular[\\\/]core[\\\/](esm[\\\/]src|src)[\\\/]linker/,
+			path.resolve('./src'),
+			{}
+		),
+		new webpack.ContextReplacementPlugin(
+			/power-assert-formatter[\\\/]lib/,
+			path.resolve('./src'),
+			{}
+		)
 	]
 };

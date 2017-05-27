@@ -5,48 +5,81 @@ import {entries, values, isUndefined} from 'lodash-bound';
 
 import {ID_MATRIX, SVGMatrix, setCTM, Point2D} from '../util/svg.js';
 import {property, flag} from 'utilities';
-import {_isNonNegative} from '../util/misc.js';
 
-const {max} = Math;
 
-import {SvgTransformable                } from './SvgTransformable.js';
-import {CORNER_RADIUS, DEFAULT_INK_COLOR} from './Box.js';
+import {SvgTransformable} from './SvgTransformable.js';
 
 /**
- * Representation of an interactive rectangle in svg space.
+ * Representation of a Box corner.
  */
 export class BoxCorner extends SvgTransformable {
 	
-	@property({ isValid: _isNonNegative, initial: CORNER_RADIUS }) size;
-	@property({ isValid: _isBoolean,     initial: false })         rounded;
+	static RADIUS = 15;
+	
+	@flag({ initial: false }) rounded;
 
 	preCreate(options) {
 		super.preCreate(options);
 		
 		/* set properties if given */
-		if (!options.size   ::isUndefined()) { this.size    = options.size    }
 		if (!options.rounded::isUndefined()) { this.rounded = options.rounded }
 	}
 	
-	create() {
+	create(options = {}) {
+		super.create(options);
 		
-		const handlePath = $.svg('<path>').css({
-			strokeWidth: 4
+		const handlePath = $.svg(`<path>`).css({
+			strokeWidth: 'inherit',
 		}).appendTo(this.svg.handles);
 		
-		const inkPath = $.svg('<path>').css({
-			fill:       DEFAULT_INK_COLOR,
-			stroke:     'black',
-			strokeWidth: 2
+		const inkPath = $.svg(`<path>`).css({
+			fill:             'transparent',
+			stroke:           'inherit',
+			strokeWidth:      'inherit',
+			strokeDasharray:  'inherit',
+			strokeDashoffset: 'inherit'
 		}).appendTo(this.svg.ink);
 		
+		const overlayFillPath = $.svg(`<path>`).css({
+			fill:            'inherit',
+			stroke:          'black',
+			strokeDasharray: 'none'
+		}).appendTo(this.svg.overlay);
+		
+		const overlayStrokePath = $.svg(`<path>`).css({
+			fill:             'transparent',
+			stroke:           'inherit',
+			strokeWidth:      'inherit',
+			strokeDasharray:  'inherit',
+			strokeDashoffset: 'inherit'
+		}).appendTo(this.svg.overlay);
+		
 		/* react to resizing and roundedness-toggling */
-		this.p(['size', 'rounded']).subscribe(([s, r]) => {
-			const cornerPath = r ? (`A ${s} ${s}, 0, 0, 1, ${s} 0`) : (`L 0 0 L ${s} 0`);
-			handlePath.attr({ d: `M 0 ${s} ${cornerPath} A ${2*s} ${2*s}, 0, 0, 1, 0 ${s} Z` });
-			inkPath   .attr({ d: `M 0 ${s} ${cornerPath}` });
+		const s = BoxCorner.RADIUS;
+		const rightAngle  = `L 0 0 L`;
+		const arcAngle    = `A ${s} ${s}, 0, 0, 0,`;
+		const bl          = `0 ${s}`;
+		const tr          = `${s} 0`;
+		const outerCorner = r => `M ${tr} ${r ? arcAngle : rightAngle} ${bl}`;
+		const innerCorner = `M ${tr} L ${bl}`;
+		this.p('rounded').subscribe((r) => {
+			handlePath       .attr({ d: outerCorner(0)       });
+			inkPath          .attr({ d: outerCorner(r)       });
+			overlayFillPath  .attr({ d: outerCorner(r) + 'Z' });
+			overlayStrokePath.attr({ d: innerCorner          });
 		});
 		
+	}
+	
+	postCreate(options = {}) {
+		super.postCreate(options);
+		
+		setTimeout(() => {
+			/* set the stroke-width of part of the overlay based on part of the ink */
+			const source = this.svg.ink    .children('[style*="stroke: inherit"]');
+			const target = this.svg.overlay.children('[style*="stroke: black"]');
+			target.css({ strokeWidth: getComputedStyle(source[0])['stroke-width'] });
+		});
 	}
 	
 }

@@ -1,23 +1,22 @@
 import assert from 'power-assert';
 import $      from '../libs/jquery.js';
-import {isBoolean as _isBoolean} from 'lodash';
-import {entries, values, assign, isEmpty} from 'lodash-bound';
+import {entries, isEmpty, isArray, pull, values} from 'lodash-bound';
+import {Observable} from '../libs/expect-rxjs.js';
 
-import {ID_MATRIX, SVGMatrix, setCTM, Point2D} from '../util/svg.js';
-import {property, flag, definePropertyByValue, definePropertiesByValue} from 'utilities';
+import {ID_MATRIX, Point2D} from '../util/svg.js';
+import {property, flag, definePropertiesByValue} from 'utilities';
 import {_isNonNegative} from '../util/misc.js';
+
+import {SvgTransformable} from './SvgTransformable.js';
+import {BoxCorner}        from './BoxCorner.js';
+import {predicate} from '../Coach';
+import {MX, MY, setCTM} from '../util/svg';
+import {BoxBorder} from './BoxBorder';
 
 const {max} = Math;
 
-import {SvgTransformable} from './SvgTransformable.js';
-import {LineSegment}      from './LineSegment.js';
-import {BoxCorner}        from './BoxCorner.js';
-import {applyCSS} from '../libs/jquery';
-
-export const BORDER_WIDTH      = 2;
-export const CORNER_RADIUS     = 15;
-export const MIN_MIN_SIZE      = 2*max(CORNER_RADIUS, BORDER_WIDTH);
-export const DEFAULT_INK_COLOR = 'cyan';
+export const BORDER_WIDTH = 2;
+export const MIN_MIN_SIZE = 2*max(BoxCorner.RADIUS, BORDER_WIDTH);
 
 /**
  * Representation of an interactive rectangle in svg space.
@@ -30,10 +29,17 @@ export class Box extends SvgTransformable {
 	@property({ isValid: _isNonNegative, initial: MIN_MIN_SIZE, transform(w) { return max(w || MIN_MIN_SIZE, this.minWidth  || MIN_MIN_SIZE) } }) width;
 	@property({ isValid: _isNonNegative, initial: MIN_MIN_SIZE, transform(h) { return max(h || MIN_MIN_SIZE, this.minHeight || MIN_MIN_SIZE) } }) height;
 	
-	@flag({ isValid: _isBoolean, initial: false }) tlRoundedCorner;
-	@flag({ isValid: _isBoolean, initial: false }) trRoundedCorner;
-	@flag({ isValid: _isBoolean, initial: false }) blRoundedCorner;
-	@flag({ isValid: _isBoolean, initial: false }) brRoundedCorner;
+	@property({ initial: {} }) stuckBorders; // TODO: more elegant solution
+	
+	
+	getSvgContainerFor(artefact) {
+		// TODO: if still needed, move this functionality to the dropzone handler
+		if (artefact instanceof BoxBorder || artefact instanceof BoxCorner) {
+			return this.svg.outline;
+		}
+		// return this.svg.content;
+		return this.svg.children;
+	}
 	
 	preCreate(options) {
 		super.preCreate(options);
@@ -57,34 +63,31 @@ export class Box extends SvgTransformable {
 	create(options = {}) {
 		super.create(options);
 		
-		this.svg._inkRect = $.svg('<rect>').attr({
-			rx:      CORNER_RADIUS,
-			ry:      CORNER_RADIUS,
-			stroke: 'none',
-			fill:    DEFAULT_INK_COLOR
-		}).appendTo(this.svg.ink);
+		this.svg.outline = $.svg('<g class="outline">')
+			.css(this.constructor.inheritedProperties)
+			.insertAfter(this.svg.children);
 		
-		this.svg._handleRect = $.svg('<rect>').attr({
-			rx:      CORNER_RADIUS,
-			ry:      CORNER_RADIUS,
+		const handlePath = $.svg('<path>').attr({
+			rx:      BoxCorner.RADIUS,
+			ry:      BoxCorner.RADIUS,
 			stroke: 'none',
 			fill:   'none'
 		}).appendTo(this.svg.handles);
 		
-		/* corners */
-		this.corners = {};
-		for (let [key, x, y] of [
-			['tl', -1, -1],
-			['tr', +1, -1],
-			['bl', -1, +1],
-			['br', +1, +1]
-		]) {
-			this.corners[key] = new BoxCorner({
-				coordinateSystem: this,
-				size: CORNER_RADIUS,
-				handler: { resizable: { artefact: this, x, y } }
-			});
-		}
+		const inkPath = $.svg('<path>').attr({
+			rx:      BoxCorner.RADIUS,
+			ry:      BoxCorner.RADIUS,
+			stroke:  'transparent',
+			fill:    'inherit'
+		}).appendTo(this.svg.ink);
+		
+		const overlayPath = $.svg('<path>').attr({
+			stroke:           'inherit',
+			strokeWidth:      'inherit',
+			strokeDasharray:  'inherit',
+			strokeDashoffset: 'inherit',
+			fill:             'transparent',
+		}).appendTo(this.svg.overlay);
 		
 		/* borders */
 		this.borders = {};
@@ -94,11 +97,62 @@ export class Box extends SvgTransformable {
 			['bottom', 0, +1],
 			['left',  -1,  0]
 		]) {
-			this.borders[key] = new LineSegment({
-				coordinateSystem: this,
-				lengthen1: -CORNER_RADIUS,
-				lengthen2: -CORNER_RADIUS,
-				handler: { resizable: { artefact: this, x, y } }
+			this.borders[key] = new BoxBorder({
+				parent: this,
+				lengthen1: -BoxCorner.RADIUS,
+				lengthen2: -BoxCorner.RADIUS,
+				side:      {key, x, y}
+			});
+			this.borders[key].registerHandlers({
+				resizable: {
+					artefact: this,
+					directions: {x, y},
+					before: () => { this.handlesActive = false },
+					after:  () => { this.handlesActive = true  }
+				},
+				highlightable: {
+					artefact: this,
+					effect: {
+						elements: this.borders[key].svg.overlay
+					}
+				},
+				dropzone: {
+					artefact: this.borders[key],
+					after: ({artefact}) => {
+						if (artefact instanceof Box) {
+							// TODO: finish this (mirror the LyphBox.js version)
+						}
+					}
+				}
+			});
+		}
+		
+		/* corners */
+		this.corners = {};
+		for (let [key, x, y, s1, s2] of [
+			['tl', -1, -1, 'top',    'left' ],
+			['tr', +1, -1, 'top',    'right'],
+			['bl', -1, +1, 'bottom', 'left' ],
+			['br', +1, +1, 'bottom', 'right']
+		]) {
+			this.corners[key] = new BoxCorner({
+				parent: this
+			});
+			this.corners[key].registerHandlers({
+				resizable: {
+					artefact: this,
+					directions: {x, y},
+					before: () => { this.handlesActive = false },
+					after:  () => { this.handlesActive = true  }
+				},
+				highlightable: {
+					artefact: this,
+					effect: {
+						elements: this.corners[key].svg.overlay
+							  .add(this.borders[s1].svg.overlay)
+							  .add(this.borders[s2].svg.overlay)
+					}
+				}
 			});
 		}
 		
@@ -110,7 +164,7 @@ export class Box extends SvgTransformable {
 			left:   { top:  this.corners.tl, bottom: this.corners.bl }
 		});
 		
-		/* resizing */
+		/* bookkeeping */
 		let cornerPoints = {
 			tl: { x: -1, y: -1, r:   0 },
 			tr: { x: +1, y: -1, r:  90 },
@@ -120,52 +174,196 @@ export class Box extends SvgTransformable {
 		let borderPoints = {
 			top:    [cornerPoints.tl, cornerPoints.tr],
 			right:  [cornerPoints.tr, cornerPoints.br],
-			bottom: [cornerPoints.bl, cornerPoints.br],
-			left:   [cornerPoints.tl, cornerPoints.bl]
+			bottom: [cornerPoints.br, cornerPoints.bl],
+			left:   [cornerPoints.bl, cornerPoints.tl]
 		};
-		this.p(['width', 'height']).subscribe(([w, h]) => {
-			this.svg._inkRect   .attr({ width: w, height: h, x: -w/2, y: -h/2 });
-			this.svg._handleRect.attr({ width: w, height: h, x: -w/2, y: -h/2 });
-			
+		
+		/* keep outline updated */
+		Observable.combineLatest(
+			this.p('width'),
+			this.p('height'),
+			this.corners.tr.p('rounded'),
+			this.corners.br.p('rounded'),
+			this.corners.bl.p('rounded'),
+			this.corners.tl.p('rounded')
+		).subscribe(([w, h]) => {
+			/* place the four corners */
 			for (let [key, cp] of cornerPoints::entries()) {
 				cp.p = new Point2D({
 					x:                cp.x * w / 2,
 					y:                cp.y * h / 2,
-					coordinateSystem: this.svg.children
+					coordinateSystem: this.svg.main
 				});
 				this.corners[key].transformation = ID_MATRIX.translate(...cp.p.xy).rotate(cp.r);
 			}
-			
-			for (let [s, [cp1, cp2]] of borderPoints::entries()) {
-				this.borders[s].point1 = cp1.p;
-				this.borders[s].point2 = cp2.p;
+			/* place the borders */
+			for (let [key, [{p:p1}, {p:p2}]] of borderPoints::entries()) {
+				this.borders[key].point1 = p1.in(this.svg.main);
+				this.borders[key].point2 = p2.in(this.svg.main);
 			}
+			
+			/* generate outline */
+			const top1    = this.borders.top   .inkPoint1;
+			const top2    = this.borders.top   .inkPoint2;
+			const right1  = this.borders.right .inkPoint1;
+			const right2  = this.borders.right .inkPoint2;
+			const bottom1 = this.borders.bottom.inkPoint1;
+			const bottom2 = this.borders.bottom.inkPoint2;
+			const left1   = this.borders.left  .inkPoint1;
+			const left2   = this.borders.left  .inkPoint2;
+			const cornerPath = (key) => {
+				const c = this.corners[key];
+				const s = BoxCorner.RADIUS;
+				const {x, y} = cornerPoints[key];
+				if (c.rounded) {
+					return `A ${s} ${s}, 0, 0, 0,`;
+				} else {
+					if (x*y === -1) { return `v ${y*s} L` }
+					else            { return `h ${x*s} L` }
+				}
+			};
+			$().add(inkPath)
+			   .add(handlePath)
+			   .add(overlayPath).attr({
+				d: `M
+					${left1.xy}   L ${left2.xy}   ${cornerPath('bl')}
+					${bottom1.xy} L ${bottom2.xy} ${cornerPath('br')}
+					${right1.xy}  L ${right2.xy}  ${cornerPath('tr')}
+					${top1.xy}    L ${top2.xy}    ${cornerPath('tl')}
+					${left1.xy}
+				Z`
+			});
+		});
+		
+		/* when parent changes, 'unstuck' all borders */
+		this.p('parent').subscribe(() => {
+			this.stuckBorders = {};
+		});
+		
+		// this.p('stuckBorders').switchMap((stb) => {
+		//
+		// 	console.log('----', stb);
+		//
+		// 	if (!stb.left && !stb.right && !stb.top && !stb.bottom) {
+		// 		return Observable.never();
+		// 	}
+		//
+		// 	let streams = {};
+		//
+		// 	for (let side of ['left', 'right']) {
+		// 		if (stb[side]) {
+		// 			const {box, relation, x} = stb[side];
+		// 			if (relation === 'parent') {
+		// 				streams[side] = box.p('width').map(w => x * w/2);
+		// 			} else { // sibling
+		// 				streams[side] = box.p(['width', 'transformation']).map(([w, t]) => t[MX] - x * w/2);
+		// 			}
+		// 		} else {
+		// 			streams[side] = Observable.of(null);
+		// 		}
+		// 	}
+		//
+		// 	streams.left.subscribe(console.info);
+		//
+		// 	// TODO: top, bottom
+		//
+		//
+		// 	const thisWX = this.p(['width', 'transformation']).map(([w, t]) => [w, t[MX]]);
+		// 	const thisL  = thisWX.map(([w, x]) => x - w/2);
+		// 	const thisR  = thisWX.map(([w, x]) => x + w/2);
+		// 	return Observable
+		// 		.combineLatest(streams.left, streams.right)
+		// 		.withLatestFrom(thisL, thisR, ([l, r], tl, tr) => {
+		// 			console.log(l, r, tl, tr);
+		// 			if (l === null) { l = tl }
+		// 			if (r === null) { r = tr }
+		// 			return {
+		// 				x:    (l + r) / 2,
+		// 				width: r - l
+		// 			};
+		// 		});
+		// }).subscribe(({x, width}) => {
+		// 	console.log(x, width);
+		// 	this.transformation = ID_MATRIX.translate(x, this.transformation[MY]);
+		// 	this.width = w;
+		// });
+		
+		/* react to parent resizing when stuck to border */
+		this.p(['width', 'height', 'parent.width', 'parent.height', 'stuckBorders']).subscribe(([w, h, pw, ph, stb]) => {
+			stb = [...stb::values()];
+			if (!stb || stb.length === 0) { return }
+			const stX = [...new Set(stb.map(({x}) => x))];
+			const stY = [...new Set(stb.map(({y}) => y))];
+			if (stX.length > 1) { stX::pull(0) }
+			if (stY.length > 1) { stY::pull(0) }
+			if (stX.length === 2) { w = pw }
+			if (stY.length === 2) { h = ph }
+			const [x, y] = [stX[0], stY[0]];
+			const oldX = this.transformation[MX];
+			const oldY = this.transformation[MY];
+			this.transformation = ID_MATRIX.translate(!x * oldX + x*(pw-w)/2, !y * oldY + y*(ph-h)/2).rotate(0);  // TODO
+			this.width  = w;
+			this.height = h;
+		});
+		
+		/* when stuck to borders, deactivate the appropriate outline handles */
+		this.p('stuckBorders').subscribe((stb) => {
+			// borders
+			this.borders.left.handlesActive   = !stb.left;
+			this.borders.right.handlesActive  = !stb.right;
+			this.borders.top.handlesActive    = !stb.top;
+			this.borders.bottom.handlesActive = !stb.bottom;
+			// corners
+			this.corners.tl.handlesActive = !stb.top    && !stb.left;
+			this.corners.tr.handlesActive = !stb.top    && !stb.right;
+			this.corners.bl.handlesActive = !stb.bottom && !stb.left;
+			this.corners.br.handlesActive = !stb.bottom && !stb.right;
 		});
 		
 	}
 	
 	postCreate(options = {}) {
-		/* set standard handler */
-		// console.log(this.handler);
-		// debugger;
-		if (this.handler::isEmpty()) {
-			this.handler = {
-				draggable: { artefact: this },
-				dropzone:  { artefact: this }
-			};
-		}
+		/* set standard handlers */
+		this.registerHandlers({
+			movable:   {
+				artefact: this,
+				after: () => {
+					/* when dropped, reapply relevant border stucknesses */
+					this.stuckBorders = {...this.stuckBorders};
+				}
+			},
+			rotatable: {
+				artefact: this,
+				after: () => {
+					/* after rotating, reapply relevant border stucknesses */
+					//  which, if present, would undo rotation
+					this.stuckBorders = {...this.stuckBorders};
+					// TODO: simply disallow rotation when stuck
+				}
+			},
+			dropzone:  {
+				artefact: this,
+				after: ({artefact}) => {
+					artefact.parent = this;
+				}
+			},
+			drawzone: {
+				artefact: this,
+				@predicate('conjunctive') accepts({ artefact }) {
+					return artefact instanceof SvgTransformable;
+				}
+			},
+			highlightable: {
+				artefact: this,
+				effect: { elements: this.svg.overlay }
+			},
+			deletable: {
+				artefact: this
+			}
+		});
 		
 		/***/
 		super.postCreate(options);
-	}
-	
-	setStyle(style: Object) {
-		super.setStyle(style);
-		this.svg.children::applyCSS({
-			'> .boxer-BoxCorner > .ink *': {
-				fill: this.svg._inkRect.css('fill')
-			}
-		});
 	}
 	
 }
