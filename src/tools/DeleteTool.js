@@ -32,6 +32,9 @@ export class DeleteTool extends MouseTool {
 		
 		/* handle click */
 		this.mouseMachine.CLICKING::handleBoxer('deletable').subscribe(({artefact}) => {
+			
+			console.log('((a))', artefact); // TODO
+			
 			artefact.delete();
 		});
 		

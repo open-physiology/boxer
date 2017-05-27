@@ -16,7 +16,7 @@ import {Box, Glyph, Edge, LineSegment, BoxCorner, Canvas, Coach} from '../index.
  */
 export class LyphBox extends Box {
 	
-	static AXIS_THICKNESS = 10;
+	static AXIS_THICKNESS = 20;
 	
 	@property() model;
 	

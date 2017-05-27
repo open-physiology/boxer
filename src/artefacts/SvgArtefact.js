@@ -40,7 +40,7 @@ export class SvgArtefact extends ValueTracker {
 	constructor(options = {}) {
 		super();
 		
-		this.setValueTrackerOptions({ takeUntil: this.p('deleted').filter(v=>!!v) });
+		// this.setValueTrackerOptions({ takeUntil: this.p('deleted').filter(v=>!!v) }); // TODO: put back
 		
 		this.preCreate (options);
 		this.create    (options);
@@ -118,7 +118,7 @@ export class SvgArtefact extends ValueTracker {
 		/* what to do when this is deleted */
 		this.p('deleted').filter(d=>!!d).take(1).subscribe(() => {
 			this.svg.main.remove();
-			this.parent = null;
+			// this.parent = null; // TODO: removing this fixed a bug; is it ever needed?
 		});
 		
 		/* add handler stuff that's given with the constructor */

@@ -19,9 +19,9 @@ export class Model extends ValueTracker {
 	constructor({id} = {}) {
 		super();
 		
-		this.setValueTrackerOptions({
-			takeUntil: this.p('deleted').filter(v=>!!v)
-		});
+		// this.setValueTrackerOptions({
+		// 	takeUntil: this.p('deleted').filter(v=>!!v) // TODO: put back
+		// });
 		
 		this.id = !id::isUndefined() ? id : _uniqueId()::parseInt();
 	}

@@ -288,7 +288,7 @@ export class DemoApp {
 		
 		/* create model */
 		const modelClass = isLyph ? LyphModel : isGlyph ? ProcessNodeModel : ProcessModel;
-		const newModel = new modelClass({ color: isLyph ? 'white' : 'black' }); // TODO: remove white/black init?
+		const newModel = new modelClass();
 		
 		/* register both into the system */
 		this.registerModelArtefactPair(newModel, newArtefact);
@@ -306,19 +306,17 @@ export class DemoApp {
 		
 		
 		const newArtefactOptions = {
+			model: newModel,
 			css: { '&': { 'fill': 'white', 'stroke': 'black' } }
 		};
 		if (isProcess) {
 			newArtefactOptions::assign({
-				model: newModel,
 				glyph1: this.artefactsById[newModel.glyph1.id],
 				glyph2: this.artefactsById[newModel.glyph2.id]
 			});
 		} else {
 			newArtefactOptions::assign({
-				model: newModel,
 				parent: newModel.parent && this.artefactsById[newModel.parent.id]
-				// ...newModel::pick('parent')
 			});
 		}
 		
