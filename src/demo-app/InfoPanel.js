@@ -115,7 +115,7 @@ const Component = ExtensibleComponent; // to get WebStorm syntax highlighting
 			        [style.color]            =" model.contrastingColor       "
 			        [style.border-color]     =" model.darkenedColor          "
 			        (cpToggleChange)         =" colorPickerOpen.next($event) ">
-				<span class="button-symbol">{{ symbol }}</span>
+				<span class="button-symbol" [innerHTML]="symbol"></span>
 			</button>
 			
 			<input type="text"

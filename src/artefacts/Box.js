@@ -15,9 +15,8 @@ import {BoxBorder} from './BoxBorder';
 
 const {max} = Math;
 
-export const BORDER_WIDTH      = 2;
-export const MIN_MIN_SIZE      = 2*max(BoxCorner.RADIUS, BORDER_WIDTH);
-export const DEFAULT_INK_COLOR = 'cyan';
+export const BORDER_WIDTH = 2;
+export const MIN_MIN_SIZE = 2*max(BoxCorner.RADIUS, BORDER_WIDTH);
 
 /**
  * Representation of an interactive rectangle in svg space.

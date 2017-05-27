@@ -97,7 +97,7 @@ export class LyphInfoPanel extends InfoPanel {
 	
 	get autoCompleteOptions() { return lyphDataByName::keys() }
 	
-	get symbol() { return '▤' }
+	get symbol() { return '&#9636;' }
 	
 	constructor(elementRef: ElementRef) {
 		super(elementRef);

@@ -55,7 +55,7 @@ const {KEY_ESCAPE} = KeyCode;
 })
 export class ProcessInfoPanel extends InfoPanel {
 	
-	get symbol() { return '⊶' }
+	get symbol() { return '&#8886;' }
 	
 	constructor(elementRef: ElementRef) {
 		super(elementRef);
