@@ -27,7 +27,6 @@ import {ProcessNode} from './ProcessNode';
 import {ProcessChain} from './ProcessChain';
 import {ProcessNodeModel} from './ProcessNodeModel';
 
-
 const LEFT_PANEL_WIDTH = '200px';
 
 
@@ -183,11 +182,11 @@ const LEFT_PANEL_WIDTH = '200px';
 				     [class.animating]     = " animationCount > 0 ">
 					<h2><div>Lyphs</div></h2>
 					<lyph-info-panel
-						*ngFor            = " let model of lyphModels "
-						[model]           = " model                   "
-						[class.info-panel]= " true                    "
-						[class.visible]   = " !model.deleted          "
-						(colorPickerOpen) = "colorPickerOpen = $event "
+						*ngFor            = " let model of lyphModels  "
+						[model]           = " model                    "
+						[class.info-panel]= " true                     "
+						[class.visible]   = " !model.deleted           "
+						(colorPickerOpen) = " colorPickerOpen = $event "
 					></lyph-info-panel>
 				</div>
 				
@@ -280,6 +279,14 @@ export class DemoApp {
 		
 	}
 	
+	createLayer({parentId, layerId, layerNr}) {
+		
+		const model = cls.fromJSON(jsn, {modelClasses, modelsById});
+		modelsById[model.id] = model;
+		this.onModelCreated(model);
+		
+	}
+	
 	onArtefactCreated(newArtefact) {
 		
 		const isLyph    = newArtefact instanceof LyphBox;
@@ -342,6 +349,10 @@ export class DemoApp {
 			delete this.artefactsById[newModel.id];
 		});
 		
+		
+		console.log(newModel.name);
+		
+		
 		/* register + delete handling */
 		const models = isLyph ? this.lyphModels : isGlyph ? this.nodeModels : this.processModels;
 		Observable.of(null)
@@ -364,6 +375,11 @@ export class DemoApp {
 		this.boxer.p('selectedArtefact')
 		    .map(a => a === newArtefact)
 		    .subscribe(newModel.p('selected'));
+		
+		/* registering layers created by this model */
+		newModel.p('createdLayer').filter(m=>!!m).subscribe((layerModel) => {
+			this.onModelCreated(layerModel);
+		});
 	}
 	
 }

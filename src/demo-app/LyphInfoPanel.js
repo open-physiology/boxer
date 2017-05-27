@@ -83,8 +83,8 @@ const {KEY_ESCAPE} = KeyCode;
 					<td>External</td>
 					<td>
 						<input type="text"
-							[(ngModel)]         = " model.external     "
-							[style.border-color]=" model.darkenedColor " />
+							[(ngModel)]         = " model.external      "
+							[style.border-color]= " model.darkenedColor " />
 					</td>
 				</tr>
 			</table>
@@ -113,33 +113,8 @@ export class LyphInfoPanel extends InfoPanel {
 	}
 	
 	onDataSelected(name) {
-		const data = lyphDataByName[name];
-		if (data.external) { this.model.external = data.external }
-		if (data.topology) {
-			switch (data.topology) {
-				case 'BAG': {
-					this.model.leftSideClosed  = true;
-					this.model.rightSideClosed = false;
-				} break;
-				case 'TUBE': {
-					this.model.leftSideClosed  = false;
-					this.model.rightSideClosed = false;
-				} break;
-				case 'CYST': {
-					this.model.leftSideClosed  = true;
-					this.model.rightSideClosed = true;
-				} break;
-			}
-		}
-		if (data.length) {
-			this.model.lengthSpecified = true;
-			this.model.lengthMin = data.length.min;
-			this.model.lengthMax = data.length.max;
-		}
-		if (data.thickness) {
-			this.model.thicknessSpecified = true;
-			this.model.thicknessMin = data.thickness.min;
-			this.model.thicknessMax = data.thickness.max;
+		if (this.model.selected) {
+			this.model.setFromData(lyphDataByName[name]);
 		}
 	}
 	

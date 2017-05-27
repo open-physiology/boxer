@@ -1,6 +1,6 @@
 import assert from 'power-assert';
 import $      from '../libs/jquery.js';
-import {entries, isEmpty, isArray, pull} from 'lodash-bound';
+import {entries, isEmpty, isArray, pull, values} from 'lodash-bound';
 import {Observable} from '../libs/expect-rxjs.js';
 
 import {ID_MATRIX, Point2D} from '../util/svg.js';
@@ -30,7 +30,7 @@ export class Box extends SvgTransformable {
 	@property({ isValid: _isNonNegative, initial: MIN_MIN_SIZE, transform(w) { return max(w || MIN_MIN_SIZE, this.minWidth  || MIN_MIN_SIZE) } }) width;
 	@property({ isValid: _isNonNegative, initial: MIN_MIN_SIZE, transform(h) { return max(h || MIN_MIN_SIZE, this.minHeight || MIN_MIN_SIZE) } }) height;
 	
-	@property({ initial: [] }) stuckToBorder; // TODO: more elegant solution
+	@property({ initial: {} }) stuckBorders; // TODO: more elegant solution
 	
 	
 	getSvgContainerFor(artefact) {
@@ -118,12 +118,10 @@ export class Box extends SvgTransformable {
 					}
 				},
 				dropzone: {
-					artefact: this, // TODO: change to border artefact
+					artefact: this.borders[key],
 					after: ({artefact}) => {
 						if (artefact instanceof Box) {
-							artefact.parent = this;
-							artefact.stuckToBorder = [...artefact.stuckToBorder, {x, y}];
-							// TODO: more elegant and universal implementation
+							// TODO: finish this (mirror the LyphBox.js version)
 						}
 					}
 				}
@@ -240,11 +238,60 @@ export class Box extends SvgTransformable {
 		
 		/* when parent changes, 'unstuck' all borders */
 		this.p('parent').subscribe(() => {
-			this.stuckToBorder = [];
+			this.stuckBorders = {};
 		});
 		
-		/* parent resizing when stuck to border */
-		this.p(['width', 'height', 'parent.width', 'parent.height', 'stuckToBorder']).subscribe(([w, h, pw, ph, stb]) => {
+		// this.p('stuckBorders').switchMap((stb) => {
+		//
+		// 	console.log('----', stb);
+		//
+		// 	if (!stb.left && !stb.right && !stb.top && !stb.bottom) {
+		// 		return Observable.never();
+		// 	}
+		//
+		// 	let streams = {};
+		//
+		// 	for (let side of ['left', 'right']) {
+		// 		if (stb[side]) {
+		// 			const {box, relation, x} = stb[side];
+		// 			if (relation === 'parent') {
+		// 				streams[side] = box.p('width').map(w => x * w/2);
+		// 			} else { // sibling
+		// 				streams[side] = box.p(['width', 'transformation']).map(([w, t]) => t[MX] - x * w/2);
+		// 			}
+		// 		} else {
+		// 			streams[side] = Observable.of(null);
+		// 		}
+		// 	}
+		//
+		// 	streams.left.subscribe(console.info);
+		//
+		// 	// TODO: top, bottom
+		//
+		//
+		// 	const thisWX = this.p(['width', 'transformation']).map(([w, t]) => [w, t[MX]]);
+		// 	const thisL  = thisWX.map(([w, x]) => x - w/2);
+		// 	const thisR  = thisWX.map(([w, x]) => x + w/2);
+		// 	return Observable
+		// 		.combineLatest(streams.left, streams.right)
+		// 		.withLatestFrom(thisL, thisR, ([l, r], tl, tr) => {
+		// 			console.log(l, r, tl, tr);
+		// 			if (l === null) { l = tl }
+		// 			if (r === null) { r = tr }
+		// 			return {
+		// 				x:    (l + r) / 2,
+		// 				width: r - l
+		// 			};
+		// 		});
+		// }).subscribe(({x, width}) => {
+		// 	console.log(x, width);
+		// 	this.transformation = ID_MATRIX.translate(x, this.transformation[MY]);
+		// 	this.width = w;
+		// });
+		
+		/* react to parent resizing when stuck to border */
+		this.p(['width', 'height', 'parent.width', 'parent.height', 'stuckBorders']).subscribe(([w, h, pw, ph, stb]) => {
+			stb = [...stb::values()];
 			if (!stb || stb.length === 0) { return }
 			const stX = [...new Set(stb.map(({x}) => x))];
 			const stY = [...new Set(stb.map(({y}) => y))];
@@ -256,24 +303,22 @@ export class Box extends SvgTransformable {
 			const oldX = this.transformation[MX];
 			const oldY = this.transformation[MY];
 			this.transformation = ID_MATRIX.translate(!x * oldX + x*(pw-w)/2, !y * oldY + y*(ph-h)/2).rotate(0);  // TODO
-			this.width = w;
+			this.width  = w;
 			this.height = h;
 		});
 		
 		/* when stuck to borders, deactivate the appropriate outline handles */
-		this.p('stuckToBorder').subscribe((stb) => {
-			const stX = new Set(stb.map(({x}) => x));
-			const stY = new Set(stb.map(({y}) => y));
+		this.p('stuckBorders').subscribe((stb) => {
 			// borders
-			this.borders.left.handlesActive   = !stX.has(-1);
-			this.borders.right.handlesActive  = !stX.has(+1);
-			this.borders.top.handlesActive    = !stY.has(-1);
-			this.borders.bottom.handlesActive = !stY.has(+1);
+			this.borders.left.handlesActive   = !stb.left;
+			this.borders.right.handlesActive  = !stb.right;
+			this.borders.top.handlesActive    = !stb.top;
+			this.borders.bottom.handlesActive = !stb.bottom;
 			// corners
-			this.corners.tl.handlesActive = !stY.has(-1) && !stX.has(-1);
-			this.corners.tr.handlesActive = !stY.has(-1) && !stX.has(+1);
-			this.corners.bl.handlesActive = !stY.has(+1) && !stX.has(-1);
-			this.corners.br.handlesActive = !stY.has(+1) && !stX.has(+1);
+			this.corners.tl.handlesActive = !stb.top    && !stb.left;
+			this.corners.tr.handlesActive = !stb.top    && !stb.right;
+			this.corners.bl.handlesActive = !stb.bottom && !stb.left;
+			this.corners.br.handlesActive = !stb.bottom && !stb.right;
 		});
 		
 	}
@@ -285,7 +330,7 @@ export class Box extends SvgTransformable {
 				artefact: this,
 				after: () => {
 					/* when dropped, reapply relevant border stucknesses */
-					this.stuckToBorder = [...this.stuckToBorder];
+					this.stuckBorders = {...this.stuckBorders};
 				}
 			},
 			rotatable: {
@@ -293,7 +338,7 @@ export class Box extends SvgTransformable {
 				after: () => {
 					/* after rotating, reapply relevant border stucknesses */
 					//  which, if present, would undo rotation
-					this.stuckToBorder = [...this.stuckToBorder];
+					this.stuckBorders = {...this.stuckBorders};
 					// TODO: simply disallow rotation when stuck
 				}
 			},

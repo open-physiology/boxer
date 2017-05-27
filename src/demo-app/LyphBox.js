@@ -10,13 +10,22 @@ import {_isNonNegative} from '../util/misc.js';
 
 import {Box, Glyph, Edge, LineSegment, BoxCorner, Canvas, Coach} from '../index.js';
 
- 
+const {max} = Math;
+
+
 /**
  * Representation of a lyph in svg space.
  */
 export class LyphBox extends Box {
 	
-	static AXIS_THICKNESS = 20;
+	static AXIS_THICKNESS = 10;
+	
+	
+	// TODO: These are temporary; layers shouldn't work this way
+	@property() layerNr;
+	@property() layerCount;
+	
+	
 	
 	@property() model;
 	
@@ -38,9 +47,9 @@ export class LyphBox extends Box {
 		this.p('deleted').filter(v=>!!v).subscribe(() => { this.model.delete() });
 		
 		/* other model synchronizations */
-		for (let key of ['hasAxis', 'width', 'height', 'transformation']) {
-			this.p(`model.${key}`).subscribe( this.p(key) );
-			this.p([key, 'model']).filter(([,m]) => !!m).subscribe(([value, model]) => { model[key] = value });
+		for (let key of ['hasAxis', 'width', 'height', 'transformation', 'layerNr', 'layerCount']) {
+			this.p(`model.${key}`).filter(v=>!v::isUndefined()).subscribe( this.p(key) );
+			this.p([key, 'model']).filter(([v,m]) => !v::isUndefined() && !!m).subscribe(([value, model]) => { model[key] = value });
 		}
 	}
 	
@@ -56,13 +65,13 @@ export class LyphBox extends Box {
 		    .subscribe(([parent, model]) => {
 				model.parent = parent && parent.model || null;
 			});
-		this.p(`model.parent`)
+		this.p('model.parent')
 		    .filter(p => !p::isUndefined())
 		    .map(p => p ? artefactsById[p.id] : root)
 		    .map((a) => {
-				if (a !== root && !a.model) {
-					a = a.handlers.dropzone.artefact;
-				}
+			    if (a instanceof LyphBox) { a = a.contentBox }
+			    // ^ create more general handler/rule for using a sub-artefact as a container,
+			    //   and translating back and forth between conceptual parent and artefact parent
 				return a;
 		    })
 		    .subscribe( this.p('parent') );
@@ -71,11 +80,6 @@ export class LyphBox extends Box {
 	postCreate(options = {}) {
 		super.postCreate(options);
 		
-		/* set min-size taking axis into account */
-		const noAxisMinHeight = this.minHeight;
-		this.p('hasAxis')
-		    .map(ha => noAxisMinHeight + ha * LyphBox.AXIS_THICKNESS)
-		    .subscribe( this.p('minHeight') );
 		
 		/* create inner box */
 		this.contentBox = new Box({
@@ -99,25 +103,47 @@ export class LyphBox extends Box {
 			...this.contentBox.corners
 		}::values()) { outline.handlesActive = false }
 		// reassign snap-to-borders to contentBox
-		for (let [key, x, y] of [
-			['top',    0, -1],
-			['right', +1,  0],
-			['bottom', 0, +1],
-			['left',  -1,  0]
+		for (let [side, x, y, oppositeSide] of [
+			['top',    0, -1, 'bottom'],
+			['right', +1,  0, 'left'  ],
+			['bottom', 0, +1, 'top'   ],
+			['left',  -1,  0, 'right' ]
 		]) {
-			this.borders[key].handlers.dropzone::assign({
-				artefact: this.borders[key], // TODO: change to border artefact
+			this.borders[side].handlers.dropzone::assign({
+				artefact: this.borders[side],
 				after: ({artefact}) => {
+					// TODO: note that we're currently pretending the two stuck-together things
+					//     : have the same rotational orientation; we don't yet support rotated stuckness
 					if (artefact instanceof Box) {
-						artefact.parent = this.contentBox;
-						artefact.stuckToBorder = [...artefact.stuckToBorder, {x, y}];
-						// TODO: more elegant and universal implementation
+						if (artefact.parent === this.contentBox) { // stuck to parent
+							artefact.stuckBorders = {
+								...artefact.stuckBorders,
+								[side]: {
+									box: this.contentBox,
+									relation: 'parent',
+									side,
+									x, y // refers to artefact side (= same as parent side)
+								}
+							};
+						} else if (artefact.parent === this.parent) { // stuck to sibling
+							artefact.stuckBorders = {
+								...artefact.stuckBorders,
+								[oppositeSide]: {
+									box: this,
+									relation: 'sibling',
+									side: oppositeSide,
+									x: -x, y: -y // refers to artefact side (= opposite to sibling side)
+								}
+							};
+						}
+						// TODO: check for certain stuckness constraints
 					}
 				}
 			});
 		}
 		
-		/* synchronize size */
+		
+		/* adapt contentBox position to presence of axis */
 		this.p('hasAxis').subscribe((ha) => {
 			this.contentBox.transformation =
 				ID_MATRIX.translate(0, ha * -LyphBox.AXIS_THICKNESS/2);
@@ -138,11 +164,10 @@ export class LyphBox extends Box {
 			});
 		});
 		
-		/* when stuck to bottom border, lose the axis */
-		this.p('stuckToBorder').subscribe((stb) => {
-			const stY = new Set(stb.map(({y}) => y));
-			this.hasAxis = !stY.has(+1);
-		});
+		// /* when bottom border is stuck, lose the axis */ // TODO
+		// this.p('stuckBorders').subscribe((stb) => {
+		// 	this.hasAxis = !stb.bottom;
+		// });
 		
 		/* when clicking border, toggle open/closed sides */
 		Observable.merge(this.borders.left.e('click'), this.corners.tl.e('click')).subscribe(() => {
@@ -155,6 +180,72 @@ export class LyphBox extends Box {
 		/* change corner rounding based on open/closed sides */
 		this.p('model.leftSideClosed') .subscribe(this.corners.tl.p('rounded'));
 		this.p('model.rightSideClosed').subscribe(this.corners.tr.p('rounded'));
+		
+		
+		
+		
+		
+		
+		
+		/* react to layerNr */
+		// this.p(['parent','layerNr']).filter(([p,ln])=>!!p && !ln::isUndefined()).exhaustMap(([p, ln]) => Observable.merge(
+		// 	Observable.of([p, +1]),
+		// 	this.p(['parent','layerNr']).filter(([p2,ln])=>p !== p2 || ln::isUndefined() || ln === null).map(() => [p, -1])
+		// )).subscribe(([p, n]) => {
+		// 	p.layerCount += n;
+		// 	if (n === -1) { this.layerNr = null }
+		// });
+		
+		
+		/* set min-size taking axis and layers into account */
+		const noAxisMinHeight = this.minHeight;
+		this.p(['hasAxis', 'layerCount'])
+		    .map(([ha, lc]) => max(1, lc) * noAxisMinHeight + ha * LyphBox.AXIS_THICKNESS)
+		    .subscribe( this.p('minHeight') );
+		
+		/* if this is a layer, remove the axis */
+		this.p(['layerNr', 'parent', 'parent.parent.layerCount'])
+		    .filter(([,p]) => p instanceof Box)
+		    .subscribe(([layerNr, parent, plc]) => {
+				const isLayer = !layerNr::isUndefined();
+			    this.hasAxis = !isLayer;
+			    if (isLayer) {
+				    for (let key of ['movable', 'rotatable', 'deletable']) {
+					    this.contentBox.handlers[key]::assign(parent.handlers[key]);
+	                    this.handlers[key]::assign(parent.handlers[key]);
+				    }
+				    for (let outline of {
+			            ...this.borders,
+			            ...this.corners
+			        }::values()) { outline.handlesActive = false }
+			    }
+		    });
+		
+		/* if this is a layer, mirror open/closed of parent */
+		this.p(['layerNr', 'parent.parent.model.leftSideClosed', 'parent.parent.model.rightSideClosed'])
+		    .subscribe(([layerNr, lsc, rsc]) => {
+				const isLayer = !layerNr::isUndefined();
+				if (isLayer) {
+					this.model.leftSideClosed  = lsc;
+					this.model.rightSideClosed = rsc;
+				}
+		    });
+		
+		/* move layers with parents */
+		this.p(['parent', 'parent.width', 'parent.height', 'layerNr', 'parent.parent.layerCount'])
+		    .filter(([p,,,ln]) => p instanceof Box && !ln::isUndefined())
+		    .subscribe(([p, pw, ph, ln, plc]) => {
+				this.width          = pw;
+				this.height         = ph / plc;
+			    this.transformation = ID_MATRIX.translate(
+			    	0,
+				    ln * this.height + this.height/2 - ph/2
+			    );
+			});
+		
+		
+		
+		
 		
 	}
 	
