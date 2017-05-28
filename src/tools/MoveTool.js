@@ -62,7 +62,7 @@ export class MoveTool extends MouseTool {
 
 				/* move while dragging */
 				mousemove::subscribeDuringState((moveEvent) => {
-					let mouseVector = moveEvent.point.in(artefact.svg.main);
+					let mouseVector = moveEvent.point.in(artefact.svg.children);
 					if (referencePoint && moveEvent.ctrlKey) {
 						mouseVector = snap45(mouseVector, artefact, referencePoint);
 					}
@@ -99,9 +99,6 @@ export class MoveTool extends MouseTool {
 				
 			}
 		}));
-		
-		// localMachine.p('state').subscribe((s) => console.log('---', s)); // TODO: remove
-		// coach.p('selectedArtefact').subscribe((s) => console.log('---', s)); // TODO: remove
 		
 		
 		/* mutual exclusion between this machine and other machines, coordinated by coach.stateMachine */

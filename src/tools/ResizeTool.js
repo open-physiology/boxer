@@ -91,7 +91,7 @@ export class ResizeTool extends MouseTool {
 				
 				/* resize while dragging */
 				mousemove
-					.map(event => event.point.in(artefact.svg.main).minus(start.mouse))
+					.map(event => event.point.in(artefact.svg.children).minus(start.mouse))
 					::subscribeDuringState(({x: xDiff, y: yDiff}) => {
 						xDiff = directions.x * max(directions.x * xDiff, artefact.minWidth  - start.width );
 						yDiff = directions.y * max(directions.y * yDiff, artefact.minHeight - start.height);

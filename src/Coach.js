@@ -92,7 +92,7 @@ export class Coach extends ValueTracker {
 		});
 	}
 	
-	canvasE  (e) { return Observable.fromEvent($(this.root.svg.main), e).do(::this.enrichMouseEvent) }
+	rootE    (e) { return Observable.fromEvent($(this.root.svg.main), e).do(::this.enrichMouseEvent) }
 	windowE  (e) { return Observable.fromEvent($(window), e)            .do(::this.enrichMouseEvent) }
 	documentE(e) { return Observable.fromEvent($(document), e)          .do(::this.enrichMouseEvent) }
 	e        (e) { return this[$$domEvents][e]                                                       }

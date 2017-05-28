@@ -53,6 +53,14 @@ export function setCTM(matrix) {
 	          .initialize(refSVG.createSVGTransformFromMatrix(matrix));
 }
 
+export function getCTM() {
+	
+	if ($(this)[0].transform && $(this)[0].transform.baseVal && $(this)[0].transform.baseVal.numberOfItems) {
+		return $(this)[0].transform.baseVal.getItem(0).matrix;
+	}
+	return ID_MATRIX;
+}
+
 export function newSVGPoint(x, y) {
 	let result = refSVG.createSVGPoint();
 	result::assign({x, y});

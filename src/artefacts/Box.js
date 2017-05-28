@@ -192,14 +192,14 @@ export class Box extends SvgTransformable {
 				cp.p = new Point2D({
 					x:                cp.x * w / 2,
 					y:                cp.y * h / 2,
-					coordinateSystem: this.svg.main
+					coordinateSystem: this.svg.outline
 				});
 				this.corners[key].transformation = ID_MATRIX.translate(...cp.p.xy).rotate(cp.r);
 			}
 			/* place the borders */
 			for (let [key, [{p:p1}, {p:p2}]] of borderPoints::entries()) {
-				this.borders[key].point1 = p1.in(this.svg.main);
-				this.borders[key].point2 = p2.in(this.svg.main);
+				this.borders[key].point1 = p1.in(this.svg.outline);
+				this.borders[key].point2 = p2.in(this.svg.outline);
 			}
 			
 			/* generate outline */
