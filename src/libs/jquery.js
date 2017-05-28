@@ -1,6 +1,8 @@
 import $ from 'jquery';
 export default $;
 
+import 'jquery-mousewheel';
+
 import {entries} from 'lodash-bound';
 
 /* convenience static methods */

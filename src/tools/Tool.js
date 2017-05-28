@@ -21,7 +21,7 @@ export default class Tool extends ValueTracker {
 	}
 	
 	myE(stream)  { return this.p('active').switchMap(a => a ? stream : Observable.never()) }
-	canvasE  (e) { return this.myE(this.coach.canvasE  (e)) }
+	rootE    (e) { return this.myE(this.coach.rootE    (e)) }
 	windowE  (e) { return this.myE(this.coach.windowE  (e)) }
 	documentE(e) { return this.myE(this.coach.documentE(e)) }
 	e        (e) { return this.myE(this.coach.e        (e)) }

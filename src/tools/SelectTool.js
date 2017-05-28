@@ -1,4 +1,4 @@
-import $ from 'jquery';
+import $ from '../libs/jquery.js';
 import Tool from './Tool';
 import {handleBoxer} from '../Coach.js';
 import {Observable} from '../libs/expect-rxjs.js';
@@ -69,10 +69,10 @@ export class SelectTool extends Tool {
 			::handleBoxer('*') // TODO: <-- selectable?
 			.map(handler => handler.originalArtefact || handler.artefact);
 		
-		const altScroll = this.canvasE('mousewheel')
+		const altScroll = this.rootE('mousewheel')
 			.filter(withMod('alt'))
 			.do((e) => { e.preventDefault() })
-			.map(e=>e.originalEvent.deltaY);
+			.map(e=>e.deltaY);
 		
 		const mouseArtefact = mouseEnter.switchMap(enter => {
 			
@@ -86,7 +86,7 @@ export class SelectTool extends Tool {
 			const stack = [];
 			const altScrollSelect = altScroll.scan((s, d) => {
 				let next;
-				if (d < 0) { // up
+				if (d > 0) { // up
 					if (stack[0] !== s) {
 						stack.unshift(s);
 						next = s.parent; // TODO: search upward by selection criteria (like supported handlers)

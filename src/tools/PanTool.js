@@ -60,33 +60,26 @@ export class PanTool extends MouseTool {
 				idle    ::enterState('IDLE');
 			},
 			'PANNING': (args) => {
-				const {before, after, point, transformableElement, artefact} = args;
+				const {before, after, point, artefact} = args;
 				
 				/* pan initialization */
-				const initialPointerEvents = transformableElement.css('pointer-events');
-				transformableElement.css('pointer-events', 'none');
 				if (before::isFunction()) { before(args) }
-				
-				/* if no transformable element was given, use .children*/
-				const element = transformableElement || artefact.svg.children;
 				
 				/* record start dimensions and mouse position */
 				const start = {
-					transformation: element::getCTM(),
+					transformation: artefact.transformation,
 					mouse:          point
 				};
 				
 				/* resize while dragging */
 				mousemove
 					.map(event => event.point.in(artefact.svg.children).minus(start.mouse))
-					::subscribeDuringState(({x: xDiff, y: yDiff}) => {
-						element::setCTM(start.transformation.translate(xDiff, yDiff));
-					});
+					.map(({x: xDiff, y: yDiff}) => start.transformation.translate(xDiff, yDiff))
+					::subscribeDuringState((m) => { artefact.transformation = m });
 				
 				/* cancel or stop dragging */
 				dropping.do(({point}) => {
 					/* stop drawing */
-					transformableElement.css('pointer-events', initialPointerEvents);
 					// coach.selectTool.reacquire(point);
 					coach.selectTool.reacquire();
 					after::callIfFunction(); // TODO: pass args?
