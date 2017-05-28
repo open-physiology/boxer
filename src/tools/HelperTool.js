@@ -5,7 +5,7 @@ export class HelperTool extends Tool {
 	
 	showPoint(point, attrs) {
 		
-		point = point.in(this.coach.root.svg.main);
+		point = point.in(this.coach.root.svg.children);
 		
 		let indicator = $.svg('<circle>').attr({
 			...point.obj('cx', 'cy'),

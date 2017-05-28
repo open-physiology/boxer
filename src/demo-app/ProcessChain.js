@@ -86,14 +86,22 @@ export class ProcessChain extends SvgArtefact {
 		super.postCreate(options);
 		
 		/* set standard handlers */
-		this.registerHandlers({
-			highlightable: {
-				artefact: this,
-				effect: { elements: this.svg.overlay }
-			},
-			deletable: {
-				artefact: this
+		this.p('edges').subscribe((edges) => {
+			let elements = $();
+			for (let edge of edges) {
+				elements = elements.add(edge.svg.overlay);
+				edge.handlers.deletable::assign({
+					artefact: this
+				});
+				edge.handlers.highlightable::assign({
+					artefact: this,
+					effect: { elements }
+				});
 			}
+			this.handlers.highlightable::assign({
+				artefact: this,
+				effect: { elements }
+			});
 		});
 		
 		/* reassign handlers */

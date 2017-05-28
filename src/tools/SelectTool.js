@@ -8,8 +8,6 @@ import {Point2D} from '../util/svg';
 
 export class SelectTool extends Tool {
 	
-	@flag({ initial: false }) holding;
-	
 	init({coach}) {
 		super.init({ coach, events: ['mouseover', 'mouseout', 'mouseenter', 'mouseleave'] });
 		
@@ -18,7 +16,7 @@ export class SelectTool extends Tool {
 			this.reacquire = (point) => {
 				let element;
 				if (point) {
-					point = point.in(coach.root.svg.main);
+					point = point.in(coach.root.svg.children);
 					let {left, top} = coach.root.svg.main.offset();
 					element = document.elementFromPoint(
 						left + point.x,
@@ -112,9 +110,9 @@ export class SelectTool extends Tool {
 			allowSynchronousAccess: true
 		});
 		
-		// coach.p('selectedArtefact').subscribe((a) => {
-		// 	console.log('selected:', a && a.svg.main.attr('class'));
-		// });
+		coach.p('selectedArtefact').subscribe((a) => {
+			console.log('selected:', a && a.svg.main.attr('class'));
+		});
 		
 		
 		

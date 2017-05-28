@@ -22,6 +22,10 @@ export class Canvas extends SvgArtefact {
 				@predicate('conjunctive') accepts({ artefact }) {
 					return artefact instanceof SvgTransformable;
 				}
+			},
+			pannable: {
+				artefact:             this,
+				transformableElement: this.svg.children
 			}
 		});
 		super.postCreate(options);
