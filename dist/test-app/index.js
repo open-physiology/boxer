@@ -59067,9 +59067,6 @@ var HighlightTool = exports.HighlightTool = function (_GlobalBehaviorTool) {
 	}, {
 		key: 'activateBehavior',
 		value: function activateBehavior(current) {
-
-			console.log('highlighting', current);
-
 			/* set value */
 			this.currentValue = current;
 			/* set styling */
