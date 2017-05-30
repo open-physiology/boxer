@@ -36,6 +36,8 @@ const {KEY_ESCAPE} = KeyCode;
 })
 export class NgBoxer extends Coach {
 	
+	@Input() delayStart = false;
+	
 	@property({ initial: null }) toolMode;
 	
 	stapleTools: Set = new Set;
@@ -63,9 +65,7 @@ export class NgBoxer extends Coach {
 				boxFactory:   LyphBox,
 				edgeFactory:  ProcessChain,
 				glyphFactory: ProcessNode
-			}))
-			.start();
-		
+			}));
 		
 		/* setup modes */
 		this.addStapleTools(SelectTool, HighlightTool, MouseCursorTool, HelperTool);
@@ -90,6 +90,12 @@ export class NgBoxer extends Coach {
 			this.activateExclusiveTools([...this.stapleTools, ...tools]);
 			init();
 		});
+	}
+	
+	ngOnInit() {
+		if (!this.delayStart) {
+			this.start();
+		}
 	}
 	
 }

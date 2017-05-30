@@ -8,6 +8,7 @@ import {ID_MATRIX, SVGMatrix, setCTM} from '../util/svg.js';
 import {ValueTracker, property, flag, humanMsg, event}       from 'utilities';
 import {moveToFront} from '../util/svg';
 import {smartMerge} from '../Coach';
+import {Handler} from '../handlers/Handler';
 
 const $$handlers = Symbol('$$handlers');
 
@@ -172,8 +173,13 @@ export class SvgArtefact extends ValueTracker {
 		if (!this[$$handlers]) {
 			this[$$handlers] = {};
 			this.svg.handles.find('*').data('boxer-handlers', this[$$handlers]);
+			// TODO: ^ stop using 'boxer-handlers'; just get the controller
+			//     :   it's perhaps a big code-change
 		}
-		this[$$handlers]::smartMerge(handlers);
+		for (let [key, handler] of handlers::entries()) {
+			if (!this[$$handlers][key]) { this[$$handlers][key] = new Handler() }
+			this[$$handlers][key].register(handler);
+		}
 	}
 	get handlers(): Object {
 		if (!this[$$handlers]) {

@@ -1,4 +1,4 @@
-import {ValueTracker, property, flag, humanMsg} from 'utilities';
+import {ValueTracker, property, flag, humanMsg, match} from 'utilities';
 import chroma from 'chroma-js';
 import {isUndefined, pick, parseInt, at, assign, fromPairs} from 'lodash-bound';
 import {uniqueId as _uniqueId} from 'lodash';
@@ -10,6 +10,15 @@ import {ID_MATRIX, createSVGMatrix} from '../util/svg';
 
 import lyphData from './data.json';
 const lyphDataById = lyphData.lyphs.map(obj => [obj.id, obj])::fromPairs();
+
+/* set supertypes field */
+for (let lyph of lyphData.lyphs) {
+	for (let subtypeId of lyph.subtypes || []) {
+		let subtype = lyphDataById[subtypeId];
+		assert(subtype.supertype::isUndefined());
+		subtype.supertype = lyph.id;
+	}
+}
 
 
 
@@ -144,6 +153,17 @@ export class LyphModel extends Model {
 			layerModel.layerNr = i;
 			this.p('createdLayer').next(layerModel);
 			layerModel.setFromData(lyphDataById[data.layers[i]]);
+		}
+		
+		/* assign specific colors to specific types of lyph */
+		for (let m = this; !!m; m = m.supertype) {
+			this.color = match(m.name)({
+				'Wall of blood vessel':    'rgb(163,116,116)',
+				'Wall of urinary vessel':  'rgb(138,163,116)',
+				'Lumen of blood vessel':   'rgb(255,0,0)',
+				'Lumen of urinary vessel': 'rgb(225,222,55)',
+				default: this.color
+			});
 		}
 		
 	}

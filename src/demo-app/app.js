@@ -17,7 +17,7 @@ import {NgBoxerModule, NgBoxer} from './NgBoxer.js';
 import {InfoPanelModule} from './InfoPanel.js';
 
 import {Model} from './Model.js';
-import {match} from 'utilities';
+import {match, property, ValueTracker} from 'utilities';
 import {LyphModel} from './LyphModel';
 import {ProcessModel} from './ProcessModel';
 import {LyphBox} from './LyphBox';
@@ -154,7 +154,7 @@ const LEFT_PANEL_WIDTH = '200px';
 `],
 	template: `
 		
-		<div><svg ng-boxer #boxer=boxer></svg></div>
+		<div><svg ng-boxer [delayStart]="true" #boxer=boxer></svg></div>
 		
 		<div class="right-panel" [class.color-picker-open]="colorPickerOpen">
 			<div class="right-panel-inner">
@@ -208,7 +208,7 @@ const LEFT_PANEL_WIDTH = '200px';
 	    
 	`
 })
-export class DemoApp {
+export class DemoApp extends ValueTracker {
 	
 	// @ViewChild('fileInput') fileInput: ElementRef;
 	
@@ -223,8 +223,11 @@ export class DemoApp {
 	animationCount: number = 0;
 	colorPickerOpen = false;
 	
+	@property({ initial: null }) selectedModel;
+	
 	
 	constructor({nativeElement}: ElementRef) {
+		super();
 		this.nativeElement = $(nativeElement);
 	}
 	
@@ -235,6 +238,30 @@ export class DemoApp {
 		this.boxer.drawTool.p('artefactCreated')
 		    .filter(v=>!!v)
 		    .subscribe(::this.onArtefactCreated);
+		
+		
+		
+		
+		/* highlighting */
+		this.boxer.highlightTool.register(this.boxer.highlightTool, this.boxer.stateMachine.p('state').switchMap(state => match(state)({
+			'IDLE': this.p('selectedModel').map((model) => model ? this.artefactsById[model.id] : null),
+			'BUSY': Observable.of(null)
+		})).map(artefact => artefact && {
+			...this.boxer.highlightTool.HIGHLIGHT_DEFAULT,
+			artefact
+		}));
+		
+		
+		// this.boxer.stateMachine.p('state').subscribe((s) => {
+		// 	console.info('STATE:', s);
+		// });
+		// this.p('selectedModel').subscribe((m) => {
+		// 	console.log('SELECTED MODEL:', m);
+		// });
+		
+		
+		this.boxer.start();
+		
 		
 	}
 	
@@ -365,11 +392,25 @@ export class DemoApp {
 			.subscribe(() => { models::pull(newModel) });
 		
 		/* selecting */
-		newModel.p('selected').filter(s => !!s)
-		        .map(() => newArtefact)
-		        .subscribe(::this.boxer.setSelectedArtefact);
+		// newModel.p('selected').filter(s => !!s)
+		//         .map(() => newArtefact)
+		//         .subscribe(::this.boxer.setSelectedArtefact);
+		
+		
+		newModel.p('selected').withLatestFrom(this.p('selectedModel')).subscribe(([selected, current]) => {
+			if (selected) {
+				this.selectedModel = newModel;
+			} else if (current === newModel) {
+				this.selectedModel = null;
+			}
+		});
+		this.p('selectedModel')
+		    .map(m => m === newModel)
+		    .subscribe(newModel.p('selected'));
+		
 		this.boxer.p('selectedArtefact')
-		    .map(a => a === newArtefact)
+		    .map(a => !!a && !!a.handlers && !!a.handlers.highlightable
+		           && a.handlers.highlightable.artefact === newArtefact)
 		    .subscribe(newModel.p('selected'));
 		
 		/* registering layers created by this model */

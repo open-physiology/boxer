@@ -110,17 +110,9 @@ export class SelectTool extends Tool {
 			allowSynchronousAccess: true
 		});
 		
-		coach.p('selectedArtefact').subscribe((a) => {
-			console.log('selected:', a && a.svg.main.attr('class'));
-		});
-		
-		
-		
-		// setInterval(() => {
-		// 	console.log('(((1)))');
-		// 	coach.selectTool.reacquire();
-		// 	console.log('(((2)))');
-		// }, 1000);
+		// coach.p('selectedArtefact').subscribe((a) => {
+		// 	console.log('selected:', a && a.svg.main.attr('class'));
+		// });
 		
 		
 	}
