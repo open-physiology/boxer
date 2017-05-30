@@ -156,8 +156,10 @@ export class InfoPanel {
 		});
 		
 		/* focus on controls --> selected model */
-		this.nativeElement.focusin (() => { this.model.selected = true  });
-		this.nativeElement.focusout(() => { this.model.selected = false });
+		// this.nativeElement.focusin    (() => { this.model.selected = true  });
+		// this.nativeElement.focusout   (() => { this.model.selected = false });
+		this.nativeElement.mouseenter (() => { this.model.selected = true  });
+		this.nativeElement.mouseleave (() => { this.model.selected = false });
 		
 		/* make sure the auto-complete drop-down keeps the foreground when visible */
 		const defaultZIndex = this.nativeElement.css('z-index');

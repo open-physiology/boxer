@@ -49,9 +49,6 @@ export class HighlightTool extends GlobalBehaviorTool {
 	}
 	
 	activateBehavior(current) {
-		
-		console.log('highlighting', current);
-		
 		/* set value */
 		this.currentValue = current;
 		/* set styling */
