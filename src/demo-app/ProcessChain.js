@@ -60,7 +60,6 @@ export class ProcessChain extends SvgArtefact {
 			glyph1: this.glyph1,
 			glyph2: this.glyph2
 		});
-		delete result.handlers.highlightable;
 		result.handlers.deletable::assign({
 			artefact: this
 		});
@@ -90,6 +89,8 @@ export class ProcessChain extends SvgArtefact {
 			let elements = $();
 			for (let edge of edges) {
 				elements = elements.add(edge.svg.overlay);
+			}
+			for (let edge of edges) {
 				edge.handlers.deletable::assign({
 					artefact: this
 				});
@@ -98,19 +99,19 @@ export class ProcessChain extends SvgArtefact {
 					effect: { elements }
 				});
 			}
-			this.handlers.highlightable::assign({
+			this.handlers.highlightable = { // TODO: had to use =, because it was never assigned in the first place
 				artefact: this,
 				effect: { elements }
-			});
+			};
 		});
 		
-		/* reassign handlers */
-		// assign particular responsibilities between outer and inner box
-		this.p(['glyph1', 'glyph2', 'intermediateGlyphs', 'edges']).subscribe(([glyph1, glyph2, iGlyphs, edges]) => {
-			for (let key of ['deletable', 'highlightable']) for (let thing of [...edges, ...iGlyphs]) {
-				thing.handlers[key]::assign(this.handlers[key]);
-			}
-		});
+		// /* reassign handlers */
+		// // assign particular responsibilities between inner artefacts and the main ProcessChain
+		// this.p(['intermediateGlyphs', 'edges']).subscribe(([glyph1, glyph2, iGlyphs, edges]) => {
+		// 	for (let key of ['deletable', 'highlightable']) for (let thing of [...edges, ...iGlyphs]) {
+		// 		thing.handlers[key]::assign(this.handlers[key]);
+		// 	}
+		// });
 		
 		/* when this ProcessChain is deleted, delete all its edges */
 		this.p('deleted').filter(d=>!!d).subscribe(() => {

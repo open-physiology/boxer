@@ -105,11 +105,7 @@ export class LyphInfoPanel extends InfoPanel {
 	
 	ngOnInit() {
 		assert(this.model instanceof LyphModel);
-		
 		super.ngOnInit();
-		
-		
-		
 	}
 	
 	onDataSelected(name) {

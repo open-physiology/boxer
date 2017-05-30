@@ -1,7 +1,6 @@
 import {SvgArtefact} from './SvgArtefact.js';
 import {SvgTransformable} from './SvgTransformable';
-import {subclassOf} from '../util/misc';
-import {predicate, smartMerge} from '../Coach';
+import {predicate} from '../handlers/Handler.js';
 import {property} from 'utilities';
 import {ID_MATRIX, setCTM} from '../util/svg';
 
@@ -27,7 +26,7 @@ export class Canvas extends SvgArtefact {
 			},
 			drawzone: {
 				artefact: this,
-				@predicate('conjunctive') accepts({ artefact }) {
+				accepts({ artefact }) {
 					return artefact instanceof SvgTransformable;
 				}
 			},

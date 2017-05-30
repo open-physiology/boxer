@@ -118,7 +118,8 @@ const Component = ExtensibleComponent; // to get WebStorm syntax highlighting
 				<span class="button-symbol" [innerHTML]="symbol"></span>
 			</button>
 			
-			<input type="text"
+			<input class="name"
+			       type="text"
 			       placeholder="Name"
 				   [(ngModel)]          = " model.name          "
 			       [style.border-color] = " model.darkenedColor "
@@ -148,7 +149,7 @@ export class InfoPanel {
 	ngOnInit() {
 		/* when the model is selected, give a nice focus effect to the name box */
 		this.model.p('selected').subscribe((s) => {
-			this.nativeElement.children('input').css(
+			this.nativeElement.find('input.name').css(
 				'background-color',
 				s ? 'var(--boxer-highlight-color)' : ''
 			)

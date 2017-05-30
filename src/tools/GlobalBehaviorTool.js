@@ -23,10 +23,18 @@ export class GlobalBehaviorTool extends Tool {
 		super.init({ coach, events: ['mouseleave', 'mouseover'] });
 	}
 	
-	register(tool, patternStream) {
+	register(condition, patternStream) {
+		let active;
+		if (condition instanceof Tool) {
+			active = condition.p('active');
+		} else if (condition instanceof Observable) {
+			active = condition;
+		} else {
+			active = Observable.of(true);
+		}
 		if (!this[$$values]) { this[$$values] = [] }
 		this[$$values].push(patternStream
-			.withLatestFrom(tool.p('active'), (v, a) => a ? v : null)
+			.withLatestFrom(active, (v, a) => a ? v : null)
 			.catch(::console.error)
 			.startWith(null));
 	}

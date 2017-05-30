@@ -9,7 +9,7 @@ import {_isNonNegative} from '../util/misc.js';
 
 import {SvgTransformable} from './SvgTransformable.js';
 import {BoxCorner}        from './BoxCorner.js';
-import {predicate} from '../Coach';
+import {predicate} from '../handlers/Handler.js';
 import {MX, MY, setCTM} from '../util/svg';
 import {BoxBorder} from './BoxBorder';
 
@@ -349,7 +349,7 @@ export class Box extends SvgTransformable {
 			},
 			drawzone: {
 				artefact: this,
-				@predicate('conjunctive') accepts({ artefact }) {
+				accepts({ artefact }) {
 					return artefact instanceof SvgTransformable;
 				}
 			},
