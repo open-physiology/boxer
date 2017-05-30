@@ -156,7 +156,7 @@ export class LyphModel extends Model {
 		}
 		
 		/* assign specific colors to specific types of lyph */
-		for (let m = this; !!m; m = m.supertype) {
+		for (let m = data; !!m; m = lyphDataById[m.supertype]) {
 			this.color = match(m.name)({
 				'Wall of blood vessel':    'rgb(163,116,116)',
 				'Wall of urinary vessel':  'rgb(138,163,116)',
