@@ -7,7 +7,9 @@ import { NguiAutoCompleteModule } from '@ngui/auto-complete';
 import ExtensibleComponent from './ExtensibleComponent.js';
 
 import KeyCode from 'keycode-js';
+import {plainDOM} from '../libs/jquery';
 const {KEY_ESCAPE} = KeyCode;
+
 
 /**
  * The info-panel component.
@@ -156,10 +158,25 @@ export class InfoPanel {
 		});
 		
 		/* focus on controls --> selected model */
-		// this.nativeElement.focusin    (() => { this.model.selected = true  });
-		// this.nativeElement.focusout   (() => { this.model.selected = false });
-		this.nativeElement.mouseenter (() => { this.model.selected = true  });
-		this.nativeElement.mouseleave (() => { this.model.selected = false });
+		let mouseInside = false;
+		this.nativeElement.mouseenter (() => {
+			mouseInside = true;
+			this.model.selected = true;
+		});
+		this.nativeElement.mouseleave (() => {
+			mouseInside = false;
+			this.model.selected = false;
+		});
+		
+		/* scroll to this element when it gets selected */
+		let thisElement = this.nativeElement::plainDOM();
+		this.model.p('selected').filter(s => !!s && !mouseInside).subscribe(() => {
+			if (thisElement.scrollIntoViewIfNeeded) {
+				thisElement.scrollIntoViewIfNeeded();
+			} else {
+				thisElement.scrollIntoView();
+			}
+		});
 		
 		/* make sure the auto-complete drop-down keeps the foreground when visible */
 		const defaultZIndex = this.nativeElement.css('z-index');

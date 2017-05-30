@@ -1,6 +1,6 @@
 {
   "name": "project-template",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "description": "Templates for starting new open-physiology projects",
   "main": "dist/index.js",
   "scripts": {
