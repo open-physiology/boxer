@@ -3,6 +3,7 @@ import {NgModule, Input, Output, ElementRef, EventEmitter} from '@angular/core';
 import {ColorPickerModule} from 'angular2-color-picker'
 import {FormsModule}       from '@angular/forms';
 import {NguiAutoCompleteModule} from '@ngui/auto-complete';
+import {isFunction} from 'lodash-bound';
 
 import ExtensibleComponent from './ExtensibleComponent.js';
 
@@ -156,12 +157,14 @@ export class InfoPanel {
 	
 	ngOnInit() {
 		/* when the model is selected, give a nice focus effect to the name box */
-		this.model.p('selected').subscribe((s) => {
-			this.nativeElement.find('input.name').css(
-				'background-color',
-				s ? 'var(--boxer-highlight-color)' : ''
-			)
-		});
+		if (this.model.p::isFunction()) {
+			this.model.p('selected').subscribe((s) => {
+				this.nativeElement.find('input.name').css(
+					'background-color',
+					s ? 'var(--boxer-highlight-color)' : ''
+				)
+			});
+		}
 		
 		/* focus on controls --> selected model */
 		this.nativeElement.mouseenter (() => {

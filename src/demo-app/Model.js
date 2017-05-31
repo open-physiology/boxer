@@ -26,6 +26,7 @@ export class Model extends ValueTracker {
 		});
 		
 		this.id = !id::isUndefined() ? id : _uniqueId()::parseInt();
+		this.class = this.constructor.name;
 	}
 	
 	delete() { this.deleted = true }

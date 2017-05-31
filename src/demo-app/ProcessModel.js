@@ -15,7 +15,7 @@ export class ProcessModel extends Model {
 	@property() glyph2;
 	
 	// @property({ initial: [] }) edges;
-	
+		
 	////////////////////////////////////////////////////////////////////////////
 	
 	toJSON() {
