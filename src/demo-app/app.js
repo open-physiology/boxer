@@ -314,28 +314,47 @@ export class DemoApp extends ValueTracker {
 	}
 	
 	load(json) {
-		
+		/* convenient map of mode classes by name */
 		const modelClasses = {
 			LyphModel,
 			ProcessNodeModel,
 			ProcessModel
 		};
 		
-		const modelsById = {};
-		
+		/* create a map from model id to corresponding json object */
+		const jsonById = {};
 		for (let [cls, key] of [
 			[LyphModel,        'lyphs'    ],
 			[ProcessNodeModel, 'nodes'    ],
 			[ProcessModel,     'processes']
-		]) {
-			for (let jsn of json[key]) {
-				const model = cls.fromJSON(jsn, {modelClasses, modelsById});
-				modelsById[model.id] = model;
-				this.onModelCreated(model);
-			}
+		]) for (let jsn of json[key]) {
+			jsonById[jsn.id] = jsn;
 		}
 		
+		/* how to create a new model (it is called recursively to create prerequisites first) */
+		const modelsById = {};
+		const createModel = (jsn) => {
+			if (!modelsById[jsn.id]) {
+				const cls = modelClasses[jsn.class];
+				
+				/* do parents or connected glyphs first */
+				if (jsn.parent) { createModel(jsonById[jsn.parent]) }
+				if (jsn.glyph1) { createModel(jsonById[jsn.glyph1]) }
+				if (jsn.glyph2) { createModel(jsonById[jsn.glyph2]) }
+				
+				/* then create this model */
+				const model = cls.fromJSON(jsn, {modelClasses, modelsById});
+				modelsById[model.id] = model;
+				
+				/* and register it */
+				this.onModelCreated(model);
+			}
+		};
 		
+		/* kick off model creation */
+		for (let jsn of jsonById::values()) {
+			createModel(jsn);
+		}
 	}
 	
 	createLayer({parentId, layerId, layerNr}) {

@@ -36874,7 +36874,6 @@ var SvgTransformable = exports.SvgTransformable = (_dec = (0, _utilities.propert
 			this.p('transformation').subscribe((_context = this.svg.main, _svg.setCTM).bind(_context));
 
 			/* keep track of the transformation of this artefact w.r.t. the canvas */
-
 			this.p(['parent?.globalTransformation', 'transformation'], function (pgt, t) {
 				return (pgt || _svg.ID_MATRIX).multiply(t);
 			}).subscribe(this.p('globalTransformation'));
@@ -43472,7 +43471,7 @@ var _createClass = function () { function defineProperties(target, props) { for 
 
 var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
 
-var _dec, _desc, _value, _class, _descriptor;
+var _dec, _dec2, _desc, _value, _class, _descriptor, _descriptor2;
 
 var _SvgArtefact2 = __webpack_require__(125);
 
@@ -43540,6 +43539,8 @@ function _instanceof(left, right) { if (right != null && typeof Symbol !== "unde
  */
 var Canvas = exports.Canvas = (_dec = (0, _utilities.property)({ initial: _svg.ID_MATRIX, isValid: function isValid(v) {
 		return _instanceof(v, SVGMatrix);
+	} }), _dec2 = (0, _utilities.property)({ initial: _svg.ID_MATRIX, isValid: function isValid(v) {
+		return _instanceof(v, SVGMatrix);
 	} }), (_class = function (_SvgArtefact) {
 	_inherits(Canvas, _SvgArtefact);
 
@@ -43554,19 +43555,36 @@ var Canvas = exports.Canvas = (_dec = (0, _utilities.property)({ initial: _svg.I
 			args[_key] = arguments[_key];
 		}
 
-		return _ret = (_temp = (_this = _possibleConstructorReturn(this, (_ref = Canvas.__proto__ || Object.getPrototypeOf(Canvas)).call.apply(_ref, [this].concat(args))), _this), _initDefineProp(_this, 'transformation', _descriptor, _this), _temp), _possibleConstructorReturn(_this, _ret);
+		return _ret = (_temp = (_this = _possibleConstructorReturn(this, (_ref = Canvas.__proto__ || Object.getPrototypeOf(Canvas)).call.apply(_ref, [this].concat(args))), _this), _initDefineProp(_this, 'transformation', _descriptor, _this), _initDefineProp(_this, 'globalTransformation', _descriptor2, _this), _temp), _possibleConstructorReturn(_this, _ret);
 	}
 
 	_createClass(Canvas, [{
-		key: 'postCreate',
-		value: function postCreate() {
-			var _context,
-			    _this2 = this;
+		key: 'preCreate',
+		value: function preCreate() {
+			var _context;
 
 			var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
+			_get(Canvas.prototype.__proto__ || Object.getPrototypeOf(Canvas.prototype), 'preCreate', this).call(this, options);
+
+			/* set transformation if given */
+			if (options.transformation) {
+				this.transformation = options.transformation;
+			}
+
 			/* apply canvas transformation (zooming, panning, etc.) */
 			this.p('transformation').subscribe((_context = this.svg.children, _svg.setCTM).bind(_context));
+
+			/* keep track of the global transformation */
+			this.p('transformation').subscribe(this.p('globalTransformation'));
+		}
+	}, {
+		key: 'postCreate',
+		value: function postCreate() {
+			var _this2 = this;
+
+			var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+
 
 			/* register canvas handlers */
 			this.registerHandlers({
@@ -43611,6 +43629,11 @@ var Canvas = exports.Canvas = (_dec = (0, _utilities.property)({ initial: _svg.I
 	enumerable: true,
 	initializer: function initializer() {
 		return this.transformation;
+	}
+}), _descriptor2 = _applyDecoratedDescriptor(_class.prototype, 'globalTransformation', [_dec2], {
+	enumerable: true,
+	initializer: function initializer() {
+		return this.globalTransformation;
 	}
 })), _class));
 
@@ -43781,7 +43804,7 @@ var Edge = exports.Edge = (_dec = (0, _utilities.property)({ isValid: function i
 					    gt = _ref8[0],
 					    root = _ref8[1];
 
-					return _svg.Point2D.fromMatrixTranslation(gt, root.svg.children);
+					return _svg.Point2D.fromMatrixTranslation(gt, root.svg.main);
 				}).subscribe(this.p('point' + _g));
 			}
 
