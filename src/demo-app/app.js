@@ -102,6 +102,7 @@ const LEFT_PANEL_WIDTH = '200px';
 			width: 202px;
 			border: solid 1px black;
 			z-index: 10;
+			pointer-events: none;
 		}
 		
 		perfect-scrollbar.right-panel {
@@ -200,7 +201,12 @@ const LEFT_PANEL_WIDTH = '200px';
 			    [class.selected]        = " boxer.toolMode === toolMode     "
 			    (click)                 = " boxer.toolMode =   toolMode     ">{{ toolMode }}</button
 	    ></div>
-		<perfect-scrollbar class="right-panel" [class.color-picker-open]="colorPickerOpen">
+		<perfect-scrollbar class="right-panel"
+			[class.color-picker-open]="colorPickerOpen"
+			(mouseenter)=" mouseOverRightPanel = true  "
+			(mouseleave)=" mouseOverRightPanel = false "
+		>
+		
 			<div class="right-panel-inner">
 				
 				<div *ngIf="lyphModels.length"
@@ -234,8 +240,8 @@ const LEFT_PANEL_WIDTH = '200px';
 		</perfect-scrollbar>
 			
 		<div class="right-panel-bottom"
-			*ngIf                    = " selectedModel               "
-			[style.background-color] = " selectedModel.color "
+			*ngIf                    = " selectedModel && !mouseOverRightPanel "
+			[style.background-color] = " selectedModel.color                   "
 		>
 			<universal-info-panel
 				[model]           = " selectedModel            "
@@ -256,7 +262,8 @@ export class DemoApp extends ValueTracker {
 	artefactsById = {};
 	
 	animationCount: number = 0;
-	colorPickerOpen = false;
+	colorPickerOpen     = false;
+	mouseOverRightPanel = false;
 	
 	@property({ initial: null }) selectedModel;
 	
