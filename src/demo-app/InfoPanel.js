@@ -150,6 +150,8 @@ export class InfoPanel {
 	
 	@Output() colorPickerOpen = new EventEmitter;
 	
+	@Output() init = new EventEmitter;
+	
 	constructor({nativeElement}: ElementRef) {
 		this.nativeElement = $(nativeElement);
 		this.console = console;
@@ -184,6 +186,8 @@ export class InfoPanel {
 			this.nativeElement.find('ngui-auto-complete').hide();
 		});
 		
+		/* fire init event */
+		this.init.next();
 	}
 	
 	onDataSelected(name) {
