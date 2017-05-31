@@ -8,8 +8,7 @@ import assert from 'power-assert';
 import {Model} from './Model.js';
 import {ID_MATRIX, createSVGMatrix} from '../util/svg';
 
-import lyphData from './data.json';
-const lyphDataById = lyphData.lyphs.map(obj => [obj.id, obj])::fromPairs();
+import {data as lyphData, lyphDataById} from './data.js';
 
 /* set supertypes field */
 for (let lyph of lyphData.lyphs) {
@@ -117,6 +116,7 @@ export class LyphModel extends Model {
 	}
 	
 	setFromData(data) {
+		super.setFromData(data);
 		if (data.name)     { this.name     = data.name     }
 		if (data.external) { this.external = data.external }
 		if (data.topology) {

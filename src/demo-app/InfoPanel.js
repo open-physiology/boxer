@@ -2,13 +2,15 @@ import $ from 'jquery';
 import {NgModule, Input, Output, ElementRef, EventEmitter} from '@angular/core';
 import {ColorPickerModule} from 'angular2-color-picker'
 import {FormsModule}       from '@angular/forms';
-import { NguiAutoCompleteModule } from '@ngui/auto-complete';
+import {NguiAutoCompleteModule} from '@ngui/auto-complete';
 
 import ExtensibleComponent from './ExtensibleComponent.js';
 
 import KeyCode from 'keycode-js';
 import {plainDOM} from '../libs/jquery';
 const {KEY_ESCAPE} = KeyCode;
+
+import {lyphDataByName} from './data.js';
 
 
 /**
@@ -41,6 +43,10 @@ const Component = ExtensibleComponent; // to get WebStorm syntax highlighting
 			height: 19px;
 		}
 		
+		.header.no-auto-complete >>> ngui-auto-complete {
+			display: none !important;
+		}
+		
 		.header >>> .ngui-auto-complete-wrapper {
 			margin-left: 29px;
 			width: calc(100% - 29px);
@@ -69,6 +75,7 @@ const Component = ExtensibleComponent; // to get WebStorm syntax highlighting
 			border-radius: 0 0 6px 6px;
 			margin-top: -8px;
 			padding: 12px 4px 4px 4px;
+			background-color: white;
 		}
 		
 		.other-fields table td:nth-child(1) {
@@ -107,26 +114,25 @@ const Component = ExtensibleComponent; // to get WebStorm syntax highlighting
 	`],
 	template: `
 
-		<div class="header">
+		<div class="header" [class.no-auto-complete]=" model.wasSetFromData || autoCompleteOptions.length === 0 ">
 		
-			<button [(colorPicker)]          =" model.color                  "
-					[cpPosition]             =" 'left'                       "
-					[cpPositionOffset]       =" '5px'                        "
-					[cpAlphaChannel]         =" 'disabled'                   "
-			        [style.background-color] =" model.color                  "
-			        [style.color]            =" model.contrastingColor       "
-			        [style.border-color]     =" model.darkenedColor          "
-			        (cpToggleChange)         =" colorPickerOpen.next($event) ">
+			<button [(colorPicker)]          = " model.color                  "
+					[cpPosition]             = " 'left'                       "
+					[cpPositionOffset]       = " '5px'                        "
+					[cpAlphaChannel]         = " 'disabled'                   "
+			        [style.background-color] = " model.color                  "
+			        [style.color]            = " model.contrastingColor       "
+			        [style.border-color]     = " model.darkenedColor          "
+			        (cpToggleChange)         = " colorPickerOpen.next($event) ">
 				<span class="button-symbol" [innerHTML]="symbol"></span>
 			</button>
 			
-			<input class="name"
-			       type="text"
-			       placeholder="Name"
-				   [(ngModel)]          = " model.name          "
-			       [style.border-color] = " model.darkenedColor "
+			<input class="name" type="text" placeholder="Name"
+			       [disabled]           = " model.wasSetFromData "
+				   [(ngModel)]          = " model.name           "
+			       [style.border-color] = " model.darkenedColor  "
 			       auto-complete
-			       [source]       = " autoCompleteOptions "
+			       [source]       = " autoCompleteOptions    "
 			       (valueChanged) = " onDataSelected($event) "/>
 			     
 		</div>
@@ -158,24 +164,11 @@ export class InfoPanel {
 		});
 		
 		/* focus on controls --> selected model */
-		let mouseInside = false;
 		this.nativeElement.mouseenter (() => {
-			mouseInside = true;
 			this.model.selected = true;
 		});
 		this.nativeElement.mouseleave (() => {
-			mouseInside = false;
 			this.model.selected = false;
-		});
-		
-		/* scroll to this element when it gets selected */
-		let thisElement = this.nativeElement::plainDOM();
-		this.model.p('selected').filter(s => !!s && !mouseInside).subscribe(() => {
-			if (thisElement.scrollIntoViewIfNeeded) {
-				thisElement.scrollIntoViewIfNeeded();
-			} else {
-				thisElement.scrollIntoView();
-			}
 		});
 		
 		/* make sure the auto-complete drop-down keeps the foreground when visible */
@@ -191,9 +184,13 @@ export class InfoPanel {
 	}
 	
 	onDataSelected(name) {
-	} // intentionally empty; override in subclass
-	
-	
+		const condition =
+			lyphDataByName[name] &&
+			!this.model.wasSetFromData;
+		if (condition) {
+			this.model.setFromData(lyphDataByName[name]);
+		}
+	}
 	
 }
 

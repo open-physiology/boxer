@@ -2,6 +2,7 @@ import {ValueTracker, property, flag} from 'utilities';
 import chroma from 'chroma-js';
 import {isUndefined, pick, parseInt} from 'lodash-bound';
 import {uniqueId as _uniqueId} from 'lodash';
+import assert from 'power-assert';
 
 export class Model extends ValueTracker {
 	
@@ -13,15 +14,16 @@ export class Model extends ValueTracker {
 	
 	@flag({ initial: false }) deleted;
 	@flag({ initial: false }) selected;
+	@flag({ initial: false }) wasSetFromData;
 	
 	////////////////////////////////////////////////////////////////////////////
 	
 	constructor({id} = {}) {
 		super();
 		
-		// this.setValueTrackerOptions({
-		// 	takeUntil: this.p('deleted').filter(v=>!!v) // TODO: put back
-		// });
+		this.setValueTrackerOptions({
+			takeUntil: this.p('deleted').filter(v=>!!v)
+		});
 		
 		this.id = !id::isUndefined() ? id : _uniqueId()::parseInt();
 	}
@@ -31,7 +33,7 @@ export class Model extends ValueTracker {
 	toJSON() {
 		return {
 			'class': this.constructor.name,
-			...this::pick('id', 'name', 'color')
+			...this::pick('id', 'name', 'color', 'wasSetFromData')
 		};
 	}
 	
@@ -41,7 +43,13 @@ export class Model extends ValueTracker {
 		result.id    = json.id;
 		result.name  = json.name;
 		result.color = json.color;
+		result.wasSetFromData = json.wasSetFromData;
 		return result;
+	}
+	
+	setFromData(data) {
+		assert(!this.wasSetFromData);
+		this.wasSetFromData = true;
 	}
 	
 	////////////////////////////////////////////////////////////////////////////

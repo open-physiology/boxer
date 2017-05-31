@@ -1,5 +1,6 @@
 import {NgModule, Component, Input, ElementRef, ViewChild} from '@angular/core';
 import {BrowserModule} from '@angular/platform-browser';
+import {PerfectScrollbarModule} from 'angular2-perfect-scrollbar';
 import {animationLoop} from 'rxjs-animation-loop';
 import assert from 'power-assert';
 import FileSaver from 'file-saver';
@@ -26,6 +27,7 @@ import {ProcessInfoPanelModule} from './ProcessInfoPanel';
 import {ProcessNode} from './ProcessNode';
 import {ProcessChain} from './ProcessChain';
 import {ProcessNodeModel} from './ProcessNodeModel';
+import {UniversalInfoPanel, UniversalInfoPanelModule} from './UniversalInfoPanel';
 
 const LEFT_PANEL_WIDTH = '200px';
 
@@ -54,18 +56,66 @@ const LEFT_PANEL_WIDTH = '200px';
 			height:   100%;
 		}
 		
-		div.right-panel {
+		div.button-section {
+			position: fixed;
+			top: 0;
+			right: 0;
+			margin: 0;
+			padding: 2px;
+			width: 202px;
+			height: 80px;
+			border: solid 1px black;
+			z-index: 10;
+			background-color: white;
+			display: flex;
+			flex-wrap: wrap; 
+			justify-content: space-between;
+			align-content: stretch;
+		}
+		
+		div.button-section > button {
+			border: solid 1px gray;
+			margin: 2px;
+			outline: none;
+			cursor: pointer;
+			background-color: transparent;
+			flex-basis: 90px;
+			flex-grow: 1;
+		}
+		
+		div.button-section > button:hover {
+			border-color: black;
+			background-color: #eee;
+		}
+		
+		div.button-section > button.selected {
+			border-color: black;
+			background-color: #aff;
+		}
+		
+		div.right-panel-bottom {
+			position: fixed;
+			bottom: 0;
+			right: 0;
+			margin: 0;
+			padding: 0;
+			width: 202px;
+			border: solid 1px black;
+			z-index: 10;
+		}
+		
+		perfect-scrollbar.right-panel {
 			margin: 0;
 			padding: 0;
 			position: absolute;
-			top: 0;
+			top: 80px;
 			right: 0;
-			height: 100%;
-			width:  218px;
-			overflow-y: auto;
+			height: calc(100% - 80px);
+			width:  202px;
+			/*overflow-y: auto;*/
 		}
 		
-		div.right-panel.color-picker-open {
+		perfect-scrollbar.right-panel.color-picker-open {
 			width: 100%;
 		}
 		
@@ -75,39 +125,16 @@ const LEFT_PANEL_WIDTH = '200px';
 			right: 0;
 			margin: 0;
 			padding: 0;
-			min-height: 100%;
 			width:  202px;
-			border: solid 1px black;
+			border: 1px black;
+			border-style: none solid;
 			overflow: visible;
 			background-color: white;
-		}
-		
-		div.right-panel-inner > .button-section {
-			margin: -1px 0 0 -1px;
-			width: 200px;
-			border-bottom: solid 1px black;
-		}
-		
-		div.right-panel-inner > .button-section > button {
-			border: 1px black;
-			border-style: solid none solid solid;
-			margin: 0 -1px -2px 0;
-			width: calc(50% + 1px);
-			outline: none;
-			cursor: pointer;
-			background-color: white;
-		}
-		
-		div.right-panel-inner > .button-section > button:hover {
-			background-color: #eee;
-		}
-		
-		div.right-panel-inner > .button-section > button.selected {
-			background-color: #aff;
+			min-height: 100%;
 		}
 		
 		div.right-panel-inner > .model-section {
-			width: 200px;
+			width: 100%;
 			padding-bottom: 5px;
 			overflow: visible;
 		}
@@ -156,26 +183,25 @@ const LEFT_PANEL_WIDTH = '200px';
 		
 		<div><svg ng-boxer [delayStart]="true" #boxer=boxer></svg></div>
 		
-		<div class="right-panel" [class.color-picker-open]="colorPickerOpen">
+		<div class="button-section">
+			<input #fileInput
+				[type]          = " 'file'                     "
+				[accept]        = " '.json'                    "
+				[style.display] = " 'none'                     "
+				(change)        = " loadFiles(fileInput.files) " />
+			<button
+		        [style.font-weight]     = " 'bold'                          "
+		        (click)                 = " fileInput.click()               "> Load </button
+	        ><button
+		        [style.font-weight]     = " 'bold'                          "
+		        (click)                 = " save()                          "> Save </button
+	        ><button
+	            *ngFor                  = " let toolMode of boxer.toolModes "
+			    [class.selected]        = " boxer.toolMode === toolMode     "
+			    (click)                 = " boxer.toolMode =   toolMode     ">{{ toolMode }}</button
+	    ></div>
+		<perfect-scrollbar class="right-panel" [class.color-picker-open]="colorPickerOpen">
 			<div class="right-panel-inner">
-				
-				<div class="button-section">
-					<input #fileInput
-						[type]          = " 'file'                     "
-						[accept]        = " '.json'                    "
-						[style.display] = " 'none'                     "
-						(change)        = " loadFiles(fileInput.files) " />
-					<button
-				        [style.font-weight]     = " 'bold'                          "
-				        (click)                 = " fileInput.click()               "> Load </button
-			        ><button
-				        [style.font-weight]     = " 'bold'                          "
-				        (click)                 = " save()                          "> Save </button
-			        ><button
-			        	*ngFor                  = " let toolMode of boxer.toolModes "
-					    [class.selected]        = " boxer.toolMode === toolMode     "
-					    (click)                 = " boxer.toolMode =   toolMode     ">{{ toolMode }}</button
-			    ></div>
 				
 				<div *ngIf="lyphModels.length"
 				     [class.model-section] = " true               "
@@ -204,13 +230,22 @@ const LEFT_PANEL_WIDTH = '200px';
 				</div>
 				
 			</div>
+			
+		</perfect-scrollbar>
+			
+		<div class="right-panel-bottom"
+			*ngIf                    = " selectedModel               "
+			[style.background-color] = " selectedModel.color "
+		>
+			<universal-info-panel
+				[model]           = " selectedModel            "
+				(colorPickerOpen) = " colorPickerOpen = $event "
+			></universal-info-panel>
 		</div>
 	    
 	`
 })
 export class DemoApp extends ValueTracker {
-	
-	// @ViewChild('fileInput') fileInput: ElementRef;
 	
 	@ViewChild('boxer') boxer: NgBoxer;
 	
@@ -238,9 +273,6 @@ export class DemoApp extends ValueTracker {
 		this.boxer.drawTool.p('artefactCreated')
 		    .filter(v=>!!v)
 		    .subscribe(::this.onArtefactCreated);
-		
-		
-		
 		
 		/* highlighting */
 		this.boxer.highlightTool.register(this.boxer.highlightTool, this.boxer.stateMachine.p('state').switchMap(state => match(state)({
@@ -429,7 +461,9 @@ export class DemoApp extends ValueTracker {
 		BrowserModule,
 		NgBoxerModule,
 		LyphInfoPanelModule,
-		ProcessInfoPanelModule
+		ProcessInfoPanelModule,
+		UniversalInfoPanelModule,
+		PerfectScrollbarModule.forRoot({ suppressScrollX: true })
 	],
 	declarations: [
 		DemoApp
