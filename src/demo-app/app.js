@@ -212,26 +212,28 @@ const LEFT_PANEL_WIDTH = '200px';
 				<div *ngIf="lyphModels.length"
 				     [class.model-section] = " true               "
 				     [class.animating]     = " animationCount > 0 ">
-					<h2><div>Lyphs</div></h2>
+					<h2 #lyphsHeader><div>Lyphs</div></h2>
 					<lyph-info-panel
-						*ngFor            = " let model of lyphModels  "
-						[model]           = " model                    "
-						[class.info-panel]= " true                     "
-						[class.visible]   = " !model.deleted           "
-						(colorPickerOpen) = " colorPickerOpen = $event "
+						*ngFor            = " let model of lyphModels              "
+						(init)            = " lyphsHeader.scrollIntoViewIfNeeded() "
+						[model]           = " model                                "
+						[class.info-panel]= " true                                 "
+						[class.visible]   = " !model.deleted                       "
+						(colorPickerOpen) = " colorPickerOpen = $event             "
 					></lyph-info-panel>
 				</div>
 				
 				<div *ngIf="processModels.length"
 				     [class.model-section] = " true               "
 				     [class.animating]     = " animationCount > 0 ">
-					<h2><div>Processes</div></h2>
+					<h2 #processesHeader><div>Processes</div></h2>
 					<process-info-panel
-					    *ngFor            = " let model of processModels "
-						[model]           = " model                      "
-						[class.info-panel]= " true                       "
-						[class.visible]   = " !model.deleted             "
-						(colorPickerOpen) = "colorPickerOpen = $event    "
+					    *ngFor            = " let model of processModels               "
+						(init)            = " processesHeader.scrollIntoViewIfNeeded() "
+						[model]           = " model                                    "
+						[class.info-panel]= " true                                     "
+						[class.visible]   = " !model.deleted                           "
+						(colorPickerOpen) = " colorPickerOpen = $event                 "
 					></process-info-panel>
 				</div>
 				
@@ -254,6 +256,8 @@ export class DemoApp extends ValueTracker {
 	
 	@ViewChild('boxer') boxer: NgBoxer;
 	
+	@ViewChild('processesHeader') processesHeader;
+	
 	lyphModels:    Array<Model> = [];
 	nodeModels:    Array<Model> = [];
 	processModels: Array<Model> = [];
@@ -266,13 +270,13 @@ export class DemoApp extends ValueTracker {
 	
 	@property({ initial: null }) selectedModel;
 	
-	
 	constructor({nativeElement}: ElementRef) {
 		super();
 		this.nativeElement = $(nativeElement);
 	}
 	
 	ngOnInit() {
+		
 		
 		/* react to artefact creation */
 		// TODO: the .e() version of this caused errors. Why??
@@ -289,18 +293,7 @@ export class DemoApp extends ValueTracker {
 			artefact
 		}));
 		
-		
-		// this.boxer.stateMachine.p('state').subscribe((s) => {
-		// 	console.info('STATE:', s);
-		// });
-		// this.p('selectedModel').subscribe((m) => {
-		// 	console.log('SELECTED MODEL:', m);
-		// });
-		
-		
 		this.boxer.start();
-		
-		
 	}
 	
 	save() {
@@ -437,7 +430,7 @@ export class DemoApp extends ValueTracker {
 		const models = isLyph ? this.lyphModels : isGlyph ? this.nodeModels : this.processModels;
 		Observable.of(null)
 			.do(() => { this.animationCount += 1 })
-			.do(() => { models.push(newModel) })
+			.do(() => { models.unshift(newModel) })
 			.delay(301) // wait for the slide-out animation
 			.do(() => { this.animationCount -= 1 })
 			.subscribe(()=>{});
