@@ -36,7 +36,6 @@ export class SvgTransformable extends SvgArtefact {
 		this.p('transformation').subscribe(this.svg.main::setCTM);
 		
 		/* keep track of the transformation of this artefact w.r.t. the canvas */
-		
 		this.p(['parent?.globalTransformation', 'transformation'], (pgt, t) => (pgt || ID_MATRIX).multiply(t))
 			.subscribe( this.p('globalTransformation') );
 	}

@@ -10,10 +10,22 @@ import {ID_MATRIX, setCTM} from '../util/svg';
 export class Canvas extends SvgArtefact {
 	
 	@property({ initial: ID_MATRIX, isValid: v => v instanceof SVGMatrix }) transformation;
+	@property({ initial: ID_MATRIX, isValid: v => v instanceof SVGMatrix }) globalTransformation;
 	
-	postCreate(options = {}) {
+	preCreate(options = {}) {
+		super.preCreate(options);
+		
+		/* set transformation if given */
+		if (options.transformation) { this.transformation = options.transformation }
+		
 		/* apply canvas transformation (zooming, panning, etc.) */
 		this.p('transformation').subscribe( this.svg.children::setCTM );
+		
+		/* keep track of the global transformation */
+		this.p('transformation').subscribe(this.p('globalTransformation'));
+	}
+	
+	postCreate(options = {}) {
 		
 		/* register canvas handlers */
 		this.registerHandlers({
