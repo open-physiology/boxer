@@ -26,7 +26,7 @@ const Component = ExtensibleComponent; // to get WebStorm syntax highlighting
 	template: `
 
 		<lyph-info-panel
-			*ngIf             = " model && model.constructor.name === 'LyphModel' "
+			*ngIf             = " model && model.class === 'LyphModel' "
 			[model]           = " model                                  "
 			[class.info-panel]= " true                                   "
 			[class.visible]   = " !model.deleted                         "
@@ -34,7 +34,7 @@ const Component = ExtensibleComponent; // to get WebStorm syntax highlighting
 		></lyph-info-panel>
 		
 		<process-info-panel
-			*ngIf             = " model && model.constructor.name === 'ProcessModel' "
+			*ngIf             = " model && model.class === 'ProcessModel' "
 			[model]           = " model                                     "
 			[class.info-panel]= " true                                      "
 			[class.visible]   = " !model.deleted                            "

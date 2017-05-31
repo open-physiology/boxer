@@ -244,8 +244,7 @@ const LEFT_PANEL_WIDTH = '200px';
 			[style.background-color] = " selectedModel.color                   "
 		>
 			<universal-info-panel
-				[model]           = " selectedModel            "
-				(colorPickerOpen) = " colorPickerOpen = $event "
+				[model] = " selectedModel.toJSON()   "
 			></universal-info-panel>
 		</div>
 	    
