@@ -43,7 +43,7 @@ export class Edge extends LineSegment {
 		/* moving the line segment when the glyphs move */
 		for (let g of [1, 2]) {
 			this.p([`glyph${g}.globalTransformation`], ['root'])
-			    .map(([gt, root]) => Point2D.fromMatrixTranslation(gt, root.svg.children))
+			    .map(([gt, root]) => Point2D.fromMatrixTranslation(gt, root.svg.main))
 			    .subscribe( this.p(`point${g}`) );
 		}
 		

@@ -61,17 +61,6 @@ export class ProcessInfoPanel extends InfoPanel {
 		super(elementRef);
 	}
 	
-	
-	ngOnInit() {
-		assert(this.model instanceof ProcessModel);
-		
-		super.ngOnInit();
-		
-		
-		
-	}
-	
-	
 }
 
 /**

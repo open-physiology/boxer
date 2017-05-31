@@ -5,8 +5,7 @@ import {FormsModule}       from '@angular/forms';
 import assert from 'power-assert';
 import {fromPairs, keys} from 'lodash-bound';
 
-import lyphData from './data.json';
-const lyphDataByName = lyphData.lyphs.map(obj => [obj.name, obj])::fromPairs();
+import {lyphDataByName} from './data.js';
 
 import KeyCode from 'keycode-js';
 import {InfoPanel, InfoPanelModule} from './InfoPanel';
@@ -102,18 +101,6 @@ export class LyphInfoPanel extends InfoPanel {
 	constructor(elementRef: ElementRef) {
 		super(elementRef);
 	}
-	
-	ngOnInit() {
-		assert(this.model instanceof LyphModel);
-		super.ngOnInit();
-	}
-	
-	onDataSelected(name) {
-		if (this.model.selected) {
-			this.model.setFromData(lyphDataByName[name]);
-		}
-	}
-	
 	
 }
 

@@ -1,6 +1,6 @@
 {
   "name": "project-template",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Templates for starting new open-physiology projects",
   "main": "dist/index.js",
   "scripts": {
@@ -76,6 +76,7 @@
     "@angular/platform-browser-dynamic": "2",
     "@angular/router": "3",
     "@ngui/auto-complete": "^0.13.3",
+    "angular2-perfect-scrollbar": "^2.0.6",
     "babel-polyfill": "6",
     "bound-native-methods": "0.1",
     "cssprefix": "2",
