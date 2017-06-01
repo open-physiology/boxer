@@ -40,16 +40,16 @@ const {KEY_ESCAPE} = KeyCode;
 							[style.border-color]     = "  model.darkenedColor   "
 						>
 							<input type="number" dir="rtl"
-								[(ngModel)] = " model.lengthMin        "
-								[min]       = " 1                      "
-								[max]       = " model.lengthMax        "
-								[disabled]  = " !model.lengthSpecified " />
+								[(ngModel)] = " model.lengthMin                    "
+								[min]       = " 1                                  "
+								[max]       = " model.lengthMax                    "
+								[disabled]  = " readonly || !model.lengthSpecified " />
 							..
 							<input type="number" dir="ltr"
 								[(ngModel)] = " model.lengthMax        "
 								[min]       = " model.lengthMin        "
 								[max]       = " 9                      "
-								[disabled]  = " !model.lengthSpecified " />
+								[disabled]  = " readonly || !model.lengthSpecified " />
 							<input type="checkbox" style="float: right"
 								[(ngModel)] = " model.lengthSpecified  " />
 						</span>
@@ -66,13 +66,13 @@ const {KEY_ESCAPE} = KeyCode;
 								[(ngModel)] = " model.thicknessMin         "
 								[min]       = " 0                          "
 								[max]       = " model.thicknessMax         "
-								[disabled]  = " !model.thicknessSpecified  " />
+								[disabled]  = " readonly || !model.thicknessSpecified  " />
 							..
 							<input type="number" dir="ltr"
 								[(ngModel)] = " model.thicknessMax         "
 								[min]       = " model.thicknessMin         "
 								[max]       = " 9                          "
-								[disabled]  = " !model.thicknessSpecified  " />
+								[disabled]  = " readonly || !model.thicknessSpecified  " />
 							<input type="checkbox" style="float: right"
 								[(ngModel)] = " model.thicknessSpecified   " />
 						</span>
@@ -83,6 +83,7 @@ const {KEY_ESCAPE} = KeyCode;
 					<td>
 						<input type="text"
 							[(ngModel)]         = " model.external      "
+							[disabled]          = " readonly            "
 							[style.border-color]= " model.darkenedColor " />
 					</td>
 				</tr>

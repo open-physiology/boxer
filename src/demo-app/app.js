@@ -182,7 +182,7 @@ const LEFT_PANEL_WIDTH = '200px';
 `],
 	template: `
 		
-		<div><svg ng-boxer [delayStart]="true" #boxer=boxer></svg></div>
+		<div><svg ng-boxer [delayStart]="true" [readonly]="true" #boxer=boxer></svg></div>
 		
 		<div class="button-section">
 			<input #fileInput
@@ -215,6 +215,7 @@ const LEFT_PANEL_WIDTH = '200px';
 					<h2 #lyphsHeader><div>Lyphs</div></h2>
 					<lyph-info-panel
 						*ngFor            = " let model of lyphModels              "
+						[readonly]        = " true "
 						(init)            = " lyphsHeader.scrollIntoViewIfNeeded() "
 						[model]           = " model                                "
 						[class.info-panel]= " true                                 "
@@ -229,6 +230,7 @@ const LEFT_PANEL_WIDTH = '200px';
 					<h2 #processesHeader><div>Processes</div></h2>
 					<process-info-panel
 					    *ngFor            = " let model of processModels               "
+						[readonly]        = " true "
 						(init)            = " processesHeader.scrollIntoViewIfNeeded() "
 						[model]           = " model                                    "
 						[class.info-panel]= " true                                     "
@@ -246,7 +248,8 @@ const LEFT_PANEL_WIDTH = '200px';
 			[style.background-color] = " selectedModel.color                   "
 		>
 			<universal-info-panel
-				[model] = " selectedModel.toJSON()   "
+				[model]    = " selectedModel   "
+				[readonly] = " true            "
 			></universal-info-panel>
 		</div>
 	    
@@ -275,25 +278,32 @@ export class DemoApp extends ValueTracker {
 		this.nativeElement = $(nativeElement);
 	}
 	
-	ngOnInit() {
+	// ngOnInit() {
+	//
+	// }
+	
+	ngAfterContentInit() {
 		
-		
-		/* react to artefact creation */
-		// TODO: the .e() version of this caused errors. Why??
-		this.boxer.drawTool.p('artefactCreated')
-		    .filter(v=>!!v)
-		    .subscribe(::this.onArtefactCreated);
-		
-		/* highlighting */
-		this.boxer.highlightTool.register(this.boxer.highlightTool, this.boxer.stateMachine.p('state').switchMap(state => match(state)({
-			'IDLE': this.p('selectedModel').map((model) => model ? this.artefactsById[model.id] : null),
-			'BUSY': Observable.of(null)
-		})).map(artefact => artefact && {
-			...this.boxer.highlightTool.HIGHLIGHT_DEFAULT,
-			artefact
-		}));
-		
-		this.boxer.start();
+		setTimeout(() => { // TODO: find correct lifecycle hook
+			
+			/* react to artefact creation */
+			// TODO: the .e() version of this caused errors. Why??
+			this.boxer.drawTool.p('artefactCreated')
+			    .filter(v=>!!v)
+			    .subscribe(::this.onArtefactCreated);
+			
+			/* highlighting */
+			this.boxer.highlightTool.register(this.boxer.highlightTool, this.boxer.stateMachine.p('state').switchMap(state => match(state)({
+				'IDLE': this.p('selectedModel').map((model) => model ? this.artefactsById[model.id] : null),
+				'BUSY': Observable.of(null)
+			})).map(artefact => artefact && {
+				...this.boxer.highlightTool.HIGHLIGHT_DEFAULT,
+				artefact
+			}));
+			
+			this.boxer.start();
+			
+		}, 3000);
 	}
 	
 	save() {

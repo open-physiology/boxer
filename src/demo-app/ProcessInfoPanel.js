@@ -36,6 +36,7 @@ const {KEY_ESCAPE} = KeyCode;
 					<td>
 						<select placeholder="Type"
 							[(ngModel)]          = " model.type          "
+							[disabled]           = " readonly            "
 							[style.border-color] = " model.darkenedColor "
 						>
 							<option value="blood"    > Blood               </option>

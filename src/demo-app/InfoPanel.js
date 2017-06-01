@@ -117,21 +117,22 @@ const Component = ExtensibleComponent; // to get WebStorm syntax highlighting
 
 		<div class="header" [class.no-auto-complete]=" model.wasSetFromData || autoCompleteOptions.length === 0 ">
 		
-			<button [(colorPicker)]          = " model.color                  "
-					[cpPosition]             = " 'left'                       "
-					[cpPositionOffset]       = " '5px'                        "
-					[cpAlphaChannel]         = " 'disabled'                   "
-			        [style.background-color] = " model.color                  "
-			        [style.color]            = " model.contrastingColor       "
-			        [style.border-color]     = " model.darkenedColor          "
-			        (cpToggleChange)         = " colorPickerOpen.next($event) ">
+			<button [colorPicker]            = " model.color                        "
+					(colorPickerChange)      = " readonly || (model.color = $event) "
+					[cpPosition]             = " 'left'                             "
+					[cpPositionOffset]       = " '5px'                              "
+					[cpAlphaChannel]         = " 'disabled'                         "
+			        [style.background-color] = " model.color                        "
+			        [style.color]            = " model.contrastingColor             "
+			        [style.border-color]     = " model.darkenedColor                "
+			        (cpToggleChange)         = " colorPickerOpen.next($event)       ">
 				<span class="button-symbol" [innerHTML]="symbol"></span>
 			</button>
 			
 			<input class="name" type="text" placeholder="Name"
-			       [disabled]           = " model.wasSetFromData "
-				   [(ngModel)]          = " model.name           "
-			       [style.border-color] = " model.darkenedColor  "
+			       [disabled]           = " readonly || model.wasSetFromData "
+				   [(ngModel)]          = " model.name                       "
+			       [style.border-color] = " model.darkenedColor              "
 			       auto-complete
 			       [source]       = " autoCompleteOptions    "
 			       (valueChanged) = " onDataSelected($event) "/>
@@ -146,6 +147,9 @@ export class InfoPanel {
 	get symbol() { return '' }
 	
 	@Input() model;
+	
+	@Input() readonly = false;
+	
 	@Input() buttonSymbol = '';
 	
 	@Output() colorPickerOpen = new EventEmitter;
