@@ -96,7 +96,7 @@ export class NgBoxer extends Coach {
 			this.toolMode = 'Manipulate';
 			this.windowE('keydown')::which(KEY_ESCAPE).subscribe(() => { this.toolMode = 'Manipulate' });
 		} else {
-			this.activateExclusiveTools(this.stapleTools);
+			this.activateExclusiveTools([...this.stapleTools, PanTool, ZoomTool]);
 		}
 		
 		// this.toolMode = 'Manipulate';
