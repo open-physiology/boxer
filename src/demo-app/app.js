@@ -33,7 +33,7 @@ const LEFT_PANEL_WIDTH = '200px';
 
 
 
-import autoloadModel from './autoload-model.json';
+import autoloadModel from './autoload-model-e.json';
 import {createSVGMatrix} from '../util/svg';
 
 
