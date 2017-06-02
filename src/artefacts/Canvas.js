@@ -23,6 +23,9 @@ export class Canvas extends SvgArtefact {
 		
 		/* keep track of the global transformation */
 		this.p('transformation').subscribe(this.p('globalTransformation'));
+		
+		
+		this.p('transformation').subscribe(::console.info);
 	}
 	
 	postCreate(options = {}) {

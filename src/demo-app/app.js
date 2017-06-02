@@ -32,6 +32,13 @@ import {UniversalInfoPanel, UniversalInfoPanelModule} from './UniversalInfoPanel
 const LEFT_PANEL_WIDTH = '200px';
 
 
+
+import autoloadModel from './autoload-model.json';
+import {createSVGMatrix} from '../util/svg';
+
+
+
+
 /**
  * The demo application.
  */
@@ -116,6 +123,11 @@ const LEFT_PANEL_WIDTH = '200px';
 			/*overflow-y: auto;*/
 		}
 		
+		perfect-scrollbar.right-panel.top-right-panel {
+			top:    0;
+			height: 100%;
+		}
+		
 		perfect-scrollbar.right-panel.color-picker-open {
 			width: 100%;
 		}
@@ -184,7 +196,7 @@ const LEFT_PANEL_WIDTH = '200px';
 		
 		<div><svg ng-boxer [delayStart]="true" [readonly]="readonly" #boxer=boxer></svg></div>
 		
-		<div class="button-section">
+		<div class="button-section" *ngIf="!autoload || !readonly">
 			<input #fileInput
 				[type]          = " 'file'                     "
 				[accept]        = " '.json'                    "
@@ -203,6 +215,7 @@ const LEFT_PANEL_WIDTH = '200px';
 			    (click)                 = " boxer.toolMode =   toolMode     ">{{ toolMode }}</button
 	    ></div>
 		<perfect-scrollbar class="right-panel"
+			[class.top-right-panel]="autoload && readonly"
 			[class.color-picker-open]="colorPickerOpen"
 			(mouseenter)=" mouseOverRightPanel = true  "
 			(mouseleave)=" mouseOverRightPanel = false "
@@ -265,6 +278,7 @@ export class DemoApp extends ValueTracker {
 	@ViewChild('processesHeader') processesHeader;
 	
 	@Input() readonly = false;
+	@Input() autoload = false;
 	
 	lyphModels:    Array<Model> = [];
 	nodeModels:    Array<Model> = [];
@@ -279,6 +293,8 @@ export class DemoApp extends ValueTracker {
 	
 	@property({ initial: null }) selectedModel;
 	
+	
+	
 	constructor({nativeElement}: ElementRef) {
 		super();
 		this.nativeElement = $(nativeElement);
@@ -286,6 +302,10 @@ export class DemoApp extends ValueTracker {
 		/* fetching [readonly] from body element; @Input doesn't actually work on root components */
 		let readOnlyAttr = this.nativeElement.attr('[readonly]');
 		this.readonly = readOnlyAttr ? JSON.parse(readOnlyAttr) : false;
+		
+		/* fetching [readonly] from body element; @Input doesn't actually work on root components */
+		let autoLoadAttr = this.nativeElement.attr('[autoload]');
+		this.autoload = autoLoadAttr ? JSON.parse(autoLoadAttr) : false;
 	}
 	
 	ngAfterViewInit() {
@@ -308,6 +328,21 @@ export class DemoApp extends ValueTracker {
 		}));
 		
 		this.boxer.start();
+		
+		/* autoload file */
+		if (this.autoload) {
+			this.boxer.root.transformation = createSVGMatrix(
+				0.28098253721978733,
+				0                  ,
+				0                  ,
+				0.28098253721978733,
+				434.9340794205365  ,
+				408.86981318779766
+			);
+			setTimeout(() => {
+				this.load(autoloadModel);
+			}, 2000);
+		}
 	}
 	
 	save() {
@@ -483,53 +518,54 @@ export class DemoApp extends ValueTracker {
 		
 		
 		
-		// /* feature: hover over tile to reveal neural edges */
-		// if (isGlyph) {
-		// 	newArtefact.newProperty('revealed');
-		// 	newArtefact.p(['revealed', 'model.type']).subscribe(([r, type]) => {
-		// 		newArtefact.svg.main.css('visibility', (type !== 'cytosol' || r)
-		// 			? 'visible'
-		// 			: 'hidden'
-		// 		);
-		// 	});
-		// 	newModel.p('internal').switchMap(int => int
-		// 		? Observable.never()
-		// 		: newArtefact.p('parent.parent.model.selected')
-		// 	).subscribe( newArtefact.p('revealed') );
-		// }
-		// if (isProcess) {
-		// 	newArtefact.newProperty('revealed');
-		// 	newArtefact.p(['revealed', 'model.type']).subscribe(([r, type]) => {
-		// 		for (let edge of newArtefact.edges || []) {
-		// 			edge.svg.main.css('visibility', (type !== 'cytosol' || r)
-		// 				? 'visible'
-		// 				: 'hidden'
-		// 			);
-		// 		}
-		// 		newArtefact.glyph1.svg.main.css('visibility', (type !== 'cytosol' || r)
-		// 			? 'visible'
-		// 			: 'hidden'
-		// 		);
-		// 		newArtefact.glyph2.svg.main.css('visibility', (type !== 'cytosol' || r)
-		// 			? 'visible'
-		// 			: 'hidden'
-		// 		);
-		// 	});
-		// 	Observable.merge(
-		// 		newArtefact.p('glyph1.revealed'),
-		// 		newArtefact.p('glyph2.revealed'),
-		// 		newArtefact.p('revealed')
-		// 	).subscribe((r) => {
-		// 		if (newArtefact.glyph1.model.internal) {
-		// 			newArtefact.glyph1.p('revealed').next(r);
-		// 		}
-		// 		if (newArtefact.glyph2.model.internal) {
-		// 			newArtefact.glyph2.p('revealed').next(r);
-		// 		}
-		// 		newArtefact.p('revealed').next(r);
-		// 	});
-		// }
-		
+		/* feature: hover over tile to reveal neural edges */
+		if (this.readonly) {
+			if (isGlyph) {
+				newArtefact.newProperty('revealed');
+				newArtefact.p(['revealed', 'model.type']).subscribe(([r, type]) => {
+					newArtefact.svg.main.css('visibility', (type !== 'cytosol' || r)
+						? 'visible'
+						: 'hidden'
+					);
+				});
+				newModel.p('internal').switchMap(int => int
+					? Observable.never()
+					: newArtefact.p('parent.parent.model.selected')
+				).subscribe(newArtefact.p('revealed'));
+			}
+			if (isProcess) {
+				newArtefact.newProperty('revealed');
+				newArtefact.p(['revealed', 'model.type']).subscribe(([r, type]) => {
+					for (let edge of newArtefact.edges || []) {
+						edge.svg.main.css('visibility', (type !== 'cytosol' || r)
+							? 'visible'
+							: 'hidden'
+						);
+					}
+					newArtefact.glyph1.svg.main.css('visibility', (type !== 'cytosol' || r)
+						? 'visible'
+						: 'hidden'
+					);
+					newArtefact.glyph2.svg.main.css('visibility', (type !== 'cytosol' || r)
+						? 'visible'
+						: 'hidden'
+					);
+				});
+				Observable.merge(
+					newArtefact.p('glyph1.revealed'),
+					newArtefact.p('glyph2.revealed'),
+					newArtefact.p('revealed')
+				).subscribe((r) => {
+					if (newArtefact.glyph1.model.internal) {
+						newArtefact.glyph1.p('revealed').next(r);
+					}
+					if (newArtefact.glyph2.model.internal) {
+						newArtefact.glyph2.p('revealed').next(r);
+					}
+					newArtefact.p('revealed').next(r);
+				});
+			}
+		}
 		
 	}
 	

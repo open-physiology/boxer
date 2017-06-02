@@ -48,8 +48,6 @@ const {KEY_ESCAPE} = KeyCode;
 					</td>
 			</table>
 			
-			
-			
 		</div>
 		
 	`
