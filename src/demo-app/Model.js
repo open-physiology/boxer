@@ -18,14 +18,23 @@ export class Model extends ValueTracker {
 	
 	////////////////////////////////////////////////////////////////////////////
 	
-	constructor({id} = {}) {
+	constructor({id, modelsById} = {}) {
 		super();
 		
 		this.setValueTrackerOptions({
 			takeUntil: this.p('deleted').filter(v=>!!v)
 		});
 		
-		this.id = !id::isUndefined() ? id : _uniqueId()::parseInt();
+		if (id::isUndefined()) {
+			let newId;
+			do {
+				newId = _uniqueId()::parseInt();
+			} while (modelsById[newId]);
+			this.id = newId;
+		} else {
+			this.id = id;
+		}
+		
 		this.class = this.constructor.name;
 	}
 	
@@ -38,9 +47,9 @@ export class Model extends ValueTracker {
 		};
 	}
 	
-	static fromJSON(json, {modelClasses} = {}) {
+	static fromJSON(json, {modelClasses, modelsById} = {}) {
 		const cls = modelClasses[json.class];
-		const result = new cls();
+		const result = new cls({modelsById});
 		result.id    = json.id;
 		result.name  = json.name;
 		result.color = json.color;

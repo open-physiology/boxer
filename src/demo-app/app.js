@@ -269,6 +269,7 @@ export class DemoApp extends ValueTracker {
 	processModels: Array<Model> = [];
 	
 	artefactsById = {};
+	modelsById    = {};
 	
 	animationCount: number = 0;
 	colorPickerOpen     = false;
@@ -331,6 +332,9 @@ export class DemoApp extends ValueTracker {
 			ProcessModel
 		};
 		
+		
+		const idsSeen = new Set;
+		
 		/* create a map from model id to corresponding json object */
 		const jsonById = {};
 		for (let [cls, key] of [
@@ -338,13 +342,16 @@ export class DemoApp extends ValueTracker {
 			[ProcessNodeModel, 'nodes'    ],
 			[ProcessModel,     'processes']
 		]) for (let jsn of json[key]) {
+			if (idsSeen.has(jsn.id)) {
+				console.warn('duplicate id:', jsn.id);
+			}
+			idsSeen.add(jsn.id);
 			jsonById[jsn.id] = jsn;
 		}
 		
 		/* how to create a new model (it is called recursively to create prerequisites first) */
-		const modelsById = {};
 		const createModel = (jsn) => {
-			if (!modelsById[jsn.id]) {
+			if (!this.modelsById[jsn.id]) {
 				const cls = modelClasses[jsn.class];
 				
 				/* do parents or connected glyphs first */
@@ -353,13 +360,14 @@ export class DemoApp extends ValueTracker {
 				if (jsn.glyph2) { createModel(jsonById[jsn.glyph2]) }
 				
 				/* then create this model */
-				const model = cls.fromJSON(jsn, {modelClasses, modelsById});
-				modelsById[model.id] = model;
+				const model = cls.fromJSON(jsn, {modelClasses, modelsById: this.modelsById});
+				this.modelsById[model.id] = model;
 				
 				/* and register it */
 				this.onModelCreated(model);
 			}
 		};
+		
 		
 		/* kick off model creation */
 		for (let jsn of jsonById::values()) {
@@ -375,7 +383,7 @@ export class DemoApp extends ValueTracker {
 		
 		/* create model */
 		const modelClass = isLyph ? LyphModel : isGlyph ? ProcessNodeModel : ProcessModel;
-		const newModel = new modelClass();
+		const newModel = new modelClass({ modelsById: this.modelsById });
 		
 		/* register both into the system */
 		this.registerModelArtefactPair(newModel, newArtefact);
