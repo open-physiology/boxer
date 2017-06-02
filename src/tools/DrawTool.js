@@ -115,7 +115,7 @@ export class DrawTool extends MouseTool {
 				});
 				
 				/* allow the draw zone to reject */
-				if (!accepts({artefact})) {
+				if (accepts::isFunction() && !accepts({artefact})) {
 					artefact.delete();
 					enterState('IDLE');
 					return;
@@ -182,7 +182,7 @@ export class DrawTool extends MouseTool {
 				});
 				
 				/* allow the draw zone to reject */
-				if (!accepts({artefact})) {
+				if (accepts::isFunction() && !accepts({artefact})) {
 					artefact.delete();
 					enterState('IDLE');
 					return;
@@ -241,7 +241,7 @@ export class DrawTool extends MouseTool {
 						transformation: ID_MATRIX.translate(...point1.xy)
 					});
 					/* allow the draw zone to reject */
-					if (!accepts({ artefact: glyph1 })) {
+					if (accepts::isFunction() && !accepts({ artefact: glyph1 })) {
 						glyph1.delete();
 						enterState('IDLE');
 						return;
@@ -317,7 +317,7 @@ export class DrawTool extends MouseTool {
 							transformation: ID_MATRIX.translate(...point2.xy)
 						});
 						/* allow the draw zone to reject */
-						if (!args2.accepts({ artefact: glyph2 })) {
+						if (args2.accepts::isFunction() && !args2.accepts({ artefact: glyph2 })) {
 							glyph2.delete();
 							enterState('IDLE');
 							return;

@@ -21,6 +21,8 @@ export class ProcessChain extends SvgArtefact {
 	@property() glyph1;
 	@property() glyph2;
 	
+	@property() type;
+	
 	@property({ initial: [] }) intermediateGlyphs;
 	@property({ initial: [] }) edges;
 	
@@ -124,6 +126,28 @@ export class ProcessChain extends SvgArtefact {
 			this.p('glyph1.deleted').filter(d=>!!d),
 			this.p('glyph2.deleted').filter(d=>!!d)
 		).take(1).subscribe( this.p('deleted') );
+		
+		
+		/* sync type with glyphs */
+		Observable.combineLatest(
+			this.p('model'),
+			Observable.merge(
+				this.p('glyph1.model.type'),
+				this.p('glyph2.model.type')
+			).filter(t => t !== '')
+		).filter(([m]) => !!m).subscribe(([model, type]) => {
+			model.type = type;
+		});
+		
+		
+		Observable.combineLatest(
+			this.p('glyph1'),
+			this.p('glyph2'),
+			this.p('model.type').filter(t => t !== '')
+		).filter(([g1, g2]) => !!g1 && !!g2).subscribe(([glyph1, glyph2, type]) => {
+			glyph1.model.type = type;
+			glyph2.model.type = type;
+		});
 		
 		
 		/* set glyph handlers */

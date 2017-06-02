@@ -29,29 +29,30 @@ const {KEY_ESCAPE} = KeyCode;
 
 		${InfoPanel.ComponentAnnotation.template}
 		
-		<div class="other-fields" [style.border-color]=" model.darkenedColor ">
+		<div class="other-fields" [style.border-color]=" darkenedColor ">
 			
 			<table>
 				<tr>
 					<td>Length</td>
 					<td>
 						<span class="input"
-						    [class.disabled]         = " !model.lengthSpecified "
-							[style.border-color]     = "  model.darkenedColor   "
+						    [class.disabled]     = " !model.lengthSpecified "
+							[style.border-color] = "  darkenedColor   "
 						>
 							<input type="number" dir="rtl"
-								[(ngModel)] = " model.lengthMin        "
-								[min]       = " 1                      "
-								[max]       = " model.lengthMax        "
-								[disabled]  = " !model.lengthSpecified " />
+								[(ngModel)] = " model.lengthMin                    "
+								[min]       = " 1                                  "
+								[max]       = " model.lengthMax                    "
+								[disabled]  = " readonly || !model.lengthSpecified " />
 							..
 							<input type="number" dir="ltr"
-								[(ngModel)] = " model.lengthMax        "
-								[min]       = " model.lengthMin        "
-								[max]       = " 9                      "
-								[disabled]  = " !model.lengthSpecified " />
+								[(ngModel)] = " model.lengthMax                    "
+								[min]       = " model.lengthMin                    "
+								[max]       = " 9                                  "
+								[disabled]  = " readonly || !model.lengthSpecified " />
 							<input type="checkbox" style="float: right"
-								[(ngModel)] = " model.lengthSpecified  " />
+								[(ngModel)] = " model.lengthSpecified "
+								[disabled]  = " readonly              " />
 						</span>
 					</td>
 				</tr>
@@ -59,22 +60,23 @@ const {KEY_ESCAPE} = KeyCode;
 					<td>Thickness</td>
 					<td>
 						<span class="input"
-						    [class.disabled]         = " !model.thicknessSpecified "
-							[style.border-color]     = "  model.darkenedColor      "
+						    [class.disabled]     = " !model.thicknessSpecified "
+							[style.border-color] = "  darkenedColor      "
 						>
 							<input type="number" dir="rtl"
-								[(ngModel)] = " model.thicknessMin         "
-								[min]       = " 0                          "
-								[max]       = " model.thicknessMax         "
-								[disabled]  = " !model.thicknessSpecified  " />
+								[(ngModel)] = " model.thicknessMin                    "
+								[min]       = " 0                                     "
+								[max]       = " model.thicknessMax                    "
+								[disabled]  = " readonly || !model.thicknessSpecified " />
 							..
 							<input type="number" dir="ltr"
-								[(ngModel)] = " model.thicknessMax         "
-								[min]       = " model.thicknessMin         "
-								[max]       = " 9                          "
-								[disabled]  = " !model.thicknessSpecified  " />
+								[(ngModel)] = " model.thicknessMax                    "
+								[min]       = " model.thicknessMin                    "
+								[max]       = " 9                                     "
+								[disabled]  = " readonly || !model.thicknessSpecified " />
 							<input type="checkbox" style="float: right"
-								[(ngModel)] = " model.thicknessSpecified   " />
+								[(ngModel)] = " model.thicknessSpecified "
+								[disabled]  = " readonly                 " />
 						</span>
 					</td>
 				</tr>
@@ -83,7 +85,8 @@ const {KEY_ESCAPE} = KeyCode;
 					<td>
 						<input type="text"
 							[(ngModel)]         = " model.external      "
-							[style.border-color]= " model.darkenedColor " />
+							[disabled]          = " readonly            "
+							[style.border-color]= " darkenedColor " />
 					</td>
 				</tr>
 			</table>

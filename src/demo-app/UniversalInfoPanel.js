@@ -27,25 +27,29 @@ const Component = ExtensibleComponent; // to get WebStorm syntax highlighting
 
 		<lyph-info-panel
 			*ngIf             = " model && model.class === 'LyphModel' "
-			[model]           = " model                                  "
-			[class.info-panel]= " true                                   "
-			[class.visible]   = " !model.deleted                         "
-			(colorPickerOpen) = " colorPickerOpen.next($event)           "
+			[readonly]        = " readonly                             "
+			[model]           = " model                                "
+			[class.info-panel]= " true                                 "
+			[class.visible]   = " !model.deleted                       "
+			(colorPickerOpen) = " colorPickerOpen.next($event)         "
 		></lyph-info-panel>
 		
 		<process-info-panel
 			*ngIf             = " model && model.class === 'ProcessModel' "
-			[model]           = " model                                     "
-			[class.info-panel]= " true                                      "
-			[class.visible]   = " !model.deleted                            "
-			(colorPickerOpen) = " colorPickerOpen.next($event)              "
+			[readonly]        = " readonly                                "
+			[model]           = " model                                   "
+			[class.info-panel]= " true                                    "
+			[class.visible]   = " !model.deleted                          "
+			(colorPickerOpen) = " colorPickerOpen.next($event)            "
 		></process-info-panel>
 
 	`
 })
 export class UniversalInfoPanel {
 	
-	@Input()  model;
+	@Input() model;
+	
+	@Input() readonly = false;
 	
 	@Output() colorPickerOpen = new EventEmitter;
 		

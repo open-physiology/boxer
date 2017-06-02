@@ -36,6 +36,8 @@ const {KEY_ESCAPE} = KeyCode;
 })
 export class NgBoxer extends Coach {
 	
+	@Input() readonly = false;
+	
 	@Input() delayStart = false;
 	
 	@property({ initial: null }) toolMode;
@@ -48,6 +50,21 @@ export class NgBoxer extends Coach {
 		super({
 			root: new Canvas({ svg: $(nativeElement) })
 		});
+	}
+	
+	addStapleTools(...tools) {
+		tools.forEach(::this.stapleTools.add);
+	}
+	
+	addToolMode(label, tools, init = ()=>{}) {
+		this.toolModes.add(label);
+		this.p('toolMode').filter(mode => mode === label).subscribe((m) => {
+			this.activateExclusiveTools([...this.stapleTools, ...tools]);
+			init();
+		});
+	}
+	
+	ngOnInit() {
 		
 		/* standard tools */
 		this.addTool(new SelectTool     )
@@ -69,30 +86,23 @@ export class NgBoxer extends Coach {
 		
 		/* setup modes */
 		this.addStapleTools(SelectTool, HighlightTool, MouseCursorTool, HelperTool);
-		this.addToolMode('Manipulate', [ClickTool, MoveTool, ResizeTool, RotateTool, PanTool, ZoomTool]);
-		this.addToolMode('Delete',     [DeleteTool]);
-		this.addToolMode('Draw Lyph',  [DrawTool], () => { this.drawTool.mode = DrawTool.DRAWING_BOX   });
-		// this.addToolMode('Draw Node',  [DrawTool], () => { this.drawTool.mode = DrawTool.DRAWING_GLYPH });
-		this.addToolMode('Draw Edge',  [DrawTool], () => { this.drawTool.mode = DrawTool.DRAWING_EDGE  });
+		if (!this.readonly) {
+			this.addToolMode('Manipulate', [ClickTool, MoveTool, ResizeTool, RotateTool, PanTool, ZoomTool]);
+			this.addToolMode('Delete',     [DeleteTool]);
+			this.addToolMode('Draw Lyph',  [DrawTool], () => { this.drawTool.mode = DrawTool.DRAWING_BOX   });
+			this.addToolMode('Draw Edge',  [DrawTool], () => { this.drawTool.mode = DrawTool.DRAWING_EDGE  });
+			
+			/* escape to Manipulate */
+			this.toolMode = 'Manipulate';
+			this.windowE('keydown')::which(KEY_ESCAPE).subscribe(() => { this.toolMode = 'Manipulate' });
+		} else {
+			this.activateExclusiveTools([...this.stapleTools, PanTool, ZoomTool]);
+		}
 		
-		/* start and escape to Manipulate */
-		this.toolMode = 'Manipulate';
-		this.windowE('keydown')::which(KEY_ESCAPE).subscribe(() => { this.toolMode = 'Manipulate' });
-	}
-	
-	addStapleTools(...tools) {
-		tools.forEach(::this.stapleTools.add);
-	}
-	
-	addToolMode(label, tools, init = ()=>{}) {
-		this.toolModes.add(label);
-		this.p('toolMode').filter(mode => mode === label).subscribe((m) => {
-			this.activateExclusiveTools([...this.stapleTools, ...tools]);
-			init();
-		});
-	}
-	
-	ngOnInit() {
+		// this.toolMode = 'Manipulate';
+		// this.windowE('keydown')::which(KEY_ESCAPE).subscribe(() => { this.toolMode = 'Manipulate' });
+		
+		/* start if a delay was not requested */
 		if (!this.delayStart) {
 			this.start();
 		}

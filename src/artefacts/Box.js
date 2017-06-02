@@ -12,6 +12,7 @@ import {BoxCorner}        from './BoxCorner.js';
 import {predicate} from '../handlers/Handler.js';
 import {MX, MY, setCTM} from '../util/svg';
 import {BoxBorder} from './BoxBorder';
+import {Glyph} from './Glyph';
 
 const {max} = Math;
 
@@ -121,6 +122,8 @@ export class Box extends SvgTransformable {
 					after: ({artefact}) => {
 						if (artefact instanceof Box) {
 							// TODO: finish this (mirror the LyphBox.js version)
+						} else if (artefact instanceof Glyph) {
+							artefact.parent = this.borders[key]
 						}
 					}
 				}
