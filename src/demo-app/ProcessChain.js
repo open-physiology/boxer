@@ -134,7 +134,7 @@ export class ProcessChain extends SvgArtefact {
 			Observable.merge(
 				this.p('glyph1.model.type'),
 				this.p('glyph2.model.type')
-			)
+			).filter(t => t !== '')
 		).filter(([m]) => !!m).subscribe(([model, type]) => {
 			model.type = type;
 		});
@@ -143,7 +143,7 @@ export class ProcessChain extends SvgArtefact {
 		Observable.combineLatest(
 			this.p('glyph1'),
 			this.p('glyph2'),
-			this.p('model.type')
+			this.p('model.type').filter(t => t !== '')
 		).filter(([g1, g2]) => !!g1 && !!g2).subscribe(([glyph1, glyph2, type]) => {
 			glyph1.model.type = type;
 			glyph2.model.type = type;

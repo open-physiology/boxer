@@ -58596,7 +58596,7 @@ var DrawTool = exports.DrawTool = (_dec = (0, _utilities.property)({ initial: nu
 						});
 
 						/* allow the draw zone to reject */
-						if (!accepts({ artefact: artefact })) {
+						if (_lodashBound.isFunction.call(accepts) && !accepts({ artefact: artefact })) {
 							artefact.delete();
 							enterState('IDLE');
 							return;
@@ -58678,7 +58678,7 @@ var DrawTool = exports.DrawTool = (_dec = (0, _utilities.property)({ initial: nu
 						});
 
 						/* allow the draw zone to reject */
-						if (!accepts({ artefact: artefact })) {
+						if (_lodashBound.isFunction.call(accepts) && !accepts({ artefact: artefact })) {
 							artefact.delete();
 							enterState('IDLE');
 							return;
@@ -58744,7 +58744,7 @@ var DrawTool = exports.DrawTool = (_dec = (0, _utilities.property)({ initial: nu
 								transformation: _svg.ID_MATRIX.translate.apply(_svg.ID_MATRIX, _toConsumableArray(point1.xy))
 							});
 							/* allow the draw zone to reject */
-							if (!accepts({ artefact: glyph1 })) {
+							if (_lodashBound.isFunction.call(accepts) && !accepts({ artefact: glyph1 })) {
 								glyph1.delete();
 								enterState('IDLE');
 								return;
@@ -58819,13 +58819,15 @@ var DrawTool = exports.DrawTool = (_dec = (0, _utilities.property)({ initial: nu
 							if (_instanceof(args2.artefact, _Glyph.Glyph)) {
 								glyph2 = args2.artefact;
 							} else {
+								var _context6;
+
 								var drawZone2 = args2.artefact;
 								var point2 = args2.point.in(drawZone2.svg.children);
 								glyph2 = args2.artefact = glyphFactory({
 									transformation: _svg.ID_MATRIX.translate.apply(_svg.ID_MATRIX, _toConsumableArray(point2.xy))
 								});
 								/* allow the draw zone to reject */
-								if (!args2.accepts({ artefact: glyph2 })) {
+								if ((_context6 = args2.accepts, _lodashBound.isFunction).call(_context6) && !args2.accepts({ artefact: glyph2 })) {
 									glyph2.delete();
 									enterState('IDLE');
 									return;
