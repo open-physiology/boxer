@@ -222,6 +222,7 @@ const LEFT_PANEL_WIDTH = '200px';
 						[class.info-panel]= " true                                 "
 						[class.visible]   = " !model.deleted                       "
 						(colorPickerOpen) = " colorPickerOpen = $event             "
+						[modelsById]      = " modelsById "
 					></lyph-info-panel>
 				</div>
 				
@@ -237,6 +238,7 @@ const LEFT_PANEL_WIDTH = '200px';
 						[class.info-panel]= " true                                     "
 						[class.visible]   = " !model.deleted                           "
 						(colorPickerOpen) = " colorPickerOpen = $event                 "
+						[modelsById]      = " modelsById "
 					></process-info-panel>
 				</div>
 				

@@ -115,7 +115,7 @@ export class LyphModel extends Model {
 		return result;
 	}
 	
-	setFromData(data) {
+	setFromData(data, context) {
 		super.setFromData(data);
 		if (data.name)     { this.name     = data.name     }
 		if (data.external) { this.external = data.external }
@@ -148,7 +148,7 @@ export class LyphModel extends Model {
 		
 		this.layerCount = data.layers ? data.layers.length : 0;
 		for (let i = this.layerCount - 1; i >= 0; --i) {
-			let layerModel = new LyphModel();
+			let layerModel = new LyphModel(context);
 			layerModel.parent = this;
 			layerModel.layerNr = i;
 			this.p('createdLayer').next(layerModel);

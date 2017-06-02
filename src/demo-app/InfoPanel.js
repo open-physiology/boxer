@@ -151,6 +151,8 @@ export class InfoPanel {
 	
 	@Input() readonly = false;
 	
+	@Input() modelsById = {};
+	
 	@Input() buttonSymbol = '';
 	
 	@Output() colorPickerOpen = new EventEmitter;
@@ -213,7 +215,7 @@ export class InfoPanel {
 			lyphDataByName[name] &&
 			!this.model.wasSetFromData;
 		if (condition) {
-			this.model.setFromData(lyphDataByName[name]);
+			this.model.setFromData(lyphDataByName[name], {modelsById: this.modelsById});
 		}
 	}
 	

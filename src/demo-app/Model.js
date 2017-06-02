@@ -57,7 +57,7 @@ export class Model extends ValueTracker {
 		return result;
 	}
 	
-	setFromData(data) {
+	setFromData(data, context) {
 		assert(!this.wasSetFromData);
 		this.wasSetFromData = true;
 	}
