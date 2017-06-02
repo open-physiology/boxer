@@ -281,7 +281,8 @@ export class DemoApp extends ValueTracker {
 		this.nativeElement = $(nativeElement);
 		
 		/* fetching [readonly] from body element; @Input doesn't actually work on root components */
-		this.readonly = JSON.parse(this.nativeElement.attr('[readonly]'));
+		let readOnlyAttr = this.nativeElement.attr('[readonly]');
+		this.readonly = readOnlyAttr ? JSON.parse(readOnlyAttr) : false;
 	}
 	
 	ngAfterViewInit() {
@@ -472,52 +473,52 @@ export class DemoApp extends ValueTracker {
 		
 		
 		
-		/* feature: hover over tile to reveal neural edges */
-		if (isGlyph) {
-			newArtefact.newProperty('revealed');
-			newArtefact.p(['revealed', 'model.type']).subscribe(([r, type]) => {
-				newArtefact.svg.main.css('visibility', (type !== 'cytosol' || r)
-					? 'visible'
-					: 'hidden'
-				);
-			});
-			newModel.p('internal').switchMap(int => int
-				? Observable.never()
-				: newArtefact.p('parent.parent.model.selected')
-			).subscribe( newArtefact.p('revealed') );
-		}
-		if (isProcess) {
-			newArtefact.newProperty('revealed');
-			newArtefact.p(['revealed', 'model.type']).subscribe(([r, type]) => {
-				for (let edge of newArtefact.edges || []) {
-					edge.svg.main.css('visibility', (type !== 'cytosol' || r)
-						? 'visible'
-						: 'hidden'
-					);
-				}
-				newArtefact.glyph1.svg.main.css('visibility', (type !== 'cytosol' || r)
-					? 'visible'
-					: 'hidden'
-				);
-				newArtefact.glyph2.svg.main.css('visibility', (type !== 'cytosol' || r)
-					? 'visible'
-					: 'hidden'
-				);
-			});
-			Observable.merge(
-				newArtefact.p('glyph1.revealed'),
-				newArtefact.p('glyph2.revealed'),
-				newArtefact.p('revealed')
-			).subscribe((r) => {
-				if (newArtefact.glyph1.model.internal) {
-					newArtefact.glyph1.p('revealed').next(r);
-				}
-				if (newArtefact.glyph2.model.internal) {
-					newArtefact.glyph2.p('revealed').next(r);
-				}
-				newArtefact.p('revealed').next(r);
-			});
-		}
+		// /* feature: hover over tile to reveal neural edges */
+		// if (isGlyph) {
+		// 	newArtefact.newProperty('revealed');
+		// 	newArtefact.p(['revealed', 'model.type']).subscribe(([r, type]) => {
+		// 		newArtefact.svg.main.css('visibility', (type !== 'cytosol' || r)
+		// 			? 'visible'
+		// 			: 'hidden'
+		// 		);
+		// 	});
+		// 	newModel.p('internal').switchMap(int => int
+		// 		? Observable.never()
+		// 		: newArtefact.p('parent.parent.model.selected')
+		// 	).subscribe( newArtefact.p('revealed') );
+		// }
+		// if (isProcess) {
+		// 	newArtefact.newProperty('revealed');
+		// 	newArtefact.p(['revealed', 'model.type']).subscribe(([r, type]) => {
+		// 		for (let edge of newArtefact.edges || []) {
+		// 			edge.svg.main.css('visibility', (type !== 'cytosol' || r)
+		// 				? 'visible'
+		// 				: 'hidden'
+		// 			);
+		// 		}
+		// 		newArtefact.glyph1.svg.main.css('visibility', (type !== 'cytosol' || r)
+		// 			? 'visible'
+		// 			: 'hidden'
+		// 		);
+		// 		newArtefact.glyph2.svg.main.css('visibility', (type !== 'cytosol' || r)
+		// 			? 'visible'
+		// 			: 'hidden'
+		// 		);
+		// 	});
+		// 	Observable.merge(
+		// 		newArtefact.p('glyph1.revealed'),
+		// 		newArtefact.p('glyph2.revealed'),
+		// 		newArtefact.p('revealed')
+		// 	).subscribe((r) => {
+		// 		if (newArtefact.glyph1.model.internal) {
+		// 			newArtefact.glyph1.p('revealed').next(r);
+		// 		}
+		// 		if (newArtefact.glyph2.model.internal) {
+		// 			newArtefact.glyph2.p('revealed').next(r);
+		// 		}
+		// 		newArtefact.p('revealed').next(r);
+		// 	});
+		// }
 		
 		
 	}
