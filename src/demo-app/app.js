@@ -340,7 +340,9 @@ export class DemoApp extends ValueTracker {
 					434.9340794205365  ,
 					408.86981318779766
 				);
-				this.load(autoloadModel);
+				setTimeout(() => {
+					this.load(autoloadModel);
+				}, 2000);
 			}, 2000);
 		}
 	}
@@ -361,7 +363,7 @@ export class DemoApp extends ValueTracker {
 		reader.readAsText(files[0]);
 	}
 	
-	load(json) {
+	async load(json) {
 		/* convenient map of mode classes by name */
 		const modelClasses = {
 			LyphModel,
@@ -387,14 +389,24 @@ export class DemoApp extends ValueTracker {
 		}
 		
 		/* how to create a new model (it is called recursively to create prerequisites first) */
-		const createModel = (jsn) => {
-			if (!this.modelsById[jsn.id]) {
+		const idsLoaded = new Set;
+		const createModel = async (jsn) => {
+			if (!idsLoaded.has(jsn.id)) {
+				idsLoaded.add(jsn.id);
+				await new Promise(r => setTimeout(r));
+				
 				const cls = modelClasses[jsn.class];
 				
 				/* do parents or connected glyphs first */
-				if (jsn.parent) { createModel(jsonById[jsn.parent]) }
-				if (jsn.glyph1) { createModel(jsonById[jsn.glyph1]) }
-				if (jsn.glyph2) { createModel(jsonById[jsn.glyph2]) }
+				if (jsn.parent) {
+					await createModel(jsonById[jsn.parent]);
+				}
+				if (jsn.glyph1) {
+					await createModel(jsonById[jsn.glyph1]);
+				}
+				if (jsn.glyph2) {
+					await createModel(jsonById[jsn.glyph2]);
+				}
 				
 				/* then create this model */
 				const model = cls.fromJSON(jsn, {modelClasses, modelsById: this.modelsById});
@@ -408,7 +420,7 @@ export class DemoApp extends ValueTracker {
 		
 		/* kick off model creation */
 		for (let jsn of jsonById::values()) {
-			createModel(jsn);
+			await createModel(jsn);
 		}
 	}
 	
