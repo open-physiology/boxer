@@ -59941,7 +59941,7 @@ var RotateTool = exports.RotateTool = (_temp = _class = function (_MouseTool) {
 			var mousemove = this.windowE('mousemove');
 			var threshold = (_context = this.mouseMachine.THRESHOLD.filter(function () {
 				return _this2.active;
-			}).filter((0, _utilities.withMod)('shift')).filter((0, _utilities.withoutMod)('ctrl', 'alt')), _Coach.handleBoxer).call(_context, 'rotatable');
+			}).filter((0, _utilities.withMod)('shift')).filter((0, _utilities.withoutMod)('ctrl')), _Coach.handleBoxer).call(_context, 'rotatable');
 			var dragging = (_context = this.mouseMachine.DRAGGING.filter(function () {
 				return _this2.active;
 			}), _Coach.handleBoxer).call(_context, 'rotatable');

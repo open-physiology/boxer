@@ -27,7 +27,7 @@ export class RotateTool extends MouseTool {
 		const mousemove = this.windowE('mousemove');
 		const threshold = this.mouseMachine.THRESHOLD
 			.filter(() => this.active)
-			.filter(withMod('shift')).filter(withoutMod('ctrl', 'alt'))
+			.filter(withMod('shift')).filter(withoutMod('ctrl'))
 			::handleBoxer('rotatable');
 		const dragging = this.mouseMachine.DRAGGING
 			.filter(() => this.active)
