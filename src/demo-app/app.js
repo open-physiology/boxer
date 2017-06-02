@@ -331,15 +331,15 @@ export class DemoApp extends ValueTracker {
 		
 		/* autoload file */
 		if (this.autoload) {
-			this.boxer.root.transformation = createSVGMatrix(
-				0.28098253721978733,
-				0                  ,
-				0                  ,
-				0.28098253721978733,
-				434.9340794205365  ,
-				408.86981318779766
-			);
 			setTimeout(() => {
+				this.boxer.root.transformation = createSVGMatrix(
+					0.28098253721978733,
+					0                  ,
+					0                  ,
+					0.28098253721978733,
+					434.9340794205365  ,
+					408.86981318779766
+				);
 				this.load(autoloadModel);
 			}, 2000);
 		}
