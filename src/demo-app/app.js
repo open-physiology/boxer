@@ -182,7 +182,7 @@ const LEFT_PANEL_WIDTH = '200px';
 `],
 	template: `
 		
-		<div><svg ng-boxer [delayStart]="true" [readonly]="true" #boxer=boxer></svg></div>
+		<div><svg ng-boxer [delayStart]="true" [readonly]="readonly" #boxer=boxer></svg></div>
 		
 		<div class="button-section">
 			<input #fileInput
@@ -194,6 +194,7 @@ const LEFT_PANEL_WIDTH = '200px';
 		        [style.font-weight]     = " 'bold'                          "
 		        (click)                 = " fileInput.click()               "> Load </button
 	        ><button
+	        	*ngIf                   = " !readonly                       "
 		        [style.font-weight]     = " 'bold'                          "
 		        (click)                 = " save()                          "> Save </button
 	        ><button
@@ -215,7 +216,7 @@ const LEFT_PANEL_WIDTH = '200px';
 					<h2 #lyphsHeader><div>Lyphs</div></h2>
 					<lyph-info-panel
 						*ngFor            = " let model of lyphModels              "
-						[readonly]        = " true "
+						[readonly]        = " readonly                             "
 						(init)            = " lyphsHeader.scrollIntoViewIfNeeded() "
 						[model]           = " model                                "
 						[class.info-panel]= " true                                 "
@@ -230,7 +231,7 @@ const LEFT_PANEL_WIDTH = '200px';
 					<h2 #processesHeader><div>Processes</div></h2>
 					<process-info-panel
 					    *ngFor            = " let model of processModels               "
-						[readonly]        = " true "
+						[readonly]        = " readonly                                 "
 						(init)            = " processesHeader.scrollIntoViewIfNeeded() "
 						[model]           = " model                                    "
 						[class.info-panel]= " true                                     "
@@ -248,8 +249,8 @@ const LEFT_PANEL_WIDTH = '200px';
 			[style.background-color] = " selectedModel.color                   "
 		>
 			<universal-info-panel
-				[model]    = " selectedModel   "
-				[readonly] = " true            "
+				[model]    = " selectedModel "
+				[readonly] = " true          "
 			></universal-info-panel>
 		</div>
 	    
@@ -260,6 +261,8 @@ export class DemoApp extends ValueTracker {
 	@ViewChild('boxer') boxer: NgBoxer;
 	
 	@ViewChild('processesHeader') processesHeader;
+	
+	@Input() readonly = false;
 	
 	lyphModels:    Array<Model> = [];
 	nodeModels:    Array<Model> = [];
@@ -276,34 +279,31 @@ export class DemoApp extends ValueTracker {
 	constructor({nativeElement}: ElementRef) {
 		super();
 		this.nativeElement = $(nativeElement);
+		
+		/* fetching [readonly] from body element; @Input doesn't actually work on root components */
+		this.readonly = JSON.parse(this.nativeElement.attr('[readonly]'));
 	}
 	
-	// ngOnInit() {
-	//
-	// }
-	
-	ngAfterContentInit() {
+	ngAfterViewInit() {
+		/* react to artefact creation */
+		// TODO: the .e() version of this caused errors. Why??
+		this.boxer.drawTool.p('artefactCreated')
+		    .filter(v=>!!v)
+		    .subscribe(::this.onArtefactCreated);
 		
-		setTimeout(() => { // TODO: find correct lifecycle hook
-			
-			/* react to artefact creation */
-			// TODO: the .e() version of this caused errors. Why??
-			this.boxer.drawTool.p('artefactCreated')
-			    .filter(v=>!!v)
-			    .subscribe(::this.onArtefactCreated);
-			
-			/* highlighting */
-			this.boxer.highlightTool.register(this.boxer.highlightTool, this.boxer.stateMachine.p('state').switchMap(state => match(state)({
-				'IDLE': this.p('selectedModel').map((model) => model ? this.artefactsById[model.id] : null),
-				'BUSY': Observable.of(null)
-			})).map(artefact => artefact && {
-				...this.boxer.highlightTool.HIGHLIGHT_DEFAULT,
-				artefact
-			}));
-			
-			this.boxer.start();
-			
-		}, 3000);
+		/* register events we'll use */
+		this.boxer.registerArtefactEvent('mouseenter', 'mouseleave');
+		
+		/* highlighting */
+		this.boxer.highlightTool.register(this.boxer.highlightTool, this.boxer.stateMachine.p('state').switchMap(state => match(state)({
+			'IDLE': this.p('selectedModel').map((model) => model ? this.artefactsById[model.id] : null),
+			'BUSY': Observable.of(null)
+		})).map(artefact => artefact && {
+			...this.boxer.highlightTool.HIGHLIGHT_DEFAULT,
+			artefact
+		}));
+		
+		this.boxer.start();
 	}
 	
 	save() {
@@ -364,14 +364,6 @@ export class DemoApp extends ValueTracker {
 		for (let jsn of jsonById::values()) {
 			createModel(jsn);
 		}
-	}
-	
-	createLayer({parentId, layerId, layerNr}) {
-		
-		const model = cls.fromJSON(jsn, {modelClasses, modelsById});
-		modelsById[model.id] = model;
-		this.onModelCreated(model);
-		
 	}
 	
 	onArtefactCreated(newArtefact) {
@@ -477,6 +469,57 @@ export class DemoApp extends ValueTracker {
 		newModel.p('createdLayer').filter(m=>!!m).subscribe((layerModel) => {
 			this.onModelCreated(layerModel);
 		});
+		
+		
+		
+		/* feature: hover over tile to reveal neural edges */
+		if (isGlyph) {
+			newArtefact.newProperty('revealed');
+			newArtefact.p(['revealed', 'model.type']).subscribe(([r, type]) => {
+				newArtefact.svg.main.css('visibility', (type !== 'cytosol' || r)
+					? 'visible'
+					: 'hidden'
+				);
+			});
+			newModel.p('internal').switchMap(int => int
+				? Observable.never()
+				: newArtefact.p('parent.parent.model.selected')
+			).subscribe( newArtefact.p('revealed') );
+		}
+		if (isProcess) {
+			newArtefact.newProperty('revealed');
+			newArtefact.p(['revealed', 'model.type']).subscribe(([r, type]) => {
+				for (let edge of newArtefact.edges || []) {
+					edge.svg.main.css('visibility', (type !== 'cytosol' || r)
+						? 'visible'
+						: 'hidden'
+					);
+				}
+				newArtefact.glyph1.svg.main.css('visibility', (type !== 'cytosol' || r)
+					? 'visible'
+					: 'hidden'
+				);
+				newArtefact.glyph2.svg.main.css('visibility', (type !== 'cytosol' || r)
+					? 'visible'
+					: 'hidden'
+				);
+			});
+			Observable.merge(
+				newArtefact.p('glyph1.revealed'),
+				newArtefact.p('glyph2.revealed'),
+				newArtefact.p('revealed')
+			).subscribe((r) => {
+				if (newArtefact.glyph1.model.internal) {
+					newArtefact.glyph1.p('revealed').next(r);
+				}
+				if (newArtefact.glyph2.model.internal) {
+					newArtefact.glyph2.p('revealed').next(r);
+				}
+				newArtefact.p('revealed').next(r);
+			});
+		}
+		
+		
 	}
 	
 }

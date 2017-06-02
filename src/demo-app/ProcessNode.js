@@ -9,6 +9,7 @@ import {property, flag, definePropertiesByValue, ValueTracker} from 'utilities';
 import {_isNonNegative} from '../util/misc.js';
 
 import {SvgArtefact, Glyph, Edge} from '../index.js';
+import {LyphBox} from './LyphBox';
 
  
 /**
@@ -53,6 +54,12 @@ export class ProcessNode extends Glyph {
 		this.p(`model.parent`)
 		    .filter(p => !p::isUndefined())
 			.map(p => p ? artefactsById[p.id] : root)
+			.map((a) => {
+			    if (a instanceof LyphBox) { a = a.contentBox }
+			    // ^ create more general handler/rule for using a sub-artefact as a container,
+			    //   and translating back and forth between conceptual parent and artefact parent
+				return a;
+			})
 			.subscribe( this.p('parent') );
 	}
 	

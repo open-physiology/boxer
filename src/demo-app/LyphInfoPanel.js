@@ -36,8 +36,8 @@ const {KEY_ESCAPE} = KeyCode;
 					<td>Length</td>
 					<td>
 						<span class="input"
-						    [class.disabled]         = " !model.lengthSpecified "
-							[style.border-color]     = "  model.darkenedColor   "
+						    [class.disabled]     = " !model.lengthSpecified "
+							[style.border-color] = "  model.darkenedColor   "
 						>
 							<input type="number" dir="rtl"
 								[(ngModel)] = " model.lengthMin                    "
@@ -46,12 +46,13 @@ const {KEY_ESCAPE} = KeyCode;
 								[disabled]  = " readonly || !model.lengthSpecified " />
 							..
 							<input type="number" dir="ltr"
-								[(ngModel)] = " model.lengthMax        "
-								[min]       = " model.lengthMin        "
-								[max]       = " 9                      "
+								[(ngModel)] = " model.lengthMax                    "
+								[min]       = " model.lengthMin                    "
+								[max]       = " 9                                  "
 								[disabled]  = " readonly || !model.lengthSpecified " />
 							<input type="checkbox" style="float: right"
-								[(ngModel)] = " model.lengthSpecified  " />
+								[(ngModel)] = " model.lengthSpecified "
+								[disabled]  = " readonly              " />
 						</span>
 					</td>
 				</tr>
@@ -59,22 +60,23 @@ const {KEY_ESCAPE} = KeyCode;
 					<td>Thickness</td>
 					<td>
 						<span class="input"
-						    [class.disabled]         = " !model.thicknessSpecified "
-							[style.border-color]     = "  model.darkenedColor      "
+						    [class.disabled]     = " !model.thicknessSpecified "
+							[style.border-color] = "  model.darkenedColor      "
 						>
 							<input type="number" dir="rtl"
-								[(ngModel)] = " model.thicknessMin         "
-								[min]       = " 0                          "
-								[max]       = " model.thicknessMax         "
-								[disabled]  = " readonly || !model.thicknessSpecified  " />
+								[(ngModel)] = " model.thicknessMin                    "
+								[min]       = " 0                                     "
+								[max]       = " model.thicknessMax                    "
+								[disabled]  = " readonly || !model.thicknessSpecified " />
 							..
 							<input type="number" dir="ltr"
-								[(ngModel)] = " model.thicknessMax         "
-								[min]       = " model.thicknessMin         "
-								[max]       = " 9                          "
-								[disabled]  = " readonly || !model.thicknessSpecified  " />
+								[(ngModel)] = " model.thicknessMax                    "
+								[min]       = " model.thicknessMin                    "
+								[max]       = " 9                                     "
+								[disabled]  = " readonly || !model.thicknessSpecified " />
 							<input type="checkbox" style="float: right"
-								[(ngModel)] = " model.thicknessSpecified   " />
+								[(ngModel)] = " model.thicknessSpecified "
+								[disabled]  = " readonly                 " />
 						</span>
 					</td>
 				</tr>
