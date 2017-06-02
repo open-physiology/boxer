@@ -1,4 +1,4 @@
-import {ValueTracker, property, flag, humanMsg} from 'utilities';
+import {ValueTracker, property, flag, humanMsg, match} from 'utilities';
 import chroma from 'chroma-js';
 import {isUndefined, pick, parseInt, at, assign} from 'lodash-bound';
 import {uniqueId as _uniqueId} from 'lodash';
@@ -15,7 +15,19 @@ export class ProcessModel extends Model {
 	@property() glyph2;
 	
 	// @property({ initial: [] }) edges;
+	
+	constructor(options = {}) {
+		super(options);
 		
+		this.p('type').map(t => match(t)({
+			'blood':   'pink',
+			'csf':     'blue',
+			'cytosol': 'black',
+			'urine':   'orange',
+			default:   'white'
+		})).subscribe( this.p('color') );
+	}
+	
 	////////////////////////////////////////////////////////////////////////////
 	
 	toJSON() {
