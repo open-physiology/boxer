@@ -55,18 +55,18 @@ export class Model extends ValueTracker {
 	
 	////////////////////////////////////////////////////////////////////////////
 	
-	get contrastingColor() {
-		const c = chroma(this.color);
-		if (c.luminance() < 0.5) {
-			return c.luminance(0.9);
-		} else {
-			return c.luminance(0.1);
-		}
-	}
-	
-	get darkenedColor() {
-		return chroma(this.color).darken(2).hex();
-	}
+	// get contrastingColor() {
+	// 	const c = chroma(this.color);
+	// 	if (c.luminance() < 0.5) {
+	// 		return c.luminance(0.9);
+	// 	} else {
+	// 		return c.luminance(0.1);
+	// 	}
+	// }
+	//
+	// get darkenedColor() {
+	// 	return chroma(this.color).darken(2).hex();
+	// }
 	
 	////////////////////////////////////////////////////////////////////////////
 	

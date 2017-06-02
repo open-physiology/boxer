@@ -29,7 +29,7 @@ const {KEY_ESCAPE} = KeyCode;
 
 		${InfoPanel.ComponentAnnotation.template}
 		
-		<div class="other-fields" [style.border-color]=" model.darkenedColor ">
+		<div class="other-fields" [style.border-color]=" darkenedColor ">
 			
 			<table>
 				<tr>
@@ -37,7 +37,7 @@ const {KEY_ESCAPE} = KeyCode;
 					<td>
 						<span class="input"
 						    [class.disabled]     = " !model.lengthSpecified "
-							[style.border-color] = "  model.darkenedColor   "
+							[style.border-color] = "  darkenedColor   "
 						>
 							<input type="number" dir="rtl"
 								[(ngModel)] = " model.lengthMin                    "
@@ -61,7 +61,7 @@ const {KEY_ESCAPE} = KeyCode;
 					<td>
 						<span class="input"
 						    [class.disabled]     = " !model.thicknessSpecified "
-							[style.border-color] = "  model.darkenedColor      "
+							[style.border-color] = "  darkenedColor      "
 						>
 							<input type="number" dir="rtl"
 								[(ngModel)] = " model.thicknessMin                    "
@@ -86,7 +86,7 @@ const {KEY_ESCAPE} = KeyCode;
 						<input type="text"
 							[(ngModel)]         = " model.external      "
 							[disabled]          = " readonly            "
-							[style.border-color]= " model.darkenedColor " />
+							[style.border-color]= " darkenedColor " />
 					</td>
 				</tr>
 			</table>

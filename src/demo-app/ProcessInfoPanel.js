@@ -28,7 +28,7 @@ const {KEY_ESCAPE} = KeyCode;
 
 		${InfoPanel.ComponentAnnotation.template}
 		
-		<div class="other-fields" [style.border-color]=" model.darkenedColor ">
+		<div class="other-fields" [style.border-color]=" darkenedColor ">
 			
 			<table>
 				<tr>
@@ -37,7 +37,7 @@ const {KEY_ESCAPE} = KeyCode;
 						<select placeholder="Type"
 							[(ngModel)]          = " model.type          "
 							[disabled]           = " readonly            "
-							[style.border-color] = " model.darkenedColor "
+							[style.border-color] = " darkenedColor "
 						>
 							<option value="blood"    > Blood               </option>
 							<option value="cytosol"  > Cytosol             </option>
