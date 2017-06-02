@@ -191,7 +191,8 @@
 		27,
 		24,
 		33,
-		36
+		36,
+		1001
 	  ]
 	},
 	{
@@ -222,7 +223,8 @@
 		28,
 		25,
 		34,
-		37
+		37,
+				1002
 	  ],
 	  "materials": [
 		9,
@@ -271,7 +273,8 @@
 		29,
 		26,
 		35,
-		38
+		38,
+				1003
 	  ]
 	},
 	{
@@ -3008,6 +3011,53 @@
 	  },
 	  "length":    {
 		"min": "0",
+		"max": "2"
+	  }
+	},
+	{
+	  "id":        1001,
+	  "name":      "Bladder",
+	  "topology":  "TUBE",
+	  "thickness": {
+		"min": "2",
+		"max": "2"
+	  },
+	  "length":    {
+		"min": "1",
+		"max": "2"
+	  },
+	  "layers":    [
+		1002,
+		1003
+	  ]
+	},
+	{
+	  "id":        1002,
+	  "name":      "Lumen of bladder",
+	  "topology":  "TUBE",
+	  "thickness": {
+		"min": "2",
+		"max": "2"
+	  },
+	  "length":    {
+		"min": "1",
+		"max": "2"
+	  },
+	  "materials": [
+		9,
+		13
+	  ]
+	},
+	{
+	  "id":        1003,
+	  "name":      "Wall of bladder",
+	  "topology":  "TUBE",
+	  "thickness": {
+		"min": "2",
+		"max": "2"
+	  },
+	  "length":    {
+		"min": "1",
 		"max": "2"
 	  }
 	}
