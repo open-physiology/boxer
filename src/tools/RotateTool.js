@@ -71,7 +71,7 @@ export class RotateTool extends MouseTool {
 				mousemove.map((moveEvent) => {
 					let angle = moveEvent.point.minus(start.center).angle();
 					angle -= start.mouseAngle;
-					tracking.snapping = moveEvent.ctrlKey;
+					tracking.snapping = moveEvent.altKey;
 					if (tracking.snapping) {
 						angle = round(angle / RotateTool.SNAP_ANGLE) * RotateTool.SNAP_ANGLE;
 					}
