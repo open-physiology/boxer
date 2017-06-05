@@ -2091,6 +2091,31 @@ function newSVGPoint(x, y) {
  * A representation of a vector in 2D SVG space.
  */
 
+function _angle() {
+	var l = this.length;
+	return atan2(this.y / l, this.x / l) * 180 / PI;
+}
+
+function _get() {
+	return this.svgPoint.x;
+}
+
+function _get2() {
+	return this.svgPoint.y;
+}
+
+function _get3() {
+	return [this.x, this.y];
+}
+
+function _get4() {
+	return sqrt(this.x * this.x + this.y * this.y);
+}
+
+function _fromMatrixTranslatio(m) {
+	return new this({ x: mx.call(m), y: my.call(m) });
+}
+
 var Vector2D = exports.Vector2D = function () {
 	function Vector2D(other) {
 		_classCallCheck(this, Vector2D);
@@ -2172,35 +2197,22 @@ var Vector2D = exports.Vector2D = function () {
 
 	}, {
 		key: 'angle',
-		value: function angle() {
-			var l = this.length;
-			return atan2(this.y / l, this.x / l) * 180 / PI;
-		}
+		value: _angle
 	}, {
 		key: 'x',
-		get: function get() {
-			return this.svgPoint.x;
-		}
+		get: _get
 	}, {
 		key: 'y',
-		get: function get() {
-			return this.svgPoint.y;
-		}
+		get: _get2
 	}, {
 		key: 'xy',
-		get: function get() {
-			return [this.x, this.y];
-		}
+		get: _get3
 	}, {
 		key: 'length',
-		get: function get() {
-			return sqrt(this.x * this.x + this.y * this.y);
-		}
+		get: _get4
 	}], [{
 		key: 'fromMatrixTranslation',
-		value: function fromMatrixTranslation(m) {
-			return new this({ x: mx.call(m), y: my.call(m) });
-		}
+		value: _fromMatrixTranslatio
 
 		/**
    * The raw SVGPoint instance.
@@ -2216,6 +2228,23 @@ var Vector2D = exports.Vector2D = function () {
  * This represents a point in 2D SVG space. It is aware of its x and y coordinates and of its local coordinate system.
  */
 
+
+function _obj() {
+	var _ref;
+
+	var xKey = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 'x';
+	var yKey = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'y';
+
+	return _ref = {}, _defineProperty(_ref, xKey, this.x), _defineProperty(_ref, yKey, this.y), _ref;
+}
+
+function _fromMatrixTranslatio2(m, coordinateSystem) {
+	return new this({
+		x: mx.call(m),
+		y: my.call(m),
+		coordinateSystem: _jquery.plainDOM.call(coordinateSystem)
+	});
+}
 
 var Point2D = exports.Point2D = function (_Vector2D) {
 	_inherits(Point2D, _Vector2D);
@@ -2254,14 +2283,7 @@ var Point2D = exports.Point2D = function (_Vector2D) {
 		}
 	}, {
 		key: 'obj',
-		value: function obj() {
-			var _ref;
-
-			var xKey = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 'x';
-			var yKey = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'y';
-
-			return _ref = {}, _defineProperty(_ref, xKey, this.x), _defineProperty(_ref, yKey, this.y), _ref;
-		}
+		value: _obj
 	}, {
 		key: 'plus',
 		value: function plus(other) {
@@ -2323,13 +2345,7 @@ var Point2D = exports.Point2D = function (_Vector2D) {
    * @param {SVGMatrix} coordinateSystem - the coordinate system for this new point
    * @returns {Point2D}                  - the new point
    */
-		value: function fromMatrixTranslation(m, coordinateSystem) {
-			return new this({
-				x: mx.call(m),
-				y: my.call(m),
-				coordinateSystem: _jquery.plainDOM.call(coordinateSystem)
-			});
-		}
+		value: _fromMatrixTranslatio2
 	}]);
 
 	return Point2D;
@@ -3368,12 +3384,14 @@ function emitWhenComplete(value) {
 	return this.ignoreElements().concat(_expectRxjs.Observable.of(value));
 }
 
+function _ref(a, b) {
+	return [a, b];
+}
+
 function withLatestFrom(stream) {
 	var _this = this;
 
-	var combinator = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : function (a, b) {
-		return [a, b];
-	};
+	var combinator = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : _ref;
 
 	return _expectRxjs.Observable.create(function (observer) {
 		var value = void 0;
@@ -3403,14 +3421,14 @@ function sineWave() {
 
 		try {
 			for (var _iterator = waves[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-				var _ref2 = _step.value;
-				var amplitude = _ref2.amplitude,
-				    _ref2$period = _ref2.period,
-				    period = _ref2$period === undefined ? 1 / frequency : _ref2$period,
-				    _ref2$frequency = _ref2.frequency,
-				    frequency = _ref2$frequency === undefined ? 1 / period : _ref2$frequency,
-				    _ref2$phase = _ref2.phase,
-				    phase = _ref2$phase === undefined ? 0 : _ref2$phase;
+				var _ref3 = _step.value;
+				var amplitude = _ref3.amplitude,
+				    _ref3$period = _ref3.period,
+				    period = _ref3$period === undefined ? 1 / frequency : _ref3$period,
+				    _ref3$frequency = _ref3.frequency,
+				    frequency = _ref3$frequency === undefined ? 1 / period : _ref3$frequency,
+				    _ref3$phase = _ref3.phase,
+				    phase = _ref3$phase === undefined ? 0 : _ref3$phase;
 
 				result += amplitude * sin(2 * PI * frequency * time + phase);
 			}
@@ -3690,6 +3708,157 @@ var $$domEvents = Symbol('$$domEvents');
 var $$tools = Symbol('$$tools');
 var $$initialized = Symbol('$$initialized');
 
+function _addTool(tool) {
+	var _context;
+
+	this[(_context = tool.constructor.name, _lodashBound.camelCase).call(_context)] = tool;
+	if (!this[$$tools]) {
+		this[$$tools] = new Set();
+	}
+	this[$$tools].add(tool);
+	tool.init({ coach: this });
+	return this;
+}
+
+function _activateExclusiveToo(chosenTools) {
+	chosenTools = [].concat(_toConsumableArray(chosenTools));
+	var _iteratorNormalCompletion = true;
+	var _didIteratorError = false;
+	var _iteratorError = undefined;
+
+	try {
+		for (var _iterator = this[$$tools][Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+			var _context2;
+
+			var tool = _step.value;
+
+			var makeActive = chosenTools.includes(tool) || chosenTools.includes(tool.constructor) || chosenTools.includes(tool.constructor.name) || chosenTools.includes((_context2 = tool.constructor.name, _lodashBound.camelCase).call(_context2));
+			if (makeActive !== tool.active) {
+				tool.active = makeActive;
+			}
+		}
+	} catch (err) {
+		_didIteratorError = true;
+		_iteratorError = err;
+	} finally {
+		try {
+			if (!_iteratorNormalCompletion && _iterator.return) {
+				_iterator.return();
+			}
+		} finally {
+			if (_didIteratorError) {
+				throw _iteratorError;
+			}
+		}
+	}
+}
+
+function _start() {
+	this[$$initialized] = true;
+	var _iteratorNormalCompletion2 = true;
+	var _didIteratorError2 = false;
+	var _iteratorError2 = undefined;
+
+	try {
+		for (var _iterator2 = this[$$tools][Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+			var _context3;
+
+			var tool = _step2.value;
+
+			if ((_context3 = tool.postInit, _lodashBound.isFunction).call(_context3)) {
+				tool.postInit({ coach: this });
+			}
+		}
+	} catch (err) {
+		_didIteratorError2 = true;
+		_iteratorError2 = err;
+	} finally {
+		try {
+			if (!_iteratorNormalCompletion2 && _iterator2.return) {
+				_iterator2.return();
+			}
+		} finally {
+			if (_didIteratorError2) {
+				throw _iteratorError2;
+			}
+		}
+	}
+}
+
+function _registerArtefactEven() {
+	var _this2 = this;
+
+	for (var _len = arguments.length, events = Array(_len), _key = 0; _key < _len; _key++) {
+		events[_key] = arguments[_key];
+	}
+
+	var _iteratorNormalCompletion3 = true;
+	var _didIteratorError3 = false;
+	var _iteratorError3 = undefined;
+
+	function _ref2() {
+		var e = _step3.value;
+
+		if (!_this2[$$domEvents][e]) {
+			_this2[$$domEvents][e] = _expectRxjs.Observable.merge(_expectRxjs.Observable.fromEventPattern(function (fn) {
+				(0, _jquery2.default)(_this2.root.svg.main).on(e, '.boxer > .handles *', fn);
+			}, function (fn) {
+				(0, _jquery2.default)(_this2.root.svg.main).off(e, '.boxer > .handles *', fn);
+			}), _expectRxjs.Observable.fromEventPattern(function (fn) {
+				(0, _jquery2.default)(_this2.root.svg.main).on(e, fn);
+			}, function (fn) {
+				(0, _jquery2.default)(_this2.root.svg.main).off(e, fn);
+			})).do(_this2.enrichMouseEvent.bind(_this2));
+		}
+	}
+
+	try {
+		var _loop = _ref2;
+
+		for (var _iterator3 = events[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
+			_loop();
+		}
+	} catch (err) {
+		_didIteratorError3 = true;
+		_iteratorError3 = err;
+	} finally {
+		try {
+			if (!_iteratorNormalCompletion3 && _iterator3.return) {
+				_iterator3.return();
+			}
+		} finally {
+			if (_didIteratorError3) {
+				throw _iteratorError3;
+			}
+		}
+	}
+}
+
+function _enrichMouseEvent(event) {
+	event.stopPropagation();
+	event.point = new _svg.Point2D({
+		x: event.pageX,
+		y: event.pageY,
+		coordinateSystem: this.root.svg.main
+	});
+}
+
+function _rootE(e) {
+	return _expectRxjs.Observable.fromEvent((0, _jquery2.default)(this.root.svg.main), e).do(this.enrichMouseEvent.bind(this));
+}
+
+function _windowE(e) {
+	return _expectRxjs.Observable.fromEvent((0, _jquery2.default)(window), e).do(this.enrichMouseEvent.bind(this));
+}
+
+function _documentE(e) {
+	return _expectRxjs.Observable.fromEvent((0, _jquery2.default)(document), e).do(this.enrichMouseEvent.bind(this));
+}
+
+function _e2(_e) {
+	return this[$$domEvents][_e];
+}
+
 var Coach = function (_ValueTracker) {
 	_inherits(Coach, _ValueTracker);
 
@@ -3719,162 +3888,31 @@ var Coach = function (_ValueTracker) {
 
 	_createClass(Coach, [{
 		key: 'addTool',
-		value: function addTool(tool) {
-			var _context;
-
-			this[(_context = tool.constructor.name, _lodashBound.camelCase).call(_context)] = tool;
-			if (!this[$$tools]) {
-				this[$$tools] = new Set();
-			}
-			this[$$tools].add(tool);
-			tool.init({ coach: this });
-			return this;
-		}
+		value: _addTool
 	}, {
 		key: 'activateExclusiveTools',
-		value: function activateExclusiveTools(chosenTools) {
-			chosenTools = [].concat(_toConsumableArray(chosenTools));
-			var _iteratorNormalCompletion = true;
-			var _didIteratorError = false;
-			var _iteratorError = undefined;
-
-			try {
-				for (var _iterator = this[$$tools][Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-					var _context2;
-
-					var tool = _step.value;
-
-					var makeActive = chosenTools.includes(tool) || chosenTools.includes(tool.constructor) || chosenTools.includes(tool.constructor.name) || chosenTools.includes((_context2 = tool.constructor.name, _lodashBound.camelCase).call(_context2));
-					if (makeActive !== tool.active) {
-						tool.active = makeActive;
-					}
-				}
-			} catch (err) {
-				_didIteratorError = true;
-				_iteratorError = err;
-			} finally {
-				try {
-					if (!_iteratorNormalCompletion && _iterator.return) {
-						_iterator.return();
-					}
-				} finally {
-					if (_didIteratorError) {
-						throw _iteratorError;
-					}
-				}
-			}
-		}
+		value: _activateExclusiveToo
 	}, {
 		key: 'start',
-		value: function start() {
-			this[$$initialized] = true;
-			var _iteratorNormalCompletion2 = true;
-			var _didIteratorError2 = false;
-			var _iteratorError2 = undefined;
-
-			try {
-				for (var _iterator2 = this[$$tools][Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
-					var _context3;
-
-					var tool = _step2.value;
-
-					if ((_context3 = tool.postInit, _lodashBound.isFunction).call(_context3)) {
-						tool.postInit({ coach: this });
-					}
-				}
-			} catch (err) {
-				_didIteratorError2 = true;
-				_iteratorError2 = err;
-			} finally {
-				try {
-					if (!_iteratorNormalCompletion2 && _iterator2.return) {
-						_iterator2.return();
-					}
-				} finally {
-					if (_didIteratorError2) {
-						throw _iteratorError2;
-					}
-				}
-			}
-		}
+		value: _start
 	}, {
 		key: 'registerArtefactEvent',
-		value: function registerArtefactEvent() {
-			var _this2 = this;
-
-			for (var _len = arguments.length, events = Array(_len), _key = 0; _key < _len; _key++) {
-				events[_key] = arguments[_key];
-			}
-
-			var _iteratorNormalCompletion3 = true;
-			var _didIteratorError3 = false;
-			var _iteratorError3 = undefined;
-
-			try {
-				var _loop = function _loop() {
-					var e = _step3.value;
-
-					if (!_this2[$$domEvents][e]) {
-						_this2[$$domEvents][e] = _expectRxjs.Observable.merge(_expectRxjs.Observable.fromEventPattern(function (fn) {
-							(0, _jquery2.default)(_this2.root.svg.main).on(e, '.boxer > .handles *', fn);
-						}, function (fn) {
-							(0, _jquery2.default)(_this2.root.svg.main).off(e, '.boxer > .handles *', fn);
-						}), _expectRxjs.Observable.fromEventPattern(function (fn) {
-							(0, _jquery2.default)(_this2.root.svg.main).on(e, fn);
-						}, function (fn) {
-							(0, _jquery2.default)(_this2.root.svg.main).off(e, fn);
-						})).do(_this2.enrichMouseEvent.bind(_this2));
-					}
-				};
-
-				for (var _iterator3 = events[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
-					_loop();
-				}
-			} catch (err) {
-				_didIteratorError3 = true;
-				_iteratorError3 = err;
-			} finally {
-				try {
-					if (!_iteratorNormalCompletion3 && _iterator3.return) {
-						_iterator3.return();
-					}
-				} finally {
-					if (_didIteratorError3) {
-						throw _iteratorError3;
-					}
-				}
-			}
-		}
+		value: _registerArtefactEven
 	}, {
 		key: 'enrichMouseEvent',
-		value: function enrichMouseEvent(event) {
-			event.stopPropagation();
-			event.point = new _svg.Point2D({
-				x: event.pageX,
-				y: event.pageY,
-				coordinateSystem: this.root.svg.main
-			});
-		}
+		value: _enrichMouseEvent
 	}, {
 		key: 'rootE',
-		value: function rootE(e) {
-			return _expectRxjs.Observable.fromEvent((0, _jquery2.default)(this.root.svg.main), e).do(this.enrichMouseEvent.bind(this));
-		}
+		value: _rootE
 	}, {
 		key: 'windowE',
-		value: function windowE(e) {
-			return _expectRxjs.Observable.fromEvent((0, _jquery2.default)(window), e).do(this.enrichMouseEvent.bind(this));
-		}
+		value: _windowE
 	}, {
 		key: 'documentE',
-		value: function documentE(e) {
-			return _expectRxjs.Observable.fromEvent((0, _jquery2.default)(document), e).do(this.enrichMouseEvent.bind(this));
-		}
+		value: _documentE
 	}, {
 		key: 'e',
-		value: function e(_e) {
-			return this[$$domEvents][_e];
-		}
+		value: _e2
 	}]);
 
 	return Coach;
@@ -3910,11 +3948,11 @@ function handleBoxer(key) {
 		}
 	}).filter(function (v) {
 		return key === '*' || !!v[2];
-	}).map(function (_ref2) {
-		var _ref3 = _slicedToArray(_ref2, 3),
-		    point = _ref3[0],
-		    controller = _ref3[1],
-		    handlers = _ref3[2];
+	}).map(function (_ref3) {
+		var _ref4 = _slicedToArray(_ref3, 3),
+		    point = _ref4[0],
+		    controller = _ref4[1],
+		    handlers = _ref4[2];
 
 		var originalArtefact = controller;
 		handlers = key === '*' ? {} : handlers;
@@ -23350,6 +23388,218 @@ function _initializerWarningHelper(descriptor, context) {
 	throw new Error('Decorating class property failed. Please ensure that transform-class-properties is enabled.');
 }
 
+function _ref2() {}
+
+function _link() {
+	var _context3,
+	    _this2 = this;
+
+	for (var _len = arguments.length, links = Array(_len), _key = 0; _key < _len; _key++) {
+		links[_key] = arguments[_key];
+	}
+
+	if (!(_context3 = links[0], _lodashBound.isArray).call(_context3)) {
+		links = [links];
+	}
+	var _iteratorNormalCompletion = true;
+	var _didIteratorError = false;
+	var _iteratorError = undefined;
+
+	function _ref5() {
+		var _step$value = _slicedToArray(_step.value, 3),
+		    localState1 = _step$value[0],
+		    otherState = _step$value[1],
+		    localState2 = _step$value[2];
+
+		_this2.extend(function (_ref3) {
+			var enterState = _ref3.enterState;
+			return _defineProperty({}, localState1, function () {
+				enterState.call(otherState, localState2);
+			});
+		});
+	}
+
+	try {
+		var _loop = _ref5;
+		for (var _iterator = links[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+			_loop();
+		}
+		/* return machine itself */
+	} catch (err) {
+		_didIteratorError = true;
+		_iteratorError = err;
+	} finally {
+		try {
+			if (!_iteratorNormalCompletion && _iterator.return) {
+				_iterator.return();
+			}
+		} finally {
+			if (_didIteratorError) {
+				throw _iteratorError;
+			}
+		}
+	}
+
+	return this;
+}
+
+function _ref6() {
+	return true;
+}
+
+function _extend(descFn) {
+	var _this3 = this;
+
+	var runCondition = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : _ref6;
+
+	/* define bound convenience functions */
+	var thisMachine = this;
+	var boundFunctions = {
+		enterState: function enterState(nextState, data) {
+			function _ref7(data) {
+				thisMachine.enterState(nextState, data);
+			}
+
+			if (_lodashBound.isUndefined.call(this)) {
+				return thisMachine.enterState(nextState, data);
+			} else {
+				return boundFunctions.subscribeDuringState.call(this, _ref7);
+			}
+		},
+		subscribeDuringState: function subscribeDuringState() {
+			var sub = this.subscribe.apply(this, arguments);
+			thisMachine.subscriptions.push(sub);
+			return sub;
+		}
+	};
+	/* extend descriptions */
+	var result = descFn(boundFunctions);
+	var subscribers = [];
+	var _iteratorNormalCompletion2 = true;
+	var _didIteratorError2 = false;
+	var _iteratorError2 = undefined;
+
+	function _ref8() {
+		var _context4;
+
+		var _step2$value = _slicedToArray(_step2.value, 2),
+		    key = _step2$value[0],
+		    fn = _step2$value[1];
+
+		if ((_context4 = _this3[key], _lodashBound.isUndefined).call(_context4)) {
+			_this3[key] = _this3.newEvent(key);
+		}
+		var subscriber = _this3.e(key).filter(runCondition).subscribe(function (data) {
+			_this3.enterSpecifiedState(fn);
+		});
+		subscribers.push(subscriber);
+	}
+
+	try {
+		var _loop2 = _ref8;
+		for (var _iterator2 = _lodashBound.toPairs.call(result)[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+			_loop2();
+		}
+		/* run if it says something about the current state */
+	} catch (err) {
+		_didIteratorError2 = true;
+		_iteratorError2 = err;
+	} finally {
+		try {
+			if (!_iteratorNormalCompletion2 && _iterator2.return) {
+				_iterator2.return();
+			}
+		} finally {
+			if (_didIteratorError2) {
+				throw _iteratorError2;
+			}
+		}
+	}
+
+	if (this.state in result && runCondition()) {
+		this.enterSpecifiedState(result[this.state]);
+	}
+	/* return a way to undo the extension */
+	return function () {
+		var _iteratorNormalCompletion3 = true;
+		var _didIteratorError3 = false;
+		var _iteratorError3 = undefined;
+
+		try {
+			for (var _iterator3 = subscribers[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
+				var sub = _step3.value;
+
+				sub.unsubscribe();
+			}
+		} catch (err) {
+			_didIteratorError3 = true;
+			_iteratorError3 = err;
+		} finally {
+			try {
+				if (!_iteratorNormalCompletion3 && _iterator3.return) {
+					_iterator3.return();
+				}
+			} finally {
+				if (_didIteratorError3) {
+					throw _iteratorError3;
+				}
+			}
+		}
+	};
+}
+
+function _unsubscribe() {
+	var _iteratorNormalCompletion4 = true;
+	var _didIteratorError4 = false;
+	var _iteratorError4 = undefined;
+
+	try {
+		for (var _iterator4 = this.subscriptions.reverse()[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
+			var sub = _step4.value;
+
+			sub.unsubscribe();
+		}
+	} catch (err) {
+		_didIteratorError4 = true;
+		_iteratorError4 = err;
+	} finally {
+		try {
+			if (!_iteratorNormalCompletion4 && _iterator4.return) {
+				_iterator4.return();
+			}
+		} finally {
+			if (_didIteratorError4) {
+				throw _iteratorError4;
+			}
+		}
+	}
+
+	this.subscriptions = [];
+}
+
+function _enterState(state, data) {
+	this.unsubscribe();
+	this.log(this.name + ' - entering state: \'' + state + '\'', [data]);
+	var _ref9 = [state, data];
+	this.state = _ref9[0];
+	this.data = _ref9[1];
+
+	this.e(state).next(data);
+}
+
+function _enterSpecifiedState(specifiedStateFn) {
+	var _context5, _subscriptions;
+
+	var specifiedState = specifiedStateFn(this.data);
+	if ((_context5 = specifiedState, _lodashBound.isUndefined).call(_context5)) {
+		specifiedState = [];
+	}
+	if (!(_context5 = specifiedState, _lodashBound.isArray).call(_context5)) {
+		specifiedState = [specifiedState];
+	}
+	(_subscriptions = this.subscriptions).push.apply(_subscriptions, _toConsumableArray(specifiedState));
+}
+
 var Machine = (_dec = (0, _utilities.property)({ initial: null }), _dec2 = (0, _utilities.property)({ initial: null }), (_class = function (_ValueTracker) {
 	_inherits(Machine, _ValueTracker);
 
@@ -23381,220 +23631,26 @@ var Machine = (_dec = (0, _utilities.property)({ initial: null }), _dec2 = (0, _
 
 			_this.log = (_context2 = console)[log].bind(_context2);
 		} else {
-			_this.log = function () {};
+			_this.log = _ref2;
 		}
 		return _this;
 	}
 
 	_createClass(Machine, [{
 		key: 'link',
-		value: function link() {
-			var _context3,
-			    _this2 = this;
-
-			for (var _len = arguments.length, links = Array(_len), _key = 0; _key < _len; _key++) {
-				links[_key] = arguments[_key];
-			}
-
-			if (!(_context3 = links[0], _lodashBound.isArray).call(_context3)) {
-				links = [links];
-			}
-			var _iteratorNormalCompletion = true;
-			var _didIteratorError = false;
-			var _iteratorError = undefined;
-
-			try {
-				var _loop = function _loop() {
-					var _step$value = _slicedToArray(_step.value, 3),
-					    localState1 = _step$value[0],
-					    otherState = _step$value[1],
-					    localState2 = _step$value[2];
-
-					_this2.extend(function (_ref2) {
-						var enterState = _ref2.enterState;
-						return _defineProperty({}, localState1, function () {
-							enterState.call(otherState, localState2);
-						});
-					});
-				};
-
-				for (var _iterator = links[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-					_loop();
-				}
-				/* return machine itself */
-			} catch (err) {
-				_didIteratorError = true;
-				_iteratorError = err;
-			} finally {
-				try {
-					if (!_iteratorNormalCompletion && _iterator.return) {
-						_iterator.return();
-					}
-				} finally {
-					if (_didIteratorError) {
-						throw _iteratorError;
-					}
-				}
-			}
-
-			return this;
-		}
+		value: _link
 	}, {
 		key: 'extend',
-		value: function extend(descFn) {
-			var _this3 = this;
-
-			var runCondition = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : function () {
-				return true;
-			};
-
-			/* define bound convenience functions */
-			var thisMachine = this;
-			var boundFunctions = {
-				enterState: function enterState(nextState, data) {
-					if (_lodashBound.isUndefined.call(this)) {
-						return thisMachine.enterState(nextState, data);
-					} else {
-						return boundFunctions.subscribeDuringState.call(this, function (data) {
-							thisMachine.enterState(nextState, data);
-						});
-					}
-				},
-				subscribeDuringState: function subscribeDuringState() {
-					var sub = this.subscribe.apply(this, arguments);
-					thisMachine.subscriptions.push(sub);
-					return sub;
-				}
-			};
-			/* extend descriptions */
-			var result = descFn(boundFunctions);
-			var subscribers = [];
-			var _iteratorNormalCompletion2 = true;
-			var _didIteratorError2 = false;
-			var _iteratorError2 = undefined;
-
-			try {
-				var _loop2 = function _loop2() {
-					var _context4;
-
-					var _step2$value = _slicedToArray(_step2.value, 2),
-					    key = _step2$value[0],
-					    fn = _step2$value[1];
-
-					if ((_context4 = _this3[key], _lodashBound.isUndefined).call(_context4)) {
-						_this3[key] = _this3.newEvent(key);
-					}
-					var subscriber = _this3.e(key).filter(runCondition).subscribe(function (data) {
-						_this3.enterSpecifiedState(fn);
-					});
-					subscribers.push(subscriber);
-				};
-
-				for (var _iterator2 = _lodashBound.toPairs.call(result)[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
-					_loop2();
-				}
-				/* run if it says something about the current state */
-			} catch (err) {
-				_didIteratorError2 = true;
-				_iteratorError2 = err;
-			} finally {
-				try {
-					if (!_iteratorNormalCompletion2 && _iterator2.return) {
-						_iterator2.return();
-					}
-				} finally {
-					if (_didIteratorError2) {
-						throw _iteratorError2;
-					}
-				}
-			}
-
-			if (this.state in result && runCondition()) {
-				this.enterSpecifiedState(result[this.state]);
-			}
-			/* return a way to undo the extension */
-			return function () {
-				var _iteratorNormalCompletion3 = true;
-				var _didIteratorError3 = false;
-				var _iteratorError3 = undefined;
-
-				try {
-					for (var _iterator3 = subscribers[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
-						var sub = _step3.value;
-
-						sub.unsubscribe();
-					}
-				} catch (err) {
-					_didIteratorError3 = true;
-					_iteratorError3 = err;
-				} finally {
-					try {
-						if (!_iteratorNormalCompletion3 && _iterator3.return) {
-							_iterator3.return();
-						}
-					} finally {
-						if (_didIteratorError3) {
-							throw _iteratorError3;
-						}
-					}
-				}
-			};
-		}
+		value: _extend
 	}, {
 		key: 'unsubscribe',
-		value: function unsubscribe() {
-			var _iteratorNormalCompletion4 = true;
-			var _didIteratorError4 = false;
-			var _iteratorError4 = undefined;
-
-			try {
-				for (var _iterator4 = this.subscriptions.reverse()[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
-					var sub = _step4.value;
-
-					sub.unsubscribe();
-				}
-			} catch (err) {
-				_didIteratorError4 = true;
-				_iteratorError4 = err;
-			} finally {
-				try {
-					if (!_iteratorNormalCompletion4 && _iterator4.return) {
-						_iterator4.return();
-					}
-				} finally {
-					if (_didIteratorError4) {
-						throw _iteratorError4;
-					}
-				}
-			}
-
-			this.subscriptions = [];
-		}
+		value: _unsubscribe
 	}, {
 		key: 'enterState',
-		value: function enterState(state, data) {
-			this.unsubscribe();
-			this.log(this.name + ' - entering state: \'' + state + '\'', [data]);
-			var _ref4 = [state, data];
-			this.state = _ref4[0];
-			this.data = _ref4[1];
-
-			this.e(state).next(data);
-		}
+		value: _enterState
 	}, {
 		key: 'enterSpecifiedState',
-		value: function enterSpecifiedState(specifiedStateFn) {
-			var _context5, _subscriptions;
-
-			var specifiedState = specifiedStateFn(this.data);
-			if ((_context5 = specifiedState, _lodashBound.isUndefined).call(_context5)) {
-				specifiedState = [];
-			}
-			if (!(_context5 = specifiedState, _lodashBound.isArray).call(_context5)) {
-				specifiedState = [specifiedState];
-			}
-			(_subscriptions = this.subscriptions).push.apply(_subscriptions, _toConsumableArray(specifiedState));
-		}
+		value: _enterSpecifiedState
 	}]);
 
 	return Machine;
@@ -23691,6 +23747,61 @@ function _initializerWarningHelper(descriptor, context) {
 	throw new Error('Decorating class property failed. Please ensure that transform-class-properties is enabled.');
 }
 
+function _init() {
+	var _ref2 = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
+	    coach = _ref2.coach,
+	    _ref2$events = _ref2.events,
+	    events = _ref2$events === undefined ? [] : _ref2$events;
+
+	this.coach = coach;
+	var _iteratorNormalCompletion = true;
+	var _didIteratorError = false;
+	var _iteratorError = undefined;
+
+	try {
+		for (var _iterator = events[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+			var e = _step.value;
+
+			coach.registerArtefactEvent(e);
+		}
+	} catch (err) {
+		_didIteratorError = true;
+		_iteratorError = err;
+	} finally {
+		try {
+			if (!_iteratorNormalCompletion && _iterator.return) {
+				_iterator.return();
+			}
+		} finally {
+			if (_didIteratorError) {
+				throw _iteratorError;
+			}
+		}
+	}
+}
+
+function _myE(stream) {
+	return this.p('active').switchMap(function (a) {
+		return a ? stream : _expectRxjs.Observable.never();
+	});
+}
+
+function _rootE(e) {
+	return this.myE(this.coach.rootE(e));
+}
+
+function _windowE(e) {
+	return this.myE(this.coach.windowE(e));
+}
+
+function _documentE(e) {
+	return this.myE(this.coach.documentE(e));
+}
+
+function _e2(_e) {
+	return this.myE(this.coach.e(_e));
+}
+
 var Tool = (_dec = (0, _utilities.property)({ initial: true }), (_class = function (_ValueTracker) {
 	_inherits(Tool, _ValueTracker);
 
@@ -23712,65 +23823,22 @@ var Tool = (_dec = (0, _utilities.property)({ initial: true }), (_class = functi
 
 	_createClass(Tool, [{
 		key: 'init',
-		value: function init() {
-			var _ref2 = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
-			    coach = _ref2.coach,
-			    _ref2$events = _ref2.events,
-			    events = _ref2$events === undefined ? [] : _ref2$events;
-
-			this.coach = coach;
-			var _iteratorNormalCompletion = true;
-			var _didIteratorError = false;
-			var _iteratorError = undefined;
-
-			try {
-				for (var _iterator = events[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-					var e = _step.value;
-
-					coach.registerArtefactEvent(e);
-				}
-			} catch (err) {
-				_didIteratorError = true;
-				_iteratorError = err;
-			} finally {
-				try {
-					if (!_iteratorNormalCompletion && _iterator.return) {
-						_iterator.return();
-					}
-				} finally {
-					if (_didIteratorError) {
-						throw _iteratorError;
-					}
-				}
-			}
-		}
+		value: _init
 	}, {
 		key: 'myE',
-		value: function myE(stream) {
-			return this.p('active').switchMap(function (a) {
-				return a ? stream : _expectRxjs.Observable.never();
-			});
-		}
+		value: _myE
 	}, {
 		key: 'rootE',
-		value: function rootE(e) {
-			return this.myE(this.coach.rootE(e));
-		}
+		value: _rootE
 	}, {
 		key: 'windowE',
-		value: function windowE(e) {
-			return this.myE(this.coach.windowE(e));
-		}
+		value: _windowE
 	}, {
 		key: 'documentE',
-		value: function documentE(e) {
-			return this.myE(this.coach.documentE(e));
-		}
+		value: _documentE
 	}, {
 		key: 'e',
-		value: function e(_e) {
-			return this.myE(this.coach.e(_e));
-		}
+		value: _e2
 	}]);
 
 	return Tool;
@@ -24322,6 +24390,213 @@ var $$handlers = Symbol('$$handlers');
 /**
  * Abstract representation of an interactive artefact in svg space.
  */
+
+function _ref(d) {
+	return !!d;
+}
+
+function _ref4(d) {
+	return d + 1;
+}
+
+function _ref5(p) {
+	return p ? p.p('depth').map(_ref4) : _expectRxjs.Observable.of(0);
+}
+
+function _isEqual() {
+	return false;
+}
+
+function direction(d) {
+	return this.filter(function (_ref6) {
+		var direction = _ref6.direction;
+		return direction === d;
+	});
+}
+
+function _ref9(_ref7) {
+	var _ref8 = _slicedToArray(_ref7, 2),
+	    v = _ref8[0],
+	    p = _ref8[1];
+
+	return !!p;
+}
+
+function _ref14(_ref12) {
+	var _ref13 = _slicedToArray(_ref12, 2),
+	    info = _ref13[0],
+	    p = _ref13[1];
+
+	p.e('moveToFront').next(info);
+}
+
+function _preCreate() {
+	var _context,
+	    _this2 = this;
+
+	var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+
+
+	/* set parent if given */
+	if (options.parent) {
+		this.parent = options.parent;
+	}
+
+	/* when parent is deleted, this is deleted */
+	this.p('parent.deleted').filter(_ref).take(1).subscribe(this.p('deleted'));
+
+	/* set main grouping elements */
+	this.svg = { main: options.svg };
+	if (!_instanceof((_context = this.svg.main, _jquery.plainDOM).call(_context), SVGElement)) {
+		this.svg.main = _jquery2.default.svg('<g>');
+	}
+	this.svg.main.addClass('boxer boxer-' + this.constructor.name);
+	this.svg.ink = _jquery2.default.svg('<g class="ink">').appendTo(this.svg.main);
+	this.svg.handles = _jquery2.default.svg('<g class="handles">').appendTo(this.svg.main);
+	this.svg.children = _jquery2.default.svg('<g class="children">').appendTo(this.svg.main);
+	this.svg.overlay = _jquery2.default.svg('<g class="overlay">').appendTo(this.svg.main).css({ opacity: 0 });
+	this.svg.main.data('boxer-controller', this);
+
+	/* move svg on parent change */
+	this.p('parent').startWith(null).pairwise().subscribe(function (_ref2) {
+		var _ref3 = _slicedToArray(_ref2, 2),
+		    prev = _ref3[0],
+		    curr = _ref3[1];
+
+		if (!!curr) {
+			_this2.svg.main.appendTo(curr.getSvgContainerFor(_this2));
+		} else if (!!prev) {
+			_this2.svg.main.detach();
+		}
+	});
+
+	/* keep track of root */
+	this.newProperty('root', {
+		source: this.p('parent').switchMap(function (p) {
+			return p ? p.p('root') : _expectRxjs.Observable.of(_this2);
+		})
+	});
+
+	/* keep track of nesting depth */
+	this.newProperty('depth', {
+		source: this.p('parent').switchMap(_ref5),
+		isEqual: _isEqual, // always re-emit depth when parent changes
+		allowSynchronousAccess: true
+	});
+
+	/* propagate moveToFront event */
+	var thisArtefact = this;function withParent() {
+		return this.withLatestFrom(thisArtefact.p('parent')).filter(_ref9);
+	}
+
+	function _ref10(info) {
+		return _extends({}, info, { source: thisArtefact });
+	}
+
+	function registerSource() {
+		return this.map(_ref10);
+	}
+
+	function _ref11(info) {
+		return info.source !== thisArtefact;
+	}
+
+	function doNotTurnBack() {
+		return this.filter(_ref11);
+	}
+	// send outward-moving moveToFront to parent
+	(_context = (_context = (_context = this.e('moveToFront'), direction).call(_context, 'out'), registerSource).call(_context), withParent).call(_context).subscribe(_ref14);
+	// listen and propagate inward-moving moveToFront
+	(_context = this.e('parent.moveToFront'), doNotTurnBack).call(_context).subscribe(function (info) {
+		_this2.e('moveToFront').next(_extends({}, info, { direction: 'in' }));
+	});
+
+	/* shuffle svg to front on moveToFront */
+	(_context = this.e('moveToFront'), direction).call(_context, 'out').subscribe((_context = this.svg.main, _svg2.moveToFront).bind(_context));
+}
+
+function _create() {
+	var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+}
+
+function _ref15(d) {
+	return !!d;
+}
+
+function _delete2() {
+	this.p('deleted').next(true);
+}
+
+function _setCSS(css) {
+	var _context2;
+
+	(_context2 = this.svg.main, _jquery.applyCSS).call(_context2, css);
+}
+
+function _registerHandlers() {
+	var handlers = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+
+	if (!this[$$handlers]) {
+		this[$$handlers] = {};
+		this.svg.handles.find('*').data('boxer-handlers', this[$$handlers]);
+		// TODO: ^ stop using 'boxer-handlers'; just get the controller
+		//     :   it's perhaps a big code-change
+	}
+	var _iteratorNormalCompletion = true;
+	var _didIteratorError = false;
+	var _iteratorError = undefined;
+
+	try {
+		for (var _iterator = _lodashBound.entries.call(handlers)[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+			var _step$value = _slicedToArray(_step.value, 2),
+			    key = _step$value[0],
+			    handler = _step$value[1];
+
+			if (!this[$$handlers][key]) {
+				this[$$handlers][key] = new _Handler.Handler();
+			}
+			this[$$handlers][key].register(handler);
+		}
+	} catch (err) {
+		_didIteratorError = true;
+		_iteratorError = err;
+	} finally {
+		try {
+			if (!_iteratorNormalCompletion && _iterator.return) {
+				_iterator.return();
+			}
+		} finally {
+			if (_didIteratorError) {
+				throw _iteratorError;
+			}
+		}
+	}
+}
+
+function _moveToFront() {
+	this.e('moveToFront').next({ direction: 'out', source: this });
+	this.e('moveToFront').next({ direction: 'in', source: this });
+}
+
+function _getSvgContainerFor(artefact) {
+	return this.svg.children;
+}
+
+function _get() {
+	if (!this[$$handlers]) {
+		this.registerHandlers({});
+	}
+	return this[$$handlers];
+}
+
+function _get2() {
+	if (this.parent) {
+		return this.parent.depth + 1;
+	} else {
+		return 0;
+	}
+}
+
 var SvgArtefact = exports.SvgArtefact = (_dec = (0, _utilities.property)({ isValid: function isValid(v) {
 		return !v || _instanceof(v, SvgArtefact);
 	} }), _dec2 = (0, _utilities.flag)({ initial: false }), _dec3 = (0, _utilities.event)(), _dec4 = (0, _utilities.event)(), _dec5 = (0, _utilities.flag)({ initial: true }), (_class = (_temp = _class2 = function (_ValueTracker) {
@@ -24357,116 +24632,10 @@ var SvgArtefact = exports.SvgArtefact = (_dec = (0, _utilities.property)({ isVal
 
 	_createClass(SvgArtefact, [{
 		key: 'preCreate',
-		value: function preCreate() {
-			var _context,
-			    _this2 = this;
-
-			var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
-
-
-			/* set parent if given */
-			if (options.parent) {
-				this.parent = options.parent;
-			}
-
-			/* when parent is deleted, this is deleted */
-			this.p('parent.deleted').filter(function (d) {
-				return !!d;
-			}).take(1).subscribe(this.p('deleted'));
-
-			/* set main grouping elements */
-			this.svg = { main: options.svg };
-			if (!_instanceof((_context = this.svg.main, _jquery.plainDOM).call(_context), SVGElement)) {
-				this.svg.main = _jquery2.default.svg('<g>');
-			}
-			this.svg.main.addClass('boxer boxer-' + this.constructor.name);
-			this.svg.ink = _jquery2.default.svg('<g class="ink">').appendTo(this.svg.main);
-			this.svg.handles = _jquery2.default.svg('<g class="handles">').appendTo(this.svg.main);
-			this.svg.children = _jquery2.default.svg('<g class="children">').appendTo(this.svg.main);
-			this.svg.overlay = _jquery2.default.svg('<g class="overlay">').appendTo(this.svg.main).css({ opacity: 0 });
-			this.svg.main.data('boxer-controller', this);
-
-			/* move svg on parent change */
-			this.p('parent').startWith(null).pairwise().subscribe(function (_ref) {
-				var _ref2 = _slicedToArray(_ref, 2),
-				    prev = _ref2[0],
-				    curr = _ref2[1];
-
-				if (!!curr) {
-					_this2.svg.main.appendTo(curr.getSvgContainerFor(_this2));
-				} else if (!!prev) {
-					_this2.svg.main.detach();
-				}
-			});
-
-			/* keep track of root */
-			this.newProperty('root', {
-				source: this.p('parent').switchMap(function (p) {
-					return p ? p.p('root') : _expectRxjs.Observable.of(_this2);
-				})
-			});
-
-			/* keep track of nesting depth */
-			this.newProperty('depth', {
-				source: this.p('parent').switchMap(function (p) {
-					return p ? p.p('depth').map(function (d) {
-						return d + 1;
-					}) : _expectRxjs.Observable.of(0);
-				}),
-				isEqual: function isEqual() {
-					return false;
-				}, // always re-emit depth when parent changes
-				allowSynchronousAccess: true
-			});
-
-			/* propagate moveToFront event */
-			var thisArtefact = this;
-			function direction(d) {
-				return this.filter(function (_ref3) {
-					var direction = _ref3.direction;
-					return direction === d;
-				});
-			}
-			function withParent() {
-				return this.withLatestFrom(thisArtefact.p('parent')).filter(function (_ref4) {
-					var _ref5 = _slicedToArray(_ref4, 2),
-					    v = _ref5[0],
-					    p = _ref5[1];
-
-					return !!p;
-				});
-			}
-			function registerSource() {
-				return this.map(function (info) {
-					return _extends({}, info, { source: thisArtefact });
-				});
-			}
-			function doNotTurnBack() {
-				return this.filter(function (info) {
-					return info.source !== thisArtefact;
-				});
-			}
-			// send outward-moving moveToFront to parent
-			(_context = (_context = (_context = this.e('moveToFront'), direction).call(_context, 'out'), registerSource).call(_context), withParent).call(_context).subscribe(function (_ref6) {
-				var _ref7 = _slicedToArray(_ref6, 2),
-				    info = _ref7[0],
-				    p = _ref7[1];
-
-				p.e('moveToFront').next(info);
-			});
-			// listen and propagate inward-moving moveToFront
-			(_context = this.e('parent.moveToFront'), doNotTurnBack).call(_context).subscribe(function (info) {
-				_this2.e('moveToFront').next(_extends({}, info, { direction: 'in' }));
-			});
-
-			/* shuffle svg to front on moveToFront */
-			(_context = this.e('moveToFront'), direction).call(_context, 'out').subscribe((_context = this.svg.main, _svg2.moveToFront).bind(_context));
-		}
+		value: _preCreate
 	}, {
 		key: 'create',
-		value: function create() {
-			var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
-		}
+		value: _create
 	}, {
 		key: 'postCreate',
 		value: function postCreate() {
@@ -24475,9 +24644,7 @@ var SvgArtefact = exports.SvgArtefact = (_dec = (0, _utilities.property)({ isVal
 			var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
 			/* what to do when this is deleted */
-			this.p('deleted').filter(function (d) {
-				return !!d;
-			}).take(1).subscribe(function () {
+			this.p('deleted').filter(_ref15).take(1).subscribe(function () {
 				_this3.svg.main.remove();
 				// this.parent = null; // TODO: removing this fixed a bug; is it ever needed?
 			});
@@ -24513,10 +24680,10 @@ var SvgArtefact = exports.SvgArtefact = (_dec = (0, _utilities.property)({ isVal
 			});
 
 			/* toggle pointer-events for active handles */
-			this.p(['parent', 'handlesActive']).subscribe(function (_ref8) {
-				var _ref9 = _slicedToArray(_ref8, 2),
-				    parent = _ref9[0],
-				    active = _ref9[1];
+			this.p(['parent', 'handlesActive']).subscribe(function (_ref16) {
+				var _ref17 = _slicedToArray(_ref16, 2),
+				    parent = _ref17[0],
+				    active = _ref17[1];
 
 				_this3.svg.main.css({ 'pointer-events': active ? !!parent ? 'inherit' : 'all' : 'none' });
 			});
@@ -24528,63 +24695,16 @@ var SvgArtefact = exports.SvgArtefact = (_dec = (0, _utilities.property)({ isVal
 		}
 	}, {
 		key: 'delete',
-		value: function _delete() {
-			this.p('deleted').next(true);
-		}
+		value: _delete2
 	}, {
 		key: 'setCSS',
-		value: function setCSS(css) {
-			var _context2;
-
-			(_context2 = this.svg.main, _jquery.applyCSS).call(_context2, css);
-		}
+		value: _setCSS
 	}, {
 		key: 'registerHandlers',
-		value: function registerHandlers() {
-			var handlers = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
-
-			if (!this[$$handlers]) {
-				this[$$handlers] = {};
-				this.svg.handles.find('*').data('boxer-handlers', this[$$handlers]);
-				// TODO: ^ stop using 'boxer-handlers'; just get the controller
-				//     :   it's perhaps a big code-change
-			}
-			var _iteratorNormalCompletion = true;
-			var _didIteratorError = false;
-			var _iteratorError = undefined;
-
-			try {
-				for (var _iterator = _lodashBound.entries.call(handlers)[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-					var _step$value = _slicedToArray(_step.value, 2),
-					    key = _step$value[0],
-					    handler = _step$value[1];
-
-					if (!this[$$handlers][key]) {
-						this[$$handlers][key] = new _Handler.Handler();
-					}
-					this[$$handlers][key].register(handler);
-				}
-			} catch (err) {
-				_didIteratorError = true;
-				_iteratorError = err;
-			} finally {
-				try {
-					if (!_iteratorNormalCompletion && _iterator.return) {
-						_iterator.return();
-					}
-				} finally {
-					if (_didIteratorError) {
-						throw _iteratorError;
-					}
-				}
-			}
-		}
+		value: _registerHandlers
 	}, {
 		key: 'moveToFront',
-		value: function moveToFront() {
-			this.e('moveToFront').next({ direction: 'out', source: this });
-			this.e('moveToFront').next({ direction: 'in', source: this });
-		}
+		value: _moveToFront
 	}, {
 		key: 'closestCommonAncestorWith',
 		// TODO: ValueTracked doesn't allow synchronous access using .newProperty() yet
@@ -24606,27 +24726,14 @@ var SvgArtefact = exports.SvgArtefact = (_dec = (0, _utilities.property)({ isVal
 		}
 	}, {
 		key: 'getSvgContainerFor',
-		value: function getSvgContainerFor(artefact) {
-			return this.svg.children;
-		} // override if necessary
+		value: _getSvgContainerFor // override if necessary
 
 	}, {
 		key: 'handlers',
-		get: function get() {
-			if (!this[$$handlers]) {
-				this.registerHandlers({});
-			}
-			return this[$$handlers];
-		}
+		get: _get
 	}, {
 		key: 'depth',
-		get: function get() {
-			if (this.parent) {
-				return this.parent.depth + 1;
-			} else {
-				return 0;
-			}
-		}
+		get: _get2
 	}]);
 
 	return SvgArtefact;
@@ -24716,6 +24823,26 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var KEY_ESCAPE = _keycodeJs2.default.KEY_ESCAPE;
+
+function _ref6(_ref4) {
+	var _ref5 = _slicedToArray(_ref4, 2),
+	    e = _ref5[0],
+	    a = _ref5[1];
+
+	return !!a;
+}
+
+function _ref9(_ref7) {
+	var _ref8 = _slicedToArray(_ref7, 2),
+	    e = _ref8[0],
+	    artefact = _ref8[1];
+
+	return _extends({
+		point: e.point,
+		artefact: artefact
+	}, _lodashBound.pick.call(e, 'shiftKey', 'ctrlKey', 'altKey'));
+}
+
 var MouseTool = exports.MouseTool = (_temp = _class = function (_Tool) {
 	_inherits(MouseTool, _Tool);
 
@@ -24747,6 +24874,10 @@ var MouseTool = exports.MouseTool = (_temp = _class = function (_Tool) {
 				selectedArtefact = a;
 			});
 
+			function _ref3(e) {
+				return [e, selectedArtefact];
+			}
+
 			this.mouseMachine.extend(function (_ref2) {
 				var enterState = _ref2.enterState;
 				return {
@@ -24755,24 +24886,7 @@ var MouseTool = exports.MouseTool = (_temp = _class = function (_Tool) {
 
 						return [(_context = _this2.e('mousedown').filter(function () {
 							return _this2.active;
-						}).map(function (e) {
-							return [e, selectedArtefact];
-						}).filter(function (_ref3) {
-							var _ref4 = _slicedToArray(_ref3, 2),
-							    e = _ref4[0],
-							    a = _ref4[1];
-
-							return !!a;
-						}).map(function (_ref5) {
-							var _ref6 = _slicedToArray(_ref5, 2),
-							    e = _ref6[0],
-							    artefact = _ref6[1];
-
-							return _extends({
-								point: e.point,
-								artefact: artefact
-							}, _lodashBound.pick.call(e, 'shiftKey', 'ctrlKey', 'altKey'));
-						}), enterState).call(_context, 'THRESHOLD'), (_context = _utilities.which.call(keydown, KEY_ESCAPE), enterState).call(_context, 'ESCAPING')];
+						}).map(_ref3).filter(_ref6).map(_ref9), enterState).call(_context, 'THRESHOLD'), (_context = _utilities.which.call(keydown, KEY_ESCAPE), enterState).call(_context, 'ESCAPING')];
 					},
 					'THRESHOLD': function THRESHOLD(args) {
 						var _context2;
@@ -37000,6 +37114,26 @@ function _instanceof(left, right) { if (right != null && typeof Symbol !== "unde
 /**
  * Abstract representation of an interactive artefact in svg space.
  */
+function _ref2(p) {
+	return p;
+}
+
+function _ref3(p) {
+	return p.svg.children;
+}
+
+function _ref6(_ref4, t) {
+	var _ref5 = _slicedToArray(_ref4, 2),
+	    prev = _ref5[0],
+	    curr = _ref5[1];
+
+	return _svg.ID_MATRIX.multiply(_jquery.plainDOM.call(curr).getScreenCTM().inverse()).multiply(_jquery.plainDOM.call(prev).getScreenCTM()).multiply(t);
+}
+
+function _ref7(pgt, t) {
+	return (pgt || _svg.ID_MATRIX).multiply(t);
+}
+
 var SvgTransformable = exports.SvgTransformable = (_dec = (0, _utilities.property)({ initial: _svg.ID_MATRIX, isValid: function isValid(v) {
 		return _instanceof(v, _svg.SVGMatrix);
 	} }), _dec2 = (0, _utilities.property)({ initial: _svg.ID_MATRIX, isValid: function isValid(v) {
@@ -37036,25 +37170,13 @@ var SvgTransformable = exports.SvgTransformable = (_dec = (0, _utilities.propert
 			}
 
 			/* smoothly transitioning to a new coordinateSystem */
-			this.p('parent').filter(function (p) {
-				return p;
-			}).map(function (p) {
-				return p.svg.children;
-			}).pairwise().withLatestFrom(this.p('transformation'), function (_ref2, t) {
-				var _ref3 = _slicedToArray(_ref2, 2),
-				    prev = _ref3[0],
-				    curr = _ref3[1];
-
-				return _svg.ID_MATRIX.multiply(_jquery.plainDOM.call(curr).getScreenCTM().inverse()).multiply(_jquery.plainDOM.call(prev).getScreenCTM()).multiply(t);
-			}).subscribe(this.p('transformation'));
+			this.p('parent').filter(_ref2).map(_ref3).pairwise().withLatestFrom(this.p('transformation'), _ref6).subscribe(this.p('transformation'));
 
 			/* keep transformation active on elements */
 			this.p('transformation').subscribe((_context = this.svg.main, _svg.setCTM).bind(_context));
 
 			/* keep track of the transformation of this artefact w.r.t. the canvas */
-			this.p(['parent?.globalTransformation', 'transformation'], function (pgt, t) {
-				return (pgt || _svg.ID_MATRIX).multiply(t);
-			}).subscribe(this.p('globalTransformation'));
+			this.p(['parent?.globalTransformation', 'transformation'], _ref7).subscribe(this.p('globalTransformation'));
 		}
 	}]);
 
@@ -38884,10 +39006,66 @@ function _instanceof(left, right) { if (right != null && typeof Symbol !== "unde
 
 var max = Math.max;
 
-
 /**
  * Representation of an interactive rectangle in svg space.
  */
+function _ref2(p) {
+	return p;
+}
+
+function _ref5(_ref3) {
+	var _ref4 = _slicedToArray(_ref3, 3),
+	    parent = _ref4[0],
+	    p1 = _ref4[1],
+	    p2 = _ref4[2];
+
+	return parent && p1 && p2;
+}
+
+function _create() {
+	var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+
+
+	var inkLine = _jquery2.default.svg('<line>').css({
+		stroke: 'inherit',
+		strokeWidth: 'inherit',
+		strokeDasharray: 'inherit',
+		strokeDashoffset: 'inherit'
+	}).appendTo(this.svg.ink);
+
+	var overlayLine = _jquery2.default.svg('<line>').css({
+		stroke: 'inherit',
+		strokeWidth: 'inherit',
+		strokeDasharray: 'inherit',
+		strokeDashoffset: 'inherit'
+	}).appendTo(this.svg.overlay);
+
+	var handleLine = _jquery2.default.svg('<line>').css({
+		strokeWidth: 'inherit'
+	}).appendTo(this.svg.handles);
+
+	this.p(['parent', 'point1', 'point2', 'lengthen1', 'lengthen2']).filter(_ref5).subscribe(function (_ref6) {
+		var _ref7 = _slicedToArray(_ref6, 5),
+		    parent = _ref7[0],
+		    p1 = _ref7[1],
+		    p2 = _ref7[2],
+		    l1 = _ref7[3],
+		    l2 = _ref7[4];
+
+		p1 = p1.in(parent.svg.children);
+		p2 = p2.in(parent.svg.children);
+		(0, _jquery2.default)().add(inkLine).add(overlayLine).add(handleLine).attr(_extends({}, p1.withDistanceTo(-l2, p2).obj('x1', 'y1'), p2.withDistanceTo(-l1, p1).obj('x2', 'y2')));
+	});
+}
+
+function _get2() {
+	return this.point1.withDistanceTo(-this.lengthen2, this.point2);
+}
+
+function _get3() {
+	return this.point2.withDistanceTo(-this.lengthen1, this.point1);
+}
+
 var LineSegment = exports.LineSegment = (_dec = (0, _utilities.property)({ isValid: function isValid(v) {
 		return _instanceof(v, _svg.Point2D);
 	}, initial: _svg.ID_POINT }), _dec2 = (0, _utilities.property)({ isValid: function isValid(v) {
@@ -38932,9 +39110,7 @@ var LineSegment = exports.LineSegment = (_dec = (0, _utilities.property)({ isVal
 			}
 
 			/* smoothly transitioning to a new coordinateSystem */
-			this.p('parent').filter(function (p) {
-				return p;
-			}).subscribe(function (parent) {
+			this.p('parent').filter(_ref2).subscribe(function (parent) {
 				if (_this2.point1 && _this2.point2) {
 					_this2.point1 = _this2.point1.in(parent.svg.children);
 					_this2.point2 = _this2.point2.in(parent.svg.children);
@@ -38943,58 +39119,13 @@ var LineSegment = exports.LineSegment = (_dec = (0, _utilities.property)({ isVal
 		}
 	}, {
 		key: 'create',
-		value: function create() {
-			var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
-
-
-			var inkLine = _jquery2.default.svg('<line>').css({
-				stroke: 'inherit',
-				strokeWidth: 'inherit',
-				strokeDasharray: 'inherit',
-				strokeDashoffset: 'inherit'
-			}).appendTo(this.svg.ink);
-
-			var overlayLine = _jquery2.default.svg('<line>').css({
-				stroke: 'inherit',
-				strokeWidth: 'inherit',
-				strokeDasharray: 'inherit',
-				strokeDashoffset: 'inherit'
-			}).appendTo(this.svg.overlay);
-
-			var handleLine = _jquery2.default.svg('<line>').css({
-				strokeWidth: 'inherit'
-			}).appendTo(this.svg.handles);
-
-			this.p(['parent', 'point1', 'point2', 'lengthen1', 'lengthen2']).filter(function (_ref2) {
-				var _ref3 = _slicedToArray(_ref2, 3),
-				    parent = _ref3[0],
-				    p1 = _ref3[1],
-				    p2 = _ref3[2];
-
-				return parent && p1 && p2;
-			}).subscribe(function (_ref4) {
-				var _ref5 = _slicedToArray(_ref4, 5),
-				    parent = _ref5[0],
-				    p1 = _ref5[1],
-				    p2 = _ref5[2],
-				    l1 = _ref5[3],
-				    l2 = _ref5[4];
-
-				p1 = p1.in(parent.svg.children);
-				p2 = p2.in(parent.svg.children);
-				(0, _jquery2.default)().add(inkLine).add(overlayLine).add(handleLine).attr(_extends({}, p1.withDistanceTo(-l2, p2).obj('x1', 'y1'), p2.withDistanceTo(-l1, p1).obj('x2', 'y2')));
-			});
-		}
+		value: _create
 	}, {
 		key: 'inkPoint1',
-		get: function get() {
-			return this.point1.withDistanceTo(-this.lengthen2, this.point2);
-		}
+		get: _get2
 	}, {
 		key: 'inkPoint2',
-		get: function get() {
-			return this.point2.withDistanceTo(-this.lengthen1, this.point1);
-		}
+		get: _get3
 	}]);
 
 	return LineSegment;
@@ -39044,14 +39175,18 @@ function _instanceof(left, right) { if (right != null && typeof Symbol !== "unde
 
 function _classCallCheck(instance, Constructor) { if (!_instanceof(instance, Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
+function _ref(a) {
+	return a;
+}
+
+function _merge(key) {
+	return this.parameterTypes[key] && this.parameterTypes[key].merge || _ref;
+}
+
 var Handler = exports.Handler = (_temp = _class = function () {
 	_createClass(Handler, null, [{
 		key: 'merge',
-		value: function merge(key) {
-			return this.parameterTypes[key] && this.parameterTypes[key].merge || function (a) {
-				return a;
-			};
-		}
+		value: _merge
 	}]);
 
 	function Handler() {
@@ -42893,8 +43028,6 @@ var _Glyph = __webpack_require__(176);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
-
 function _instanceof(left, right) { if (right != null && typeof Symbol !== "undefined" && right[Symbol.hasInstance]) { return right[Symbol.hasInstance](left); } else { return _instanceof(left, right); } }
 
 function _initDefineProp(target, property, descriptor, context) {
@@ -42953,6 +43086,38 @@ var MIN_MIN_SIZE = exports.MIN_MIN_SIZE = 2 * max(_BoxCorner.BoxCorner.RADIUS, B
 /**
  * Representation of an interactive rectangle in svg space.
  */
+
+function _getSvgContainerFor(artefact) {
+	// TODO: if still needed, move this functionality to the dropzone handler
+	if (_instanceof(artefact, _BoxBorder.BoxBorder) || _instanceof(artefact, _BoxCorner.BoxCorner)) {
+		return this.svg.outline;
+	}
+	// return this.svg.content;
+	return this.svg.children;
+}
+
+function _ref4(_ref2) {
+	var _ref3 = _slicedToArray(_ref2, 2),
+	    m = _ref3[0],
+	    v = _ref3[1];
+
+	return v < m;
+}
+
+function _ref7(_ref5) {
+	var _ref6 = _slicedToArray(_ref5, 2),
+	    m = _ref6[0],
+	    v = _ref6[1];
+
+	return m;
+}
+
+function _accepts(_ref11) {
+	var artefact = _ref11.artefact;
+
+	return _instanceof(artefact, _SvgTransformable2.SvgTransformable);
+}
+
 var Box = exports.Box = (_dec = (0, _utilities.property)({ isValid: _misc._isNonNegative, initial: MIN_MIN_SIZE }), _dec2 = (0, _utilities.property)({ isValid: _misc._isNonNegative, initial: MIN_MIN_SIZE }), _dec3 = (0, _utilities.property)({ isValid: _misc._isNonNegative, initial: MIN_MIN_SIZE, transform: function transform(w) {
 		return max(w || MIN_MIN_SIZE, this.minWidth || MIN_MIN_SIZE);
 	}
@@ -42981,14 +43146,7 @@ var Box = exports.Box = (_dec = (0, _utilities.property)({ isValid: _misc._isNon
 		// TODO: more elegant solution
 
 
-		value: function getSvgContainerFor(artefact) {
-			// TODO: if still needed, move this functionality to the dropzone handler
-			if (_instanceof(artefact, _BoxBorder.BoxBorder) || _instanceof(artefact, _BoxCorner.BoxCorner)) {
-				return this.svg.outline;
-			}
-			// return this.svg.content;
-			return this.svg.children;
-		}
+		value: _getSvgContainerFor
 	}, {
 		key: 'preCreate',
 		value: function preCreate(options) {
@@ -43009,32 +43167,22 @@ var Box = exports.Box = (_dec = (0, _utilities.property)({ isValid: _misc._isNon
 				    minKey = _arr$_i[0],
 				    key = _arr$_i[1];
 
-				this.p([minKey], [key]).filter(function (_ref2) {
-					var _ref3 = _slicedToArray(_ref2, 2),
-					    m = _ref3[0],
-					    v = _ref3[1];
-
-					return v < m;
-				}).map(function (_ref4) {
-					var _ref5 = _slicedToArray(_ref4, 2),
-					    m = _ref5[0],
-					    v = _ref5[1];
-
-					return m;
-				}).subscribe(this.p(key));
+				this.p([minKey], [key]).filter(_ref4).map(_ref7).subscribe(this.p(key));
 			}
 		}
 	}, {
 		key: 'create',
 		value: function create() {
-			var _context,
-			    _this2 = this;
+			var _this2 = this;
 
 			var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
 			_get(Box.prototype.__proto__ || Object.getPrototypeOf(Box.prototype), 'create', this).call(this, options);
 
-			this.svg.outline = _jquery2.default.svg('<g class="outline">').css(this.constructor.inheritedProperties).insertAfter(this.svg.children);
+			// this.svg.outline = $.svg('<g class="outline">')
+			//    .css(this.constructor.inheritedProperties)
+			//    .css('pointer-events', 'none')
+			// 	.insertAfter(this.svg.children);
 
 			var handlePath = _jquery2.default.svg('<path>').attr({
 				rx: _BoxCorner.BoxCorner.RADIUS,
@@ -43044,9 +43192,7 @@ var Box = exports.Box = (_dec = (0, _utilities.property)({ isValid: _misc._isNon
 			}).appendTo(this.svg.handles);
 
 			var inkPath = _jquery2.default.svg('<path>').attr({
-				rx: _BoxCorner.BoxCorner.RADIUS,
-				ry: _BoxCorner.BoxCorner.RADIUS,
-				stroke: 'transparent',
+				stroke: 'inherit',
 				fill: 'inherit'
 			}).appendTo(this.svg.ink);
 
@@ -43058,99 +43204,85 @@ var Box = exports.Box = (_dec = (0, _utilities.property)({ isValid: _misc._isNon
 				fill: 'transparent'
 			}).appendTo(this.svg.overlay);
 
-			/* borders */
-			this.borders = {};
-			var _arr2 = [['top', 0, -1], ['right', +1, 0], ['bottom', 0, +1], ['left', -1, 0]];
-
-			var _loop = function _loop() {
-				var _arr2$_i = _slicedToArray(_arr2[_i2], 3),
-				    key = _arr2$_i[0],
-				    x = _arr2$_i[1],
-				    y = _arr2$_i[2];
-
-				_this2.borders[key] = new _BoxBorder.BoxBorder({
-					parent: _this2,
-					lengthen1: -_BoxCorner.BoxCorner.RADIUS,
-					lengthen2: -_BoxCorner.BoxCorner.RADIUS,
-					side: { key: key, x: x, y: y }
-				});
-				_this2.borders[key].registerHandlers({
-					resizable: {
-						artefact: _this2,
-						directions: { x: x, y: y },
-						before: function before() {
-							_this2.handlesActive = false;
-						},
-						after: function after() {
-							_this2.handlesActive = true;
-						}
-					},
-					highlightable: {
-						artefact: _this2,
-						effect: {
-							elements: _this2.borders[key].svg.overlay
-						}
-					},
-					dropzone: {
-						artefact: _this2.borders[key],
-						after: function after(_ref13) {
-							var artefact = _ref13.artefact;
-
-							if (_instanceof(artefact, Box)) {
-								// TODO: finish this (mirror the LyphBox.js version)
-							} else if (_instanceof(artefact, _Glyph.Glyph)) {
-								artefact.parent = _this2.borders[key];
-							}
-						}
-					}
-				});
-			};
-
-			for (var _i2 = 0; _i2 < _arr2.length; _i2++) {
-				_loop();
-			}
+			// /* borders */
+			// this.borders = {};
+			// for (let [key, x, y] of [
+			// 	['top',    0, -1],
+			// 	['right', +1,  0],
+			// 	['bottom', 0, +1],
+			// 	['left',  -1,  0]
+			// ]) {
+			// 	this.borders[key] = new BoxBorder({
+			// 		parent: this,
+			// 		lengthen1: -BoxCorner.RADIUS,
+			// 		lengthen2: -BoxCorner.RADIUS,
+			// 		side:      {key, x, y}
+			// 	});
+			// 	this.borders[key].registerHandlers({
+			// 		resizable: {
+			// 			artefact: this,
+			// 			directions: {x, y},
+			// 			before: () => { this.handlesActive = false },
+			// 			after:  () => { this.handlesActive = true  }
+			// 		},
+			// 		highlightable: {
+			// 			artefact: this,
+			// 			effect: {
+			// 				elements: this.borders[key].svg.overlay
+			// 			}
+			// 		},
+			// 		dropzone: {
+			// 			artefact: this.borders[key],
+			// 			after: ({artefact}) => {
+			// 				if (artefact instanceof Box) {
+			// 					// TODO: finish this (mirror the LyphBox.js version)
+			// 				} else if (artefact instanceof Glyph) {
+			// 					artefact.parent = this.borders[key]
+			// 				}
+			// 			}
+			// 		}
+			// 	});
+			// }
 
 			/* corners */
 			this.corners = {};
-			var _arr3 = [['tl', -1, -1, 'top', 'left'], ['tr', +1, -1, 'top', 'right'], ['bl', -1, +1, 'bottom', 'left'], ['br', +1, +1, 'bottom', 'right']];
-			for (var _i3 = 0; _i3 < _arr3.length; _i3++) {
-				var _arr3$_i = _slicedToArray(_arr3[_i3], 5),
-				    _key2 = _arr3$_i[0],
-				    x = _arr3$_i[1],
-				    y = _arr3$_i[2],
-				    s1 = _arr3$_i[3],
-				    s2 = _arr3$_i[4];
+			var _arr2 = [['tl', -1, -1, 'top', 'left'], ['tr', +1, -1, 'top', 'right'], ['bl', -1, +1, 'bottom', 'left'], ['br', +1, +1, 'bottom', 'right']];
+			for (var _i2 = 0; _i2 < _arr2.length; _i2++) {
+				var _arr2$_i = _slicedToArray(_arr2[_i2], 5),
+				    key = _arr2$_i[0],
+				    x = _arr2$_i[1],
+				    y = _arr2$_i[2],
+				    s1 = _arr2$_i[3],
+				    s2 = _arr2$_i[4];
 
-				this.corners[_key2] = new _BoxCorner.BoxCorner({
+				this.corners[key] = new _BoxCorner.BoxCorner({
 					parent: this
 				});
-				this.corners[_key2].registerHandlers({
-					resizable: {
-						artefact: this,
-						directions: { x: x, y: y },
-						before: function before() {
-							_this2.handlesActive = false;
-						},
-						after: function after() {
-							_this2.handlesActive = true;
-						}
-					},
-					highlightable: {
-						artefact: this,
-						effect: {
-							elements: this.corners[_key2].svg.overlay.add(this.borders[s1].svg.overlay).add(this.borders[s2].svg.overlay)
-						}
-					}
-				});
+				// this.corners[key].registerHandlers({
+				// 	resizable: {
+				// 		artefact: this,
+				// 		directions: {x, y},
+				// 		before: () => { this.handlesActive = false },
+				// 		after:  () => { this.handlesActive = true  }
+				// 	},
+				// 	highlightable: {
+				// 		artefact: this,
+				// 		effect: {
+				// 			elements: this.corners[key].svg.overlay
+				// 				  .add(this.borders[s1].svg.overlay)
+				// 				  .add(this.borders[s2].svg.overlay)
+				// 		}
+				// 	}
+				// });
 			}
 
-			/* better corner accessibility */
-			(_context = this.corners, _utilities.definePropertiesByValue).call(_context, {
-				top: { left: this.corners.tl, right: this.corners.tr },
-				right: { top: this.corners.tr, bottom: this.corners.br },
-				bottom: { left: this.corners.bl, right: this.corners.br },
-				left: { top: this.corners.tl, bottom: this.corners.bl }
-			});
+			// /* better corner accessibility */
+			// this.corners::definePropertiesByValue({
+			// 	top:    { left: this.corners.tl, right:  this.corners.tr },
+			// 	right:  { top:  this.corners.tr, bottom: this.corners.br },
+			// 	bottom: { left: this.corners.bl, right:  this.corners.br },
+			// 	left:   { top:  this.corners.tl, bottom: this.corners.bl }
+			// });
 
 			/* bookkeeping */
 			var cornerPoints = {
@@ -43159,93 +43291,64 @@ var Box = exports.Box = (_dec = (0, _utilities.property)({ isValid: _misc._isNon
 				br: { x: +1, y: +1, r: 180 },
 				bl: { x: -1, y: +1, r: 270 }
 			};
-			var borderPoints = {
-				top: [cornerPoints.tl, cornerPoints.tr],
-				right: [cornerPoints.tr, cornerPoints.br],
-				bottom: [cornerPoints.br, cornerPoints.bl],
-				left: [cornerPoints.bl, cornerPoints.tl]
-			};
+			// let borderPoints = {
+			// 	top:    [cornerPoints.tl, cornerPoints.tr],
+			// 	right:  [cornerPoints.tr, cornerPoints.br],
+			// 	bottom: [cornerPoints.br, cornerPoints.bl],
+			// 	left:   [cornerPoints.bl, cornerPoints.tl]
+			// };
 
 			/* keep outline updated */
-			_expectRxjs.Observable.combineLatest(this.p('width'), this.p('height'), this.corners.tr.p('rounded'), this.corners.br.p('rounded'), this.corners.bl.p('rounded'), this.corners.tl.p('rounded')).subscribe(function (_ref6) {
-				var _ref7 = _slicedToArray(_ref6, 2),
-				    w = _ref7[0],
-				    h = _ref7[1];
+			var bcr = _BoxCorner.BoxCorner.RADIUS;
+			var top1 = { x: 0, y: 0 };
+			var top2 = { x: 0, y: 0 };
+			var right1 = { x: 0, y: 0 };
+			var right2 = { x: 0, y: 0 };
+			var bottom1 = { x: 0, y: 0 };
+			var bottom2 = { x: 0, y: 0 };
+			var left1 = { x: 0, y: 0 };
+			var left2 = { x: 0, y: 0 };
+			_expectRxjs.Observable.combineLatest(this.p('width'), this.p('height'), this.corners.tr.p('rounded'), this.corners.br.p('rounded'), this.corners.bl.p('rounded'), this.corners.tl.p('rounded')).subscribe(function (_ref8) {
+				var _ref9 = _slicedToArray(_ref8, 2),
+				    w = _ref9[0],
+				    h = _ref9[1];
 
-				/* place the four corners */
-				var _iteratorNormalCompletion = true;
-				var _didIteratorError = false;
-				var _iteratorError = undefined;
+				// /* place the four corners */
+				// for (let [key, cp] of cornerPoints::entries()) {
+				// 	cp.p = new Point2D({
+				// 		x:                cp.x * w / 2,
+				// 		y:                cp.y * h / 2,
+				// 		coordinateSystem: this.svg.outline
+				// 	});
+				// 	this.corners[key].transformation = ID_MATRIX.translate(...cp.p.xy).rotate(cp.r);
+				// }
+				// /* place the borders */
+				// for (let [key, [{p:p1}, {p:p2}]] of borderPoints::entries()) {
+				// 	this.borders[key].point1 = p1.in(this.svg.outline);
+				// 	this.borders[key].point2 = p2.in(this.svg.outline);
+				// }
 
-				try {
-					for (var _iterator = _lodashBound.entries.call(cornerPoints)[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-						var _step$value = _slicedToArray(_step.value, 2),
-						    key = _step$value[0],
-						    cp = _step$value[1];
-
-						cp.p = new _svg.Point2D({
-							x: cp.x * w / 2,
-							y: cp.y * h / 2,
-							coordinateSystem: _this2.svg.outline
-						});
-						_this2.corners[key].transformation = _svg.ID_MATRIX.translate.apply(_svg.ID_MATRIX, _toConsumableArray(cp.p.xy)).rotate(cp.r);
-					}
-					/* place the borders */
-				} catch (err) {
-					_didIteratorError = true;
-					_iteratorError = err;
-				} finally {
-					try {
-						if (!_iteratorNormalCompletion && _iterator.return) {
-							_iterator.return();
-						}
-					} finally {
-						if (_didIteratorError) {
-							throw _iteratorError;
-						}
-					}
-				}
-
-				var _iteratorNormalCompletion2 = true;
-				var _didIteratorError2 = false;
-				var _iteratorError2 = undefined;
-
-				try {
-					for (var _iterator2 = _lodashBound.entries.call(borderPoints)[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
-						var _step2$value = _slicedToArray(_step2.value, 2),
-						    key = _step2$value[0],
-						    _step2$value$ = _slicedToArray(_step2$value[1], 2),
-						    p1 = _step2$value$[0].p,
-						    p2 = _step2$value$[1].p;
-
-						_this2.borders[key].point1 = p1.in(_this2.svg.outline);
-						_this2.borders[key].point2 = p2.in(_this2.svg.outline);
-					}
-
-					/* generate outline */
-				} catch (err) {
-					_didIteratorError2 = true;
-					_iteratorError2 = err;
-				} finally {
-					try {
-						if (!_iteratorNormalCompletion2 && _iterator2.return) {
-							_iterator2.return();
-						}
-					} finally {
-						if (_didIteratorError2) {
-							throw _iteratorError2;
-						}
-					}
-				}
-
-				var top1 = _this2.borders.top.inkPoint1;
-				var top2 = _this2.borders.top.inkPoint2;
-				var right1 = _this2.borders.right.inkPoint1;
-				var right2 = _this2.borders.right.inkPoint2;
-				var bottom1 = _this2.borders.bottom.inkPoint1;
-				var bottom2 = _this2.borders.bottom.inkPoint2;
-				var left1 = _this2.borders.left.inkPoint1;
-				var left2 = _this2.borders.left.inkPoint2;
+				/* generate outline */
+				// const top1    = this.borders.top   .inkPoint1;
+				// const top2    = this.borders.top   .inkPoint2;
+				// const right1  = this.borders.right .inkPoint1;
+				// const right2  = this.borders.right .inkPoint2;
+				// const bottom1 = this.borders.bottom.inkPoint1;
+				// const bottom2 = this.borders.bottom.inkPoint2;
+				// const left1   = this.borders.left  .inkPoint1;
+				// const left2   = this.borders.left  .inkPoint2;
+				var w12 = w / 2;
+				var h12 = h / 2;
+				var w12r = w12 - bcr;
+				var h12r = h12 - bcr;
+				top2.x = -w12r;top2.y = -h12;
+				top1.x = +w12r;top1.y = -h12;
+				right2.x = +w12;right2.y = -h12r;
+				right1.x = +w12;right1.y = +h12r;
+				bottom2.x = +w12r;bottom2.y = +h12;
+				bottom1.x = -w12r;bottom1.y = +h12;
+				left2.x = -w12;left2.y = +h12r;
+				left1.x = -w12;left1.y = -h12r;
 				var cornerPath = function cornerPath(key) {
 					var c = _this2.corners[key];
 					var s = _BoxCorner.BoxCorner.RADIUS;
@@ -43264,14 +43367,25 @@ var Box = exports.Box = (_dec = (0, _utilities.property)({ isValid: _misc._isNon
 					}
 				};
 				(0, _jquery2.default)().add(inkPath).add(handlePath).add(overlayPath).attr({
-					d: 'M\n\t\t\t\t\t' + left1.xy + '   L ' + left2.xy + '   ' + cornerPath('bl') + '\n\t\t\t\t\t' + bottom1.xy + ' L ' + bottom2.xy + ' ' + cornerPath('br') + '\n\t\t\t\t\t' + right1.xy + '  L ' + right2.xy + '  ' + cornerPath('tr') + '\n\t\t\t\t\t' + top1.xy + '    L ' + top2.xy + '    ' + cornerPath('tl') + '\n\t\t\t\t\t' + left1.xy + '\n\t\t\t\tZ'
+					d: 'M\n\t\t\t\t\t' + left1.x + ' ' + left1.y + ' L ' + left2.x + ' ' + left2.y + ' ' + cornerPath('bl') + '\n\t\t\t\t\t' + bottom1.x + ' ' + bottom1.y + ' L ' + bottom2.x + ' ' + bottom2.y + ' ' + cornerPath('br') + '\n\t\t\t\t\t' + right1.x + ' ' + right1.y + ' L ' + right2.x + ' ' + right2.y + ' ' + cornerPath('tr') + '\n\t\t\t\t\t' + top1.x + ' ' + top1.y + ' L ' + top2.x + ' ' + top2.y + ' ' + cornerPath('tl') + '\n\t\t\t\t\t' + left1.x + ' ' + left1.y + '\n\t\t\t\tZ'
 				});
+				// $().add(inkPath)
+				//    .add(handlePath)
+				//    .add(overlayPath).attr({
+				// 	d: `M
+				// 		${top1.x   } ${top1.y   } L ${top2.x   } ${top2.y   } ${cornerPath('tr')}
+				// 		${right1.x } ${right1.y } L ${right2.x } ${right2.y } ${cornerPath('br')}
+				// 		${bottom1.x} ${bottom1.y} L ${bottom2.x} ${bottom2.y} ${cornerPath('bl')}
+				// 		${left1.x  } ${left1.y  } L ${left2.x  } ${left2.y  } ${cornerPath('tl')}
+				// 		${top1.x   } ${top1.y   }
+				// 	Z`
+				// });
 			});
 
-			/* when parent changes, 'unstuck' all borders */
-			this.p('parent').subscribe(function () {
-				_this2.stuckBorders = {};
-			});
+			// /* when parent changes, 'unstuck' all borders */
+			// this.p('parent').subscribe(() => {
+			// 	this.stuckBorders = {};
+			// });
 
 			// this.p('stuckBorders').switchMap((stb) => {
 			//
@@ -43321,65 +43435,37 @@ var Box = exports.Box = (_dec = (0, _utilities.property)({ isValid: _misc._isNon
 			// 	this.width = w;
 			// });
 
-			/* react to parent resizing when stuck to border */
-			this.p(['width', 'height', 'parent.width', 'parent.height', 'stuckBorders']).subscribe(function (_ref8) {
-				var _context2;
+			// /* react to parent resizing when stuck to border */
+			// this.p(['width', 'height', 'parent.width', 'parent.height', 'stuckBorders']).subscribe(([w, h, pw, ph, stb]) => {
+			// 	stb = [...stb::values()];
+			// 	if (!stb || stb.length === 0) { return }
+			// 	const stX = [...new Set(stb.map(({x}) => x))];
+			// 	const stY = [...new Set(stb.map(({y}) => y))];
+			// 	if (stX.length > 1) { stX::pull(0) }
+			// 	if (stY.length > 1) { stY::pull(0) }
+			// 	if (stX.length === 2) { w = pw }
+			// 	if (stY.length === 2) { h = ph }
+			// 	const [x, y] = [stX[0], stY[0]];
+			// 	const oldX = this.transformation[MX];
+			// 	const oldY = this.transformation[MY];
+			// 	this.transformation = ID_MATRIX.translate(!x * oldX + x*(pw-w)/2, !y * oldY + y*(ph-h)/2).rotate(0);  // TODO
+			// 	this.width  = w;
+			// 	this.height = h;
+			// });
 
-				var _ref9 = _slicedToArray(_ref8, 5),
-				    w = _ref9[0],
-				    h = _ref9[1],
-				    pw = _ref9[2],
-				    ph = _ref9[3],
-				    stb = _ref9[4];
-
-				stb = [].concat(_toConsumableArray((_context2 = stb, _lodashBound.values).call(_context2)));
-				if (!stb || stb.length === 0) {
-					return;
-				}
-				var stX = [].concat(_toConsumableArray(new Set(stb.map(function (_ref10) {
-					var x = _ref10.x;
-					return x;
-				}))));
-				var stY = [].concat(_toConsumableArray(new Set(stb.map(function (_ref11) {
-					var y = _ref11.y;
-					return y;
-				}))));
-				if (stX.length > 1) {
-					_lodashBound.pull.call(stX, 0);
-				}
-				if (stY.length > 1) {
-					_lodashBound.pull.call(stY, 0);
-				}
-				if (stX.length === 2) {
-					w = pw;
-				}
-				if (stY.length === 2) {
-					h = ph;
-				}
-				var _ref12 = [stX[0], stY[0]],
-				    x = _ref12[0],
-				    y = _ref12[1];
-
-				var oldX = _this2.transformation[_svg2.MX];
-				var oldY = _this2.transformation[_svg2.MY];
-				_this2.transformation = _svg.ID_MATRIX.translate(!x * oldX + x * (pw - w) / 2, !y * oldY + y * (ph - h) / 2).rotate(0); // TODO
-				_this2.width = w;
-				_this2.height = h;
-			});
-
-			/* when stuck to borders, deactivate the appropriate outline handles */
-			this.p('stuckBorders').subscribe(function (stb) {
-				// borders
-				_this2.borders.left.handlesActive = !stb.left;
-				_this2.borders.right.handlesActive = !stb.right;
-				_this2.borders.top.handlesActive = !stb.top;
-				_this2.borders.bottom.handlesActive = !stb.bottom;
-				// corners
-				_this2.corners.tl.handlesActive = !stb.top && !stb.left;
-				_this2.corners.tr.handlesActive = !stb.top && !stb.right;
-				_this2.corners.bl.handlesActive = !stb.bottom && !stb.left;
-				_this2.corners.br.handlesActive = !stb.bottom && !stb.right;
-			});
+			// /* when stuck to borders, deactivate the appropriate outline handles */
+			// this.p('stuckBorders').subscribe((stb) => {
+			// 	// borders
+			// 	this.borders.left.handlesActive   = !stb.left;
+			// 	this.borders.right.handlesActive  = !stb.right;
+			// 	this.borders.top.handlesActive    = !stb.top;
+			// 	this.borders.bottom.handlesActive = !stb.bottom;
+			// 	// corners
+			// 	this.corners.tl.handlesActive = !stb.top    && !stb.left;
+			// 	this.corners.tr.handlesActive = !stb.top    && !stb.right;
+			// 	this.corners.bl.handlesActive = !stb.bottom && !stb.left;
+			// 	this.corners.br.handlesActive = !stb.bottom && !stb.right;
+			// });
 		}
 	}, {
 		key: 'postCreate',
@@ -43408,19 +43494,15 @@ var Box = exports.Box = (_dec = (0, _utilities.property)({ isValid: _misc._isNon
 				},
 				dropzone: {
 					artefact: this,
-					after: function after(_ref14) {
-						var artefact = _ref14.artefact;
+					after: function after(_ref10) {
+						var artefact = _ref10.artefact;
 
 						artefact.parent = _this3;
 					}
 				},
 				drawzone: {
 					artefact: this,
-					accepts: function accepts(_ref15) {
-						var artefact = _ref15.artefact;
-
-						return _instanceof(artefact, _SvgTransformable2.SvgTransformable);
-					}
+					accepts: _accepts
 				},
 				highlightable: {
 					artefact: this,
@@ -43546,6 +43628,16 @@ function _instanceof(left, right) { if (right != null && typeof Symbol !== "unde
 /**
  * Representation of an svg canvas used to house Boxer artefacts.
  */
+function _accepts() {
+	return true;
+}
+
+function _accepts2(_ref3) {
+	var artefact = _ref3.artefact;
+
+	return _instanceof(artefact, _SvgTransformable.SvgTransformable);
+}
+
 var Canvas = exports.Canvas = (_dec = (0, _utilities.property)({ initial: _svg.ID_MATRIX, isValid: function isValid(v) {
 		return _instanceof(v, SVGMatrix);
 	} }), _dec2 = (0, _utilities.property)({ initial: _svg.ID_MATRIX, isValid: function isValid(v) {
@@ -43599,9 +43691,7 @@ var Canvas = exports.Canvas = (_dec = (0, _utilities.property)({ initial: _svg.I
 			this.registerHandlers({
 				dropzone: {
 					artefact: this,
-					accepts: function accepts() {
-						return true;
-					},
+					accepts: _accepts,
 					after: function after(_ref2) {
 						var artefact = _ref2.artefact;
 
@@ -43610,11 +43700,7 @@ var Canvas = exports.Canvas = (_dec = (0, _utilities.property)({ initial: _svg.I
 				},
 				drawzone: {
 					artefact: this,
-					accepts: function accepts(_ref3) {
-						var artefact = _ref3.artefact;
-
-						return _instanceof(artefact, _SvgTransformable.SvgTransformable);
-					}
+					accepts: _accepts2
 				},
 				pannable: {
 					artefact: this
@@ -43744,6 +43830,72 @@ function _instanceof(left, right) { if (right != null && typeof Symbol !== "unde
 /**
  * Representation of an interactive edge in svg space, spanning between two glyphs.
  */
+function _ref4(_ref2) {
+	var _ref3 = _slicedToArray(_ref2, 2),
+	    g1 = _ref3[0],
+	    g2 = _ref3[1];
+
+	return g1 && g2;
+}
+
+function _ref7(_ref5) {
+	var _ref6 = _slicedToArray(_ref5, 2),
+	    g1 = _ref6[0],
+	    g2 = _ref6[1];
+
+	return _expectRxjs.Observable.combineLatest(g1.p('depth').filter(function (d) {
+		return !_lodashBound.isUndefined.call(d) && !g1.deleted;
+	}), g2.p('depth').filter(function (d) {
+		return !_lodashBound.isUndefined.call(d) && !g2.deleted;
+	})).map(function () {
+		return g1.closestCommonAncestorWith(g2);
+	});
+}
+
+function direction(d) {
+	return this.filter(function (_ref8) {
+		var direction = _ref8.direction;
+		return direction === d;
+	});
+}
+
+function _ref12(_ref10) {
+	var _ref11 = _slicedToArray(_ref10, 2),
+	    gt = _ref11[0],
+	    root = _ref11[1];
+
+	return _svg.Point2D.fromMatrixTranslation(gt, root.svg.main);
+}
+
+function _ref13(r) {
+	return -r;
+}
+
+function _ref16(_ref14) {
+	var _ref15 = _slicedToArray(_ref14, 3),
+	    parent = _ref15[0],
+	    p1 = _ref15[1],
+	    p2 = _ref15[2];
+
+	return parent && p1 && p2;
+}
+
+function _ref19(d) {
+	return !!d;
+}
+
+function _ref20(d) {
+	return !!d;
+}
+
+function _ref21(g) {
+	return !!g;
+}
+
+function _ref22(g) {
+	return !!g;
+}
+
 var Edge = exports.Edge = (_dec = (0, _utilities.property)({ isValid: function isValid(v) {
 		return _instanceof(v, _Glyph.Glyph);
 	} }), _dec2 = (0, _utilities.property)({ isValid: function isValid(v) {
@@ -43784,60 +43936,30 @@ var Edge = exports.Edge = (_dec = (0, _utilities.property)({ isValid: function i
 			}
 
 			/* re-parenting this Edge when either of the glyphs re-parent */
-			this.p(['glyph1', 'glyph2']).filter(function (_ref2) {
-				var _ref3 = _slicedToArray(_ref2, 2),
-				    g1 = _ref3[0],
-				    g2 = _ref3[1];
-
-				return g1 && g2;
-			}).switchMap(function (_ref4) {
-				var _ref5 = _slicedToArray(_ref4, 2),
-				    g1 = _ref5[0],
-				    g2 = _ref5[1];
-
-				return _expectRxjs.Observable.combineLatest(g1.p('depth').filter(function (d) {
-					return !_lodashBound.isUndefined.call(d) && !g1.deleted;
-				}), g2.p('depth').filter(function (d) {
-					return !_lodashBound.isUndefined.call(d) && !g2.deleted;
-				})).map(function () {
-					return g1.closestCommonAncestorWith(g2);
-				});
-			}).subscribe(this.p('parent'));
+			this.p(['glyph1', 'glyph2']).filter(_ref4).switchMap(_ref7).subscribe(this.p('parent'));
 
 			/* moving the line segment when the glyphs move */
 			var _arr2 = [1, 2];
 			for (var _i2 = 0; _i2 < _arr2.length; _i2++) {
 				var _g = _arr2[_i2];
-				this.p(['glyph' + _g + '.globalTransformation'], ['root']).map(function (_ref7) {
-					var _ref8 = _slicedToArray(_ref7, 2),
-					    gt = _ref8[0],
-					    root = _ref8[1];
-
-					return _svg.Point2D.fromMatrixTranslation(gt, root.svg.main);
-				}).subscribe(this.p('point' + _g));
+				this.p(['glyph' + _g + '.globalTransformation'], ['root']).map(_ref12).subscribe(this.p('point' + _g));
 			}
 
 			/* lengthen/shorten the line segment when the glyph radii change */
 			var _arr3 = [1, 2];
 			for (var _i3 = 0; _i3 < _arr3.length; _i3++) {
 				var _g2 = _arr3[_i3];
-				this.p('glyph' + _g2 + '.radius').map(function (r) {
-					return -r;
-				}).subscribe(this.p('lengthen' + _g2));
+				this.p('glyph' + _g2 + '.radius').map(_ref13).subscribe(this.p('lengthen' + _g2));
 			}
 
 			/* propagate moveToFront  */
 			var thisArtefact = this;
-			function direction(d) {
-				return this.filter(function (_ref6) {
-					var direction = _ref6.direction;
-					return direction === d;
-				});
+			function _ref9(info) {
+				return info.source !== thisArtefact;
 			}
+
 			function doNotTurnBack() {
-				return this.filter(function (info) {
-					return info.source !== thisArtefact;
-				});
+				return this.filter(_ref9);
 			}
 			var _arr4 = [1, 2];
 			for (var _i4 = 0; _i4 < _arr4.length; _i4++) {
@@ -43864,20 +43986,13 @@ var Edge = exports.Edge = (_dec = (0, _utilities.property)({ isValid: function i
 				strokeWidth: '4'
 			}).prependTo(this.svg.ink);
 
-			this.p(['parent', 'point1', 'point2', 'lengthen1', 'lengthen2']).filter(function (_ref9) {
-				var _ref10 = _slicedToArray(_ref9, 3),
-				    parent = _ref10[0],
-				    p1 = _ref10[1],
-				    p2 = _ref10[2];
-
-				return parent && p1 && p2;
-			}).subscribe(function (_ref11) {
-				var _ref12 = _slicedToArray(_ref11, 5),
-				    parent = _ref12[0],
-				    p1 = _ref12[1],
-				    p2 = _ref12[2],
-				    l1 = _ref12[3],
-				    l2 = _ref12[4];
+			this.p(['parent', 'point1', 'point2', 'lengthen1', 'lengthen2']).filter(_ref16).subscribe(function (_ref17) {
+				var _ref18 = _slicedToArray(_ref17, 5),
+				    parent = _ref18[0],
+				    p1 = _ref18[1],
+				    p2 = _ref18[2],
+				    l1 = _ref18[3],
+				    l2 = _ref18[4];
 
 				p1 = p1.in(parent.svg.children);
 				p2 = p2.in(parent.svg.children);
@@ -43904,11 +44019,7 @@ var Edge = exports.Edge = (_dec = (0, _utilities.property)({ isValid: function i
 			});
 
 			/* delete this when either glyph is deleted */
-			_expectRxjs.Observable.merge(this.p('glyph1.deleted').filter(function (d) {
-				return !!d;
-			}), this.p('glyph2.deleted').filter(function (d) {
-				return !!d;
-			})).take(1).subscribe(this.p('deleted'));
+			_expectRxjs.Observable.merge(this.p('glyph1.deleted').filter(_ref19), this.p('glyph2.deleted').filter(_ref20)).take(1).subscribe(this.p('deleted'));
 
 			/* set glyph handlers */
 			var handlers = {
@@ -43921,14 +44032,10 @@ var Edge = exports.Edge = (_dec = (0, _utilities.property)({ isValid: function i
 					}
 				}
 			};
-			this.p('glyph1').filter(function (g) {
-				return !!g;
-			}).subscribe(function (glyph1) {
+			this.p('glyph1').filter(_ref21).subscribe(function (glyph1) {
 				glyph1.registerHandlers(handlers);
 			});
-			this.p('glyph2').filter(function (g) {
-				return !!g;
-			}).subscribe(function (glyph2) {
+			this.p('glyph2').filter(_ref22).subscribe(function (glyph2) {
 				glyph2.registerHandlers(handlers);
 			});
 			// this.glyph2.registerHandlers(handlers);
@@ -44497,10 +44604,6 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.BoxCorner = undefined;
 
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
-
 var _dec, _desc, _value, _class, _descriptor, _class2, _temp2;
 
 var _jquery = __webpack_require__(16);
@@ -44515,7 +44618,7 @@ var _svg = __webpack_require__(17);
 
 var _utilities = __webpack_require__(12);
 
-var _SvgTransformable2 = __webpack_require__(180);
+var _SvgTransformable = __webpack_require__(180);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -44573,8 +44676,73 @@ function _initializerWarningHelper(descriptor, context) {
 /**
  * Representation of a Box corner.
  */
-var BoxCorner = exports.BoxCorner = (_dec = (0, _utilities.flag)({ initial: false }), (_class = (_temp2 = _class2 = function (_SvgTransformable) {
-	_inherits(BoxCorner, _SvgTransformable);
+// export class BoxCorner extends SvgTransformable {
+var BoxCorner = exports.BoxCorner = (_dec = (0, _utilities.flag)({ initial: false }), (_class = (_temp2 = _class2 = function (_ValueTracker) {
+	_inherits(BoxCorner, _ValueTracker);
+
+	// preCreate(options) {
+	// 	super.preCreate(options);
+	//
+	// 	/* set properties if given */
+	// 	if (!options.rounded::isUndefined()) { this.rounded = options.rounded }
+	// }
+	//
+	// create(options = {}) {
+	// 	super.create(options);
+	//
+	// 	const handlePath = $.svg(`<path>`).css({
+	// 		strokeWidth: 'inherit',
+	// 	}).appendTo(this.svg.handles);
+	//
+	// 	const inkPath = $.svg(`<path>`).css({
+	// 		fill:             'transparent',
+	// 		stroke:           'inherit',
+	// 		strokeWidth:      'inherit',
+	// 		strokeDasharray:  'inherit',
+	// 		strokeDashoffset: 'inherit'
+	// 	}).appendTo(this.svg.ink);
+	//
+	// 	const overlayFillPath = $.svg(`<path>`).css({
+	// 		fill:            'inherit',
+	// 		stroke:          'black',
+	// 		strokeDasharray: 'none'
+	// 	}).appendTo(this.svg.overlay);
+	//
+	// 	const overlayStrokePath = $.svg(`<path>`).css({
+	// 		fill:             'transparent',
+	// 		stroke:           'inherit',
+	// 		strokeWidth:      'inherit',
+	// 		strokeDasharray:  'inherit',
+	// 		strokeDashoffset: 'inherit'
+	// 	}).appendTo(this.svg.overlay);
+	//
+	// 	/* react to resizing and roundedness-toggling */
+	// 	const s = BoxCorner.RADIUS;
+	// 	const rightAngle  = `L 0 0 L`;
+	// 	const arcAngle    = `A ${s} ${s}, 0, 0, 0,`;
+	// 	const bl          = `0 ${s}`;
+	// 	const tr          = `${s} 0`;
+	// 	const outerCorner = r => `M ${tr} ${r ? arcAngle : rightAngle} ${bl}`;
+	// 	const innerCorner = `M ${tr} L ${bl}`;
+	// 	this.p('rounded').subscribe((r) => {
+	// 		handlePath       .attr({ d: outerCorner(0)       });
+	// 		inkPath          .attr({ d: outerCorner(r)       });
+	// 		overlayFillPath  .attr({ d: outerCorner(r) + 'Z' });
+	// 		overlayStrokePath.attr({ d: innerCorner          });
+	// 	});
+	//
+	// }
+	//
+	// postCreate(options = {}) {
+	// 	super.postCreate(options);
+	//
+	// 	setTimeout(() => {
+	// 		/* set the stroke-width of part of the overlay based on part of the ink */
+	// 		const source = this.svg.ink    .children('[style*="stroke: inherit"]');
+	// 		const target = this.svg.overlay.children('[style*="stroke: black"]');
+	// 		target.css({ strokeWidth: getComputedStyle(source[0])['stroke-width'] });
+	// 	});
+	// }
 
 	function BoxCorner() {
 		var _ref;
@@ -44590,88 +44758,8 @@ var BoxCorner = exports.BoxCorner = (_dec = (0, _utilities.flag)({ initial: fals
 		return _ret = (_temp = (_this = _possibleConstructorReturn(this, (_ref = BoxCorner.__proto__ || Object.getPrototypeOf(BoxCorner)).call.apply(_ref, [this].concat(args))), _this), _initDefineProp(_this, 'rounded', _descriptor, _this), _temp), _possibleConstructorReturn(_this, _ret);
 	}
 
-	_createClass(BoxCorner, [{
-		key: 'preCreate',
-		value: function preCreate(options) {
-			var _context;
-
-			_get(BoxCorner.prototype.__proto__ || Object.getPrototypeOf(BoxCorner.prototype), 'preCreate', this).call(this, options);
-
-			/* set properties if given */
-			if (!(_context = options.rounded, _lodashBound.isUndefined).call(_context)) {
-				this.rounded = options.rounded;
-			}
-		}
-	}, {
-		key: 'create',
-		value: function create() {
-			var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
-
-			_get(BoxCorner.prototype.__proto__ || Object.getPrototypeOf(BoxCorner.prototype), 'create', this).call(this, options);
-
-			var handlePath = _jquery2.default.svg('<path>').css({
-				strokeWidth: 'inherit'
-			}).appendTo(this.svg.handles);
-
-			var inkPath = _jquery2.default.svg('<path>').css({
-				fill: 'transparent',
-				stroke: 'inherit',
-				strokeWidth: 'inherit',
-				strokeDasharray: 'inherit',
-				strokeDashoffset: 'inherit'
-			}).appendTo(this.svg.ink);
-
-			var overlayFillPath = _jquery2.default.svg('<path>').css({
-				fill: 'inherit',
-				stroke: 'black',
-				strokeDasharray: 'none'
-			}).appendTo(this.svg.overlay);
-
-			var overlayStrokePath = _jquery2.default.svg('<path>').css({
-				fill: 'transparent',
-				stroke: 'inherit',
-				strokeWidth: 'inherit',
-				strokeDasharray: 'inherit',
-				strokeDashoffset: 'inherit'
-			}).appendTo(this.svg.overlay);
-
-			/* react to resizing and roundedness-toggling */
-			var s = BoxCorner.RADIUS;
-			var rightAngle = 'L 0 0 L';
-			var arcAngle = 'A ' + s + ' ' + s + ', 0, 0, 0,';
-			var bl = '0 ' + s;
-			var tr = s + ' 0';
-			var outerCorner = function outerCorner(r) {
-				return 'M ' + tr + ' ' + (r ? arcAngle : rightAngle) + ' ' + bl;
-			};
-			var innerCorner = 'M ' + tr + ' L ' + bl;
-			this.p('rounded').subscribe(function (r) {
-				handlePath.attr({ d: outerCorner(0) });
-				inkPath.attr({ d: outerCorner(r) });
-				overlayFillPath.attr({ d: outerCorner(r) + 'Z' });
-				overlayStrokePath.attr({ d: innerCorner });
-			});
-		}
-	}, {
-		key: 'postCreate',
-		value: function postCreate() {
-			var _this2 = this;
-
-			var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
-
-			_get(BoxCorner.prototype.__proto__ || Object.getPrototypeOf(BoxCorner.prototype), 'postCreate', this).call(this, options);
-
-			setTimeout(function () {
-				/* set the stroke-width of part of the overlay based on part of the ink */
-				var source = _this2.svg.ink.children('[style*="stroke: inherit"]');
-				var target = _this2.svg.overlay.children('[style*="stroke: black"]');
-				target.css({ strokeWidth: getComputedStyle(source[0])['stroke-width'] });
-			});
-		}
-	}]);
-
 	return BoxCorner;
-}(_SvgTransformable2.SvgTransformable), _class2.RADIUS = 15, _temp2), (_descriptor = _applyDecoratedDescriptor(_class.prototype, 'rounded', [_dec], {
+}(_utilities.ValueTracker), _class2.RADIUS = 15, _temp2), (_descriptor = _applyDecoratedDescriptor(_class.prototype, 'rounded', [_dec], {
 	enumerable: true,
 	initializer: function initializer() {
 		return this.rounded;
@@ -44733,6 +44821,85 @@ var floor = Math.floor;
 
 var $$values = Symbol('$$values');
 
+function _ref2(v, a) {
+	return a ? v : null;
+}
+
+function _register(condition, patternStream) {
+	var _context;
+
+	var active = void 0;
+	if (_instanceof(condition, _Tool3.default)) {
+		active = condition.p('active');
+	} else if (_instanceof(condition, _expectRxjs.Observable)) {
+		active = condition;
+	} else {
+		active = _expectRxjs.Observable.of(true);
+	}
+	if (!this[$$values]) {
+		this[$$values] = [];
+	}
+	this[$$values].push(patternStream.withLatestFrom(active, _ref2).catch((_context = console).error.bind(_context)).startWith(null));
+}
+
+function _deactivateBehavior() {}
+
+function _activateBehavior() {}
+
+function _mergeValues(vals) {
+	// console.warn(humanMsg`
+	// 	${this.constructor.name}
+	// 	got multiple values: ${vals}.
+	// 	We're choosing just one.
+	// `); // TODO: reinstate warning when the main problem is fixed
+	return vals[0];
+}
+
+function _ref4(v) {
+	return !!v;
+}
+
+function _postInit(_ref3) {
+	var _this2 = this,
+	    _context2;
+
+	var coach = _ref3.coach;
+
+
+	var currentValue = null;
+
+	_expectRxjs.Observable.combineLatest.apply(_expectRxjs.Observable, _toConsumableArray(this[$$values] || []))
+	// .debounceTime(0) // <-- to skip inconsistent intermediate combination states
+	.subscribe(function (vals) {
+		try {
+
+			vals = vals.filter(_ref4);
+
+			var newValue = void 0;
+			if (vals.length === 0) {
+				newValue = null;
+			} else {
+				if (vals.length > 1) {
+					newValue = _this2.mergeValues(vals);
+				} else {
+					newValue = vals[0];
+				}
+			}
+
+			if (currentValue) {
+				_this2.deactivateBehavior(currentValue);
+			}
+			if (newValue) {
+				_this2.activateBehavior(newValue);
+			}
+
+			currentValue = newValue;
+		} catch (err) {
+			console.error(err);
+		}
+	}, (_context2 = console).error.bind(_context2));
+}
+
 var GlobalBehaviorTool = exports.GlobalBehaviorTool = function (_Tool) {
 	_inherits(GlobalBehaviorTool, _Tool);
 
@@ -44751,87 +44918,22 @@ var GlobalBehaviorTool = exports.GlobalBehaviorTool = function (_Tool) {
 		}
 	}, {
 		key: 'register',
-		value: function register(condition, patternStream) {
-			var _context;
-
-			var active = void 0;
-			if (_instanceof(condition, _Tool3.default)) {
-				active = condition.p('active');
-			} else if (_instanceof(condition, _expectRxjs.Observable)) {
-				active = condition;
-			} else {
-				active = _expectRxjs.Observable.of(true);
-			}
-			if (!this[$$values]) {
-				this[$$values] = [];
-			}
-			this[$$values].push(patternStream.withLatestFrom(active, function (v, a) {
-				return a ? v : null;
-			}).catch((_context = console).error.bind(_context)).startWith(null));
-		}
+		value: _register
 	}, {
 		key: 'deactivateBehavior',
-		value: function deactivateBehavior() {} // override
+		value: _deactivateBehavior // override
 
 	}, {
 		key: 'activateBehavior',
-		value: function activateBehavior() {} // override
+		value: _activateBehavior // override
 
 	}, {
 		key: 'mergeValues',
-		value: function mergeValues(vals) {
-			// console.warn(humanMsg`
-			// 	${this.constructor.name}
-			// 	got multiple values: ${vals}.
-			// 	We're choosing just one.
-			// `); // TODO: reinstate warning when the main problem is fixed
-			return vals[0];
-		} // override
+		value: _mergeValues // override
 
 	}, {
 		key: 'postInit',
-		value: function postInit(_ref2) {
-			var _this2 = this,
-			    _context2;
-
-			var coach = _ref2.coach;
-
-
-			var currentValue = null;
-
-			_expectRxjs.Observable.combineLatest.apply(_expectRxjs.Observable, _toConsumableArray(this[$$values] || []))
-			// .debounceTime(0) // <-- to skip inconsistent intermediate combination states
-			.subscribe(function (vals) {
-				try {
-
-					vals = vals.filter(function (v) {
-						return !!v;
-					});
-
-					var newValue = void 0;
-					if (vals.length === 0) {
-						newValue = null;
-					} else {
-						if (vals.length > 1) {
-							newValue = _this2.mergeValues(vals);
-						} else {
-							newValue = vals[0];
-						}
-					}
-
-					if (currentValue) {
-						_this2.deactivateBehavior(currentValue);
-					}
-					if (newValue) {
-						_this2.activateBehavior(newValue);
-					}
-
-					currentValue = newValue;
-				} catch (err) {
-					console.error(err);
-				}
-			}, (_context2 = console).error.bind(_context2));
-		}
+		value: _postInit
 	}]);
 
 	return GlobalBehaviorTool;
@@ -58178,6 +58280,14 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
+function _ref2(handler) {
+	var _context2;
+
+	if ((_context2 = handler.handle, _lodashBound.isFunction).call(_context2)) {
+		handler.handle(handler);
+	}
+}
+
 var ClickTool = exports.ClickTool = function (_MouseTool) {
 	_inherits(ClickTool, _MouseTool);
 
@@ -58201,13 +58311,7 @@ var ClickTool = exports.ClickTool = function (_MouseTool) {
 
 			(_context = this.mouseMachine.CLICKING.filter(function () {
 				return _this2.active;
-			}), _Coach.handleBoxer).call(_context, 'clickable').subscribe(function (handler) {
-				var _context2;
-
-				if ((_context2 = handler.handle, _lodashBound.isFunction).call(_context2)) {
-					handler.handle(handler);
-				}
-			});
+			}), _Coach.handleBoxer).call(_context, 'clickable').subscribe(_ref2);
 		}
 	}]);
 
@@ -58257,6 +58361,30 @@ var min = Math.min,
     floor = Math.floor,
     PI = Math.PI;
 
+function _ref2() {
+	var wave = (0, _misc.sineWave)({ amplitude: 140, period: 1000 });
+	return {
+		colorCycle: function colorCycle() {
+			var t = Date.now();
+			return 'rgb(\n\t\t\t\t\t' + floor(max(255, 215 - wave(t))) + ',\n\t\t\t\t\t' + floor(min(255, 50 + wave(t))) + ',\n\t\t\t\t\t' + floor(min(255, 50 + wave(t))) + '\n\t\t\t\t)';
+		},
+		dashArray: [6, 4],
+		dashSpeed: 7
+	};
+}
+
+function _ref5(_ref4) {
+	var artefact = _ref4.artefact;
+
+	artefact.delete();
+}
+
+function _ref6(key) {
+	return function (a) {
+		return a && a.handlers[key] && a.handlers['highlightable'] ? a.handlers[key].artefact : null;
+	};
+}
+
 var DeleteTool = exports.DeleteTool = function (_MouseTool) {
 	_inherits(DeleteTool, _MouseTool);
 
@@ -58271,17 +58399,7 @@ var DeleteTool = exports.DeleteTool = function (_MouseTool) {
 			args[_key] = arguments[_key];
 		}
 
-		return _ret = (_temp = (_this = _possibleConstructorReturn(this, (_ref = DeleteTool.__proto__ || Object.getPrototypeOf(DeleteTool)).call.apply(_ref, [this].concat(args))), _this), _this.HIGHLIGHT_DELETING = function () {
-			var wave = (0, _misc.sineWave)({ amplitude: 140, period: 1000 });
-			return {
-				colorCycle: function colorCycle() {
-					var t = Date.now();
-					return 'rgb(\n\t\t\t\t\t' + floor(max(255, 215 - wave(t))) + ',\n\t\t\t\t\t' + floor(min(255, 50 + wave(t))) + ',\n\t\t\t\t\t' + floor(min(255, 50 + wave(t))) + '\n\t\t\t\t)';
-				},
-				dashArray: [6, 4],
-				dashSpeed: 7
-			};
-		}(), _temp), _possibleConstructorReturn(_this, _ret);
+		return _ret = (_temp = (_this = _possibleConstructorReturn(this, (_ref = DeleteTool.__proto__ || Object.getPrototypeOf(DeleteTool)).call.apply(_ref, [this].concat(args))), _this), _this.HIGHLIGHT_DELETING = _ref2(), _temp), _possibleConstructorReturn(_this, _ret);
 	}
 
 	/* 'selectable' related highlighting */
@@ -58289,27 +58407,19 @@ var DeleteTool = exports.DeleteTool = function (_MouseTool) {
 
 	_createClass(DeleteTool, [{
 		key: 'init',
-		value: function init(_ref2) {
+		value: function init(_ref3) {
 			var _context,
 			    _this2 = this;
 
-			var coach = _ref2.coach;
+			var coach = _ref3.coach;
 
 			_get(DeleteTool.prototype.__proto__ || Object.getPrototypeOf(DeleteTool.prototype), 'init', this).call(this, { coach: coach });
 
 			/* handle click */
-			(_context = this.mouseMachine.CLICKING, _Coach.handleBoxer).call(_context, 'deletable').subscribe(function (_ref3) {
-				var artefact = _ref3.artefact;
-
-				artefact.delete();
-			});
+			(_context = this.mouseMachine.CLICKING, _Coach.handleBoxer).call(_context, 'deletable').subscribe(_ref5);
 
 			/* prep for highlighting and mouse cursors */
-			var handlerArtefactOrNull = function handlerArtefactOrNull(key) {
-				return function (a) {
-					return a && a.handlers[key] && a.handlers['highlightable'] ? a.handlers[key].artefact : null;
-				};
-			};
+			var handlerArtefactOrNull = _ref6;
 			var deletableArtefact = coach.p('selectedArtefact').map(handlerArtefactOrNull('movable'));
 
 			/* highlighting */
@@ -58326,15 +58436,18 @@ var DeleteTool = exports.DeleteTool = function (_MouseTool) {
 
 			/* mouse cursors */
 			var deleteCursor = 'url(' + __webpack_require__(1809) + ') 10 10, auto';
-			coach.mouseCursorTool.register(this, coach.stateMachine.p('state').startWith(null).pairwise().switchMap(function (_ref4) {
-				var _ref5 = _slicedToArray(_ref4, 2),
-				    prev = _ref5[0],
-				    next = _ref5[1];
+
+			function _ref9(ma) {
+				return ma && deleteCursor;
+			}
+
+			coach.mouseCursorTool.register(this, coach.stateMachine.p('state').startWith(null).pairwise().switchMap(function (_ref7) {
+				var _ref8 = _slicedToArray(_ref7, 2),
+				    prev = _ref8[0],
+				    next = _ref8[1];
 
 				return (0, _utilities.match)(next)({
-					'IDLE': deletableArtefact.map(function (ma) {
-						return ma && deleteCursor;
-					}).startWith(prev && deleteCursor),
+					'IDLE': deletableArtefact.map(_ref9).startWith(prev && deleteCursor),
 					'BUSY': _expectRxjs.Observable.of(null)
 				});
 			}));
@@ -58477,6 +58590,67 @@ var _DRAWING_EDGE = 'DRAWING_EDGE';
 var DRAWING_EDGES = 'DRAWING_EDGES';
 var MODES = [DRAWING_BOX, DRAWING_GLYPH, _DRAWING_EDGE, DRAWING_EDGES];
 
+function _ref4(a) {
+	return !a;
+}
+
+function _ref6(a) {
+	return !a;
+}
+
+function _ref7(m) {
+	return m !== _DRAWING_EDGE;
+}
+
+function _ref9(a) {
+	return !a;
+}
+
+function _ref10(m) {
+	return m !== _DRAWING_EDGE;
+}
+
+function _ref11(a) {
+	return !a;
+}
+
+function _ref12(a) {
+	return !a;
+}
+
+function _ref13(m) {
+	return m !== _DRAWING_EDGE;
+}
+
+function _ref14() {
+	artefact.handlesActive = true;
+	artefact.moveToFront();
+}
+
+function _OTHER_TOOL() {}
+
+function _ref16() {
+	return { 'OTHER_TOOL': _OTHER_TOOL };
+}
+
+function _IDLE() {}
+
+function _BUSY() {}
+
+function _ref17() {
+	return { 'IDLE': _IDLE, 'BUSY': _BUSY };
+}
+
+function _ref20(key) {
+	return function (a) {
+		return a && a.handlers[key] ? a.handlers[key].artefact : null;
+	};
+}
+
+function _ref23(a) {
+	return a && !!a.handlers['highlightable'] ? a : null;
+}
+
 var DrawTool = exports.DrawTool = (_dec = (0, _utilities.property)({ initial: null }), _dec2 = (0, _utilities.property)({ initial: DRAWING_BOX }), (_class = (_temp = _class2 = function (_MouseTool) {
 	_inherits(DrawTool, _MouseTool);
 
@@ -58548,15 +58722,16 @@ var DrawTool = exports.DrawTool = (_dec = (0, _utilities.property)({ initial: nu
 			var _didIteratorError = false;
 			var _iteratorError = undefined;
 
+			function _ref27() {
+				var mode = _step.value;
+
+				localMachine.link('IDLE', threshold.filter(function () {
+					return _this2.mode === mode;
+				}), mode);
+			}
+
 			try {
-				var _loop = function _loop() {
-					var mode = _step.value;
-
-					localMachine.link('IDLE', threshold.filter(function () {
-						return _this2.mode === mode;
-					}), mode);
-				};
-
+				var _loop = _ref27;
 				for (var _iterator = MODES[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
 					_loop();
 				}
@@ -58641,9 +58816,7 @@ var DrawTool = exports.DrawTool = (_dec = (0, _utilities.property)({ initial: nu
 						});
 
 						/* cancel or stop dragging */
-						(_context3 = _expectRxjs.Observable.merge(_this2.p('active').filter(function (a) {
-							return !a;
-						}).concatMap(_expectRxjs.Observable.throw()), escaping.concatMap(_expectRxjs.Observable.throw()), droppingOrClicking.do(function () {
+						(_context3 = _expectRxjs.Observable.merge(_this2.p('active').filter(_ref4).concatMap(_expectRxjs.Observable.throw()), escaping.concatMap(_expectRxjs.Observable.throw()), droppingOrClicking.do(function () {
 							artefact.handlesActive = true;
 							artefact.moveToFront();
 						})).catch(function () {
@@ -58651,9 +58824,9 @@ var DrawTool = exports.DrawTool = (_dec = (0, _utilities.property)({ initial: nu
 							artefact.delete();
 							_misc2.callIfFunction.call(cancel, args);
 							return _expectRxjs.Observable.of({ deleted: true });
-						}).do(function (_ref4) {
-							var deleted = _ref4.deleted,
-							    point = _ref4.point;
+						}).do(function (_ref5) {
+							var deleted = _ref5.deleted,
+							    point = _ref5.point;
 
 							/* stop drawing */
 							// coach.selectTool.reacquire(point);
@@ -58703,11 +58876,7 @@ var DrawTool = exports.DrawTool = (_dec = (0, _utilities.property)({ initial: nu
 						// TODO: allow move following initial mousedown
 
 						/* cancel or stop dragging */
-						(_context4 = _expectRxjs.Observable.merge(escaping, _this2.p('active').filter(function (a) {
-							return !a;
-						}), _this2.p('mode').filter(function (m) {
-							return m !== _DRAWING_EDGE;
-						})).concatMap(_expectRxjs.Observable.throw()).merge(droppingOrClicking.do(function () {
+						(_context4 = _expectRxjs.Observable.merge(escaping, _this2.p('active').filter(_ref6), _this2.p('mode').filter(_ref7)).concatMap(_expectRxjs.Observable.throw()).merge(droppingOrClicking.do(function () {
 							artefact.handlesActive = true;
 							artefact.moveToFront();
 						})).catch(function () {
@@ -58715,8 +58884,8 @@ var DrawTool = exports.DrawTool = (_dec = (0, _utilities.property)({ initial: nu
 							artefact.delete();
 							_misc2.callIfFunction.call(cancel, args);
 							return _expectRxjs.Observable.of({ deleted: true });
-						}).do(function (_ref5) {
-							var point = _ref5.point;
+						}).do(function (_ref8) {
+							var point = _ref8.point;
 
 							/* stop drawing */
 							coach.selectTool.reacquire(point);
@@ -58771,33 +58940,20 @@ var DrawTool = exports.DrawTool = (_dec = (0, _utilities.property)({ initial: nu
 
 
 						/* escape / cancel */
-						(_context5 = _expectRxjs.Observable.merge(_this2.p('active').filter(function (a) {
-							return !a;
-						}), _this2.p('mode').filter(function (m) {
-							return m !== _DRAWING_EDGE;
-						}), escaping).merge(_this2.p('active').filter(function (a) {
-							return !a;
-						})).do(function () {
+						(_context5 = _expectRxjs.Observable.merge(_this2.p('active').filter(_ref9), _this2.p('mode').filter(_ref10), escaping).merge(_this2.p('active').filter(_ref11)).do(function () {
 							if (_lodashBound.isFunction.call(cancel)) {
 								cancel(args1);
 							}
 							glyph1.handlesActive = true;
 						}), enterState).call(_context5, 'IDLE');
 						/* cancel or stop dragging */
-						_expectRxjs.Observable.merge(escaping, _this2.p('active').filter(function (a) {
-							return !a;
-						}), _this2.p('mode').filter(function (m) {
-							return m !== _DRAWING_EDGE;
-						})).concatMap(_expectRxjs.Observable.throw()).merge(droppingOrClicking.do(function () {
-							artefact.handlesActive = true;
-							artefact.moveToFront();
-						})).catch(function () {
+						_expectRxjs.Observable.merge(escaping, _this2.p('active').filter(_ref12), _this2.p('mode').filter(_ref13)).concatMap(_expectRxjs.Observable.throw()).merge(droppingOrClicking.do(_ref14)).catch(function () {
 							/* cancel drawing */
 							artefact.delete();
 							_misc2.callIfFunction.call(cancel, args);
 							return _expectRxjs.Observable.of({ deleted: true });
-						}).do(function (_ref6) {
-							var point = _ref6.point;
+						}).do(function (_ref15) {
+							var point = _ref15.point;
 
 							/* stop drawing */
 							coach.selectTool.reacquire(point);
@@ -58856,20 +59012,16 @@ var DrawTool = exports.DrawTool = (_dec = (0, _utilities.property)({ initial: nu
 
 			/* mutual exclusion between this machine and other machines, coordinated by coach.stateMachine */
 			var drawing = _expectRxjs.Observable.merge(localMachine.DRAWING_BOX, localMachine.DRAWING_GLYPH, localMachine.DRAWING_EDGE);
-			localMachine.extend(function () {
-				return { 'OTHER_TOOL': function OTHER_TOOL() {} };
-			});
-			coach.stateMachine.extend(function () {
-				return { 'IDLE': function IDLE() {}, 'BUSY': function BUSY() {} };
-			});
-			localMachine.link('IDLE', coach.stateMachine.BUSY.filter(function (_ref7) {
-				var tool = _ref7.tool;
+			localMachine.extend(_ref16);
+			coach.stateMachine.extend(_ref17);
+			localMachine.link('IDLE', coach.stateMachine.BUSY.filter(function (_ref18) {
+				var tool = _ref18.tool;
 				return tool !== _this2;
 			}).map(function () {
 				return localMachine.data;
 			}), 'OTHER_TOOL');
-			localMachine.link('OTHER_TOOL', coach.stateMachine.IDLE.filter(function (_ref8) {
-				var tool = _ref8.tool;
+			localMachine.link('OTHER_TOOL', coach.stateMachine.IDLE.filter(function (_ref19) {
+				var tool = _ref19.tool;
 				return tool !== _this2;
 			}).map(function () {
 				return localMachine.data;
@@ -58882,18 +59034,14 @@ var DrawTool = exports.DrawTool = (_dec = (0, _utilities.property)({ initial: nu
 			}), 'IDLE');
 
 			/* prep for highlighting and mouse cursors */
-			var handlerArtefactOrNull = function handlerArtefactOrNull(key) {
-				return function (a) {
-					return a && a.handlers[key] ? a.handlers[key].artefact : null;
-				};
-			};
+			var handlerArtefactOrNull = _ref20;
 			var drawZoneArtefact = coach.p('selectedArtefact').map(handlerArtefactOrNull('drawzone'));
 
 			/* highlighting */
-			coach.highlightTool.register(this, localMachine.p(['state', 'data']).switchMap(function (_ref9) {
-				var _ref10 = _slicedToArray(_ref9, 2),
-				    state = _ref10[0],
-				    data = _ref10[1];
+			coach.highlightTool.register(this, localMachine.p(['state', 'data']).switchMap(function (_ref21) {
+				var _ref22 = _slicedToArray(_ref21, 2),
+				    state = _ref22[0],
+				    data = _ref22[1];
 
 				return (0, _utilities.match)(state)({
 					'IDLE': drawZoneArtefact,
@@ -58903,9 +59051,7 @@ var DrawTool = exports.DrawTool = (_dec = (0, _utilities.property)({ initial: nu
 					'DRAWING_EDGE': _expectRxjs.Observable.of(data && data.artefact),
 					'OTHER_TOOL': _expectRxjs.Observable.of(null)
 				});
-			}).map(function (a) {
-				return a && !!a.handlers['highlightable'] ? a : null;
-			}).map(function (artefact) {
+			}).map(_ref23).map(function (artefact) {
 				return artefact && _extends({}, coach.highlightTool.HIGHLIGHT_DEFAULT, {
 					artefact: artefact
 				});
@@ -58913,15 +59059,18 @@ var DrawTool = exports.DrawTool = (_dec = (0, _utilities.property)({ initial: nu
 
 			/* mouse cursors */
 			var drawCursor = _cssprefix2.default.getValue('cursor', 'crosshair');
-			coach.mouseCursorTool.register(this, localMachine.p('state').startWith(null).pairwise().switchMap(function (_ref11) {
-				var _ref12 = _slicedToArray(_ref11, 2),
-				    prev = _ref12[0],
-				    next = _ref12[1];
+
+			function _ref26(dza) {
+				return dza && drawCursor;
+			}
+
+			coach.mouseCursorTool.register(this, localMachine.p('state').startWith(null).pairwise().switchMap(function (_ref24) {
+				var _ref25 = _slicedToArray(_ref24, 2),
+				    prev = _ref25[0],
+				    next = _ref25[1];
 
 				return (0, _utilities.match)(next)({
-					'IDLE': drawZoneArtefact.map(function (dza) {
-						return dza && drawCursor;
-					}).startWith(prev && drawCursor),
+					'IDLE': drawZoneArtefact.map(_ref26).startWith(prev && drawCursor),
 					'THRESHOLD': _expectRxjs.Observable.of(drawCursor),
 					'DRAWING_BOX': _expectRxjs.Observable.of(drawCursor),
 					'DRAWING_GLYPH': _expectRxjs.Observable.of(drawCursor),
@@ -58979,6 +59128,21 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
+function _showPoint(point, attrs) {
+
+	point = point.in(this.coach.root.svg.main);
+
+	var center = _jquery2.default.svg('<circle>').attr(_extends({}, point.obj('cx', 'cy'), {
+		r: 5,
+		fill: 'red',
+		stroke: 'black'
+	}, attrs)).css({
+		'pointer-events': 'none'
+	}).appendTo(this.coach.root.svg.main);
+
+	setTimeout(center.remove.bind(center), 500);
+}
+
 var HelperTool = exports.HelperTool = function (_Tool) {
 	_inherits(HelperTool, _Tool);
 
@@ -58990,20 +59154,7 @@ var HelperTool = exports.HelperTool = function (_Tool) {
 
 	_createClass(HelperTool, [{
 		key: 'showPoint',
-		value: function showPoint(point, attrs) {
-
-			point = point.in(this.coach.root.svg.main);
-
-			var center = _jquery2.default.svg('<circle>').attr(_extends({}, point.obj('cx', 'cy'), {
-				r: 5,
-				fill: 'red',
-				stroke: 'black'
-			}, attrs)).css({
-				'pointer-events': 'none'
-			}).appendTo(this.coach.root.svg.main);
-
-			setTimeout(center.remove.bind(center), 500);
-		}
+		value: _showPoint
 	}]);
 
 	return HelperTool;
@@ -59053,6 +59204,67 @@ var floor = Math.floor,
     PI = Math.PI,
     min = Math.min;
 
+function _dashCycle() {
+	var t = Date.now();
+	return floor(t % 1000 / 1000 * 45);
+}
+
+function _ref2() {
+	var redWave = (0, _misc.sineWave)({ amplitude: 40, period: 10000 }, { amplitude: 30, period: 800, phase: 50 * PI });
+	var greenWave = (0, _misc.sineWave)({ amplitude: 30, period: 3000 });
+	var blueWave = (0, _misc.sineWave)({ amplitude: 30, period: 6000, phase: 1500 });
+	return {
+		colorCycle: function colorCycle() {
+			var t = Date.now();
+			return 'rgb(\n\t\t\t\t\t' + floor(min(255, 160 + redWave(t))) + ',\n\t\t\t\t\t' + floor(min(255, 225 + greenWave(t))) + ',\n\t\t\t\t\t' + floor(min(255, 225 + blueWave(t))) + '\n\t\t\t\t)';
+		},
+		dashCycle: _dashCycle,
+		dashArray: [10, 5],
+		dashSpeed: 3
+	};
+}
+
+function _deactivateBehavior(previous) {
+	/* set value */
+	this.currentValue = null;
+	/* set styling */
+	var handler = previous.artefact.handlers.highlightable;
+	if (!handler) {
+		return;
+	}
+	var css = { opacity: 0 };
+	if (handler.effect.elements) {
+		handler.effect.elements.css(css);
+	}
+	if (handler.effect.selector) {
+		artefact.setCSS(_defineProperty({}, handler.effect.selector, css));
+	}
+}
+
+function _activateBehavior(current) {
+	/* set value */
+	this.currentValue = current;
+	/* set styling */
+	var handler = current.artefact.handlers.highlightable;
+	if (!handler) {
+		return;
+	}
+	var css = {
+		strokeWidth: 4,
+		opacity: 1,
+		strokeDasharray: current.dashArray.join(','),
+		stroke: 'var(--boxer-highlight-color)',
+		fill: 'var(--boxer-highlight-color)',
+		strokeDashoffset: 'var(--boxer-highlight-dash-offset)'
+	};
+	if (handler.effect.elements) {
+		handler.effect.elements.css(css);
+	}
+	if (handler.effect.selector) {
+		artefact.setCSS(_defineProperty({}, handler.effect.selector, css));
+	}
+}
+
 var HighlightTool = exports.HighlightTool = function (_GlobalBehaviorTool) {
 	_inherits(HighlightTool, _GlobalBehaviorTool);
 
@@ -59067,23 +59279,7 @@ var HighlightTool = exports.HighlightTool = function (_GlobalBehaviorTool) {
 			args[_key] = arguments[_key];
 		}
 
-		return _ret = (_temp = (_this = _possibleConstructorReturn(this, (_ref = HighlightTool.__proto__ || Object.getPrototypeOf(HighlightTool)).call.apply(_ref, [this].concat(args))), _this), _this.HIGHLIGHT_DEFAULT = function () {
-			var redWave = (0, _misc.sineWave)({ amplitude: 40, period: 10000 }, { amplitude: 30, period: 800, phase: 50 * PI });
-			var greenWave = (0, _misc.sineWave)({ amplitude: 30, period: 3000 });
-			var blueWave = (0, _misc.sineWave)({ amplitude: 30, period: 6000, phase: 1500 });
-			return {
-				colorCycle: function colorCycle() {
-					var t = Date.now();
-					return 'rgb(\n\t\t\t\t\t' + floor(min(255, 160 + redWave(t))) + ',\n\t\t\t\t\t' + floor(min(255, 225 + greenWave(t))) + ',\n\t\t\t\t\t' + floor(min(255, 225 + blueWave(t))) + '\n\t\t\t\t)';
-				},
-				dashCycle: function dashCycle() {
-					var t = Date.now();
-					return floor(t % 1000 / 1000 * 45);
-				},
-				dashArray: [10, 5],
-				dashSpeed: 3
-			};
-		}(), _temp), _possibleConstructorReturn(_this, _ret);
+		return _ret = (_temp = (_this = _possibleConstructorReturn(this, (_ref = HighlightTool.__proto__ || Object.getPrototypeOf(HighlightTool)).call.apply(_ref, [this].concat(args))), _this), _this.HIGHLIGHT_DEFAULT = _ref2(), _temp), _possibleConstructorReturn(_this, _ret);
 	}
 
 	/* 'selectable' related highlighting */
@@ -59091,53 +59287,16 @@ var HighlightTool = exports.HighlightTool = function (_GlobalBehaviorTool) {
 
 	_createClass(HighlightTool, [{
 		key: 'deactivateBehavior',
-		value: function deactivateBehavior(previous) {
-			/* set value */
-			this.currentValue = null;
-			/* set styling */
-			var handler = previous.artefact.handlers.highlightable;
-			if (!handler) {
-				return;
-			}
-			var css = { opacity: 0 };
-			if (handler.effect.elements) {
-				handler.effect.elements.css(css);
-			}
-			if (handler.effect.selector) {
-				artefact.setCSS(_defineProperty({}, handler.effect.selector, css));
-			}
-		}
+		value: _deactivateBehavior
 	}, {
 		key: 'activateBehavior',
-		value: function activateBehavior(current) {
-			/* set value */
-			this.currentValue = current;
-			/* set styling */
-			var handler = current.artefact.handlers.highlightable;
-			if (!handler) {
-				return;
-			}
-			var css = {
-				strokeWidth: 4,
-				opacity: 1,
-				strokeDasharray: current.dashArray.join(','),
-				stroke: 'var(--boxer-highlight-color)',
-				fill: 'var(--boxer-highlight-color)',
-				strokeDashoffset: 'var(--boxer-highlight-dash-offset)'
-			};
-			if (handler.effect.elements) {
-				handler.effect.elements.css(css);
-			}
-			if (handler.effect.selector) {
-				artefact.setCSS(_defineProperty({}, handler.effect.selector, css));
-			}
-		}
+		value: _activateBehavior
 	}, {
 		key: 'init',
-		value: function init(_ref2) {
+		value: function init(_ref3) {
 			var _this2 = this;
 
-			var coach = _ref2.coach;
+			var coach = _ref3.coach;
 
 			_get(HighlightTool.prototype.__proto__ || Object.getPrototypeOf(HighlightTool.prototype), 'init', this).call(this, { coach: coach });
 
@@ -59270,6 +59429,14 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
+function _deactivateBehavior() {
+	(0, _jquery2.default)(this.coach.root.svg.main).css({ cursor: '' });
+}
+
+function _activateBehavior(cursor) {
+	(0, _jquery2.default)(this.coach.root.svg.main).css({ cursor: cursor });
+}
+
 var MouseCursorTool = exports.MouseCursorTool = function (_GlobalBehaviorTool) {
 	_inherits(MouseCursorTool, _GlobalBehaviorTool);
 
@@ -59281,14 +59448,10 @@ var MouseCursorTool = exports.MouseCursorTool = function (_GlobalBehaviorTool) {
 
 	_createClass(MouseCursorTool, [{
 		key: 'deactivateBehavior',
-		value: function deactivateBehavior() {
-			(0, _jquery2.default)(this.coach.root.svg.main).css({ cursor: '' });
-		}
+		value: _deactivateBehavior
 	}, {
 		key: 'activateBehavior',
-		value: function activateBehavior(cursor) {
-			(0, _jquery2.default)(this.coach.root.svg.main).css({ cursor: cursor });
-		}
+		value: _activateBehavior
 	}]);
 
 	return MouseCursorTool;
@@ -59351,6 +59514,32 @@ function _classCallCheck(instance, Constructor) { if (!_instanceof(instance, Con
 function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+function _ref4(_ref3) {
+	var point = _ref3.point,
+	    target = _ref3.target;
+	return { dropzone: (0, _jquery2.default)(target).data('boxer-handlers').dropzone, point: point };
+}
+
+function _OTHER_TOOL() {}
+
+function _ref7() {
+	return { 'OTHER_TOOL': _OTHER_TOOL };
+}
+
+function _IDLE() {}
+
+function _BUSY() {}
+
+function _ref8() {
+	return { 'IDLE': _IDLE, 'BUSY': _BUSY };
+}
+
+function _ref11(key) {
+	return function (a) {
+		return a && a.handlers[key] ? a.handlers[key].artefact : null;
+	};
+}
 
 var MoveTool = exports.MoveTool = function (_MouseTool) {
 	_inherits(MoveTool, _MouseTool);
@@ -59435,20 +59624,16 @@ var MoveTool = exports.MoveTool = function (_MouseTool) {
 						});
 
 						/* cancel or stop dragging */
-						(_context3 = _expectRxjs.Observable.merge(escaping.concatMap(_expectRxjs.Observable.throw()), dropping.map(function (_ref3) {
-							var point = _ref3.point,
-							    target = _ref3.target;
-							return { dropzone: (0, _jquery2.default)(target).data('boxer-handlers').dropzone, point: point };
-						}).do(function (_ref4) {
-							var after = _ref4.dropzone.after;
+						(_context3 = _expectRxjs.Observable.merge(escaping.concatMap(_expectRxjs.Observable.throw()), dropping.map(_ref4).do(function (_ref5) {
+							var after = _ref5.dropzone.after;
 							_misc.callIfFunction.call(after, args);
 						})).catch(function (error, caught) {
 							/* cancel dragging */
 							artefact.transformation = transformationStart;
 							_misc.callIfFunction.call(cancel, args);
 							return _expectRxjs.Observable.of({});
-						}).do(function (_ref5) {
-							var point = _ref5.point;
+						}).do(function (_ref6) {
+							var point = _ref6.point;
 
 							// try {
 							/* stop dragging */
@@ -59467,20 +59652,16 @@ var MoveTool = exports.MoveTool = function (_MouseTool) {
 			});
 
 			/* mutual exclusion between this machine and other machines, coordinated by coach.stateMachine */
-			localMachine.extend(function () {
-				return { 'OTHER_TOOL': function OTHER_TOOL() {} };
-			});
-			coach.stateMachine.extend(function () {
-				return { 'IDLE': function IDLE() {}, 'BUSY': function BUSY() {} };
-			});
-			localMachine.link('IDLE', coach.stateMachine.BUSY.filter(function (_ref6) {
-				var tool = _ref6.tool;
+			localMachine.extend(_ref7);
+			coach.stateMachine.extend(_ref8);
+			localMachine.link('IDLE', coach.stateMachine.BUSY.filter(function (_ref9) {
+				var tool = _ref9.tool;
 				return tool !== _this2;
 			}).map(function () {
 				return localMachine.data;
 			}), 'OTHER_TOOL');
-			localMachine.link('OTHER_TOOL', coach.stateMachine.IDLE.filter(function (_ref7) {
-				var tool = _ref7.tool;
+			localMachine.link('OTHER_TOOL', coach.stateMachine.IDLE.filter(function (_ref10) {
+				var tool = _ref10.tool;
 				return tool !== _this2;
 			}).map(function () {
 				return localMachine.data;
@@ -59493,11 +59674,7 @@ var MoveTool = exports.MoveTool = function (_MouseTool) {
 			}), 'IDLE');
 
 			/* prep for highlighting and mouse cursors */
-			var handlerArtefactOrNull = function handlerArtefactOrNull(key) {
-				return function (a) {
-					return a && a.handlers[key] ? a.handlers[key].artefact : null;
-				};
-			};
+			var handlerArtefactOrNull = _ref11;
 			var movableArtefact = coach.p('selectedArtefact').map(handlerArtefactOrNull('movable'));
 			var dropzoneArtefact = coach.p('selectedArtefact').map(handlerArtefactOrNull('dropzone'));
 
@@ -59518,15 +59695,18 @@ var MoveTool = exports.MoveTool = function (_MouseTool) {
 			/* mouse cursors */
 			var grabCursor = _cssprefix2.default.getValue('cursor', 'grab');
 			var grabbingCursor = _cssprefix2.default.getValue('cursor', 'grabbing');
-			coach.mouseCursorTool.register(this, localMachine.p('state').startWith(null).pairwise().switchMap(function (_ref8) {
-				var _ref9 = _slicedToArray(_ref8, 2),
-				    prev = _ref9[0],
-				    next = _ref9[1];
+
+			function _ref14(ma) {
+				return ma && grabCursor;
+			}
+
+			coach.mouseCursorTool.register(this, localMachine.p('state').startWith(null).pairwise().switchMap(function (_ref12) {
+				var _ref13 = _slicedToArray(_ref12, 2),
+				    prev = _ref13[0],
+				    next = _ref13[1];
 
 				return (0, _utilities.match)(next)({
-					'IDLE': movableArtefact.map(function (ma) {
-						return ma && grabCursor;
-					}).startWith(prev && grabCursor),
+					'IDLE': movableArtefact.map(_ref14).startWith(prev && grabCursor),
 					'THRESHOLD': _expectRxjs.Observable.of(grabbingCursor),
 					'DRAGGING': _expectRxjs.Observable.of(grabbingCursor),
 					'OTHER_TOOL': _expectRxjs.Observable.of(null)
@@ -59596,6 +59776,93 @@ var min = Math.min,
     max = Math.max,
     floor = Math.floor;
 
+function _ref2(handler) {
+	var _context2;
+
+	if (!handler) {
+		return null;
+	}
+
+	var m = (_context2 = handler.artefact.svg.main, _jquery3.plainDOM).call(_context2).getScreenCTM();
+	var angle = Math.atan2(m[_svg.M21], m[_svg.M22]) * 180 / Math.PI;
+
+	var _handler$directions = handler.directions,
+	    x = _handler$directions.x,
+	    y = _handler$directions.y;
+
+	x = x === -1 ? '-' : x === 1 ? '+' : '0';
+	y = y === -1 ? '-' : y === 1 ? '+' : '0';
+	switch (x + ' ' + y) {
+		case '0 -':
+			{
+				angle += 0;
+			}break;
+		case '+ -':
+			{
+				angle += 45;
+			}break;
+		case '+ 0':
+			{
+				angle += 90;
+			}break;
+		case '+ +':
+			{
+				angle += 135;
+			}break;
+		case '0 +':
+			{
+				angle += 180;
+			}break;
+		case '- +':
+			{
+				angle += 225;
+			}break;
+		case '- 0':
+			{
+				angle += 270;
+			}break;
+		case '- -':
+			{
+				angle += 315;
+			}break;
+	}
+	angle = (angle + 360) % 360;
+	return ['ns-resize', // 0,   0°:  |
+	'nesw-resize', // 1,  45°:  /
+	'ew-resize', // 2,  90°:  -
+	'nwse-resize' // 3, 135°:  \
+	][floor((angle + 180 / 8) % 180 / (180 / 4)) % 4];
+}
+
+function _ref6(_ref5) {
+	var point = _ref5.point,
+	    target = _ref5.target;
+	return {
+		dropzone: (0, _jquery2.default)(target).data('boxer-handlers').dropzone,
+		point: point
+	};
+}
+
+function _OTHER_TOOL() {}
+
+function _ref9() {
+	return { 'OTHER_TOOL': _OTHER_TOOL };
+}
+
+function _IDLE() {}
+
+function _BUSY() {}
+
+function _ref10() {
+	return { 'IDLE': _IDLE, 'BUSY': _BUSY };
+}
+
+function _ref13(key) {
+	return function (a) {
+		return a && a.handlers[key] && a.handlers['highlightable'] ? a.handlers[key] : null;
+	};
+}
+
 var ResizeTool = exports.ResizeTool = function (_MouseTool) {
 	_inherits(ResizeTool, _MouseTool);
 
@@ -59627,69 +59894,13 @@ var ResizeTool = exports.ResizeTool = function (_MouseTool) {
 			var escaping = this.mouseMachine.ESCAPING;
 
 			/* determining proper resizing cursor */
-			var borderCursor = function borderCursor(handler) {
-				var _context2;
-
-				if (!handler) {
-					return null;
-				}
-
-				var m = (_context2 = handler.artefact.svg.main, _jquery3.plainDOM).call(_context2).getScreenCTM();
-				var angle = Math.atan2(m[_svg.M21], m[_svg.M22]) * 180 / Math.PI;
-
-				var _handler$directions = handler.directions,
-				    x = _handler$directions.x,
-				    y = _handler$directions.y;
-
-				x = x === -1 ? '-' : x === 1 ? '+' : '0';
-				y = y === -1 ? '-' : y === 1 ? '+' : '0';
-				switch (x + ' ' + y) {
-					case '0 -':
-						{
-							angle += 0;
-						}break;
-					case '+ -':
-						{
-							angle += 45;
-						}break;
-					case '+ 0':
-						{
-							angle += 90;
-						}break;
-					case '+ +':
-						{
-							angle += 135;
-						}break;
-					case '0 +':
-						{
-							angle += 180;
-						}break;
-					case '- +':
-						{
-							angle += 225;
-						}break;
-					case '- 0':
-						{
-							angle += 270;
-						}break;
-					case '- -':
-						{
-							angle += 315;
-						}break;
-				}
-				angle = (angle + 360) % 360;
-				return ['ns-resize', // 0,   0°:  |
-				'nesw-resize', // 1,  45°:  /
-				'ew-resize', // 2,  90°:  -
-				'nwse-resize' // 3, 135°:  \
-				][floor((angle + 180 / 8) % 180 / (180 / 4)) % 4];
-			};
+			var borderCursor = _ref2;
 
 			/* main state machine of this tool */
 			var localMachine = new _Machine2.default('ResizeTool', { state: 'IDLE' });
-			localMachine.extend(function (_ref2) {
-				var enterState = _ref2.enterState,
-				    subscribeDuringState = _ref2.subscribeDuringState;
+			localMachine.extend(function (_ref3) {
+				var enterState = _ref3.enterState,
+				    subscribeDuringState = _ref3.subscribeDuringState;
 				return {
 					'IDLE': function IDLE() {
 						enterState.call(threshold, 'THRESHOLD');
@@ -59731,9 +59942,9 @@ var ResizeTool = exports.ResizeTool = function (_MouseTool) {
 						/* resize while dragging */
 						(_context4 = mousemove.map(function (event) {
 							return event.point.in(artefact.svg.children).minus(start.mouse);
-						}), subscribeDuringState).call(_context4, function (_ref3) {
-							var xDiff = _ref3.x,
-							    yDiff = _ref3.y;
+						}), subscribeDuringState).call(_context4, function (_ref4) {
+							var xDiff = _ref4.x,
+							    yDiff = _ref4.y;
 
 							xDiff = directions.x * max(directions.x * xDiff, artefact.minWidth - start.width);
 							yDiff = directions.y * max(directions.y * yDiff, artefact.minHeight - start.height);
@@ -59745,17 +59956,10 @@ var ResizeTool = exports.ResizeTool = function (_MouseTool) {
 						});
 
 						/* cancel or stop dragging */
-						(_context4 = _expectRxjs.Observable.merge(escaping.concatMap(_expectRxjs.Observable.throw()), dropping.map(function (_ref4) {
-							var point = _ref4.point,
-							    target = _ref4.target;
-							return {
-								dropzone: (0, _jquery2.default)(target).data('boxer-handlers').dropzone,
-								point: point
-							};
-						}).do(function (_ref5) {
+						(_context4 = _expectRxjs.Observable.merge(escaping.concatMap(_expectRxjs.Observable.throw()), dropping.map(_ref6).do(function (_ref7) {
 							var _context5;
 
-							var dropzone = _ref5.dropzone;
+							var dropzone = _ref7.dropzone;
 
 							// artefact.parent = dropzone.artefact; // TODO: Maybe we'll need this to snap borders
 							(_context5 = dropzone.after, _misc.callIfFunction).call(_context5, args);
@@ -59766,8 +59970,8 @@ var ResizeTool = exports.ResizeTool = function (_MouseTool) {
 							artefact.height = start.height;
 							_misc.callIfFunction.call(cancel, args);
 							return _expectRxjs.Observable.of({});
-						}).map(function (_ref6) {
-							var point = _ref6.point;
+						}).map(function (_ref8) {
+							var point = _ref8.point;
 
 							/* stop dragging */
 							artefact.handlesActive = true;
@@ -59781,20 +59985,16 @@ var ResizeTool = exports.ResizeTool = function (_MouseTool) {
 			});
 
 			/* mutual exclusion between this machine and other machines, coordinated by coach.stateMachine */
-			localMachine.extend(function () {
-				return { 'OTHER_TOOL': function OTHER_TOOL() {} };
-			});
-			coach.stateMachine.extend(function () {
-				return { 'IDLE': function IDLE() {}, 'BUSY': function BUSY() {} };
-			});
-			localMachine.link('IDLE', coach.stateMachine.BUSY.filter(function (_ref7) {
-				var tool = _ref7.tool;
+			localMachine.extend(_ref9);
+			coach.stateMachine.extend(_ref10);
+			localMachine.link('IDLE', coach.stateMachine.BUSY.filter(function (_ref11) {
+				var tool = _ref11.tool;
 				return tool !== _this2;
 			}).map(function () {
 				return localMachine.data;
 			}), 'OTHER_TOOL');
-			localMachine.link('OTHER_TOOL', coach.stateMachine.IDLE.filter(function (_ref8) {
-				var tool = _ref8.tool;
+			localMachine.link('OTHER_TOOL', coach.stateMachine.IDLE.filter(function (_ref12) {
+				var tool = _ref12.tool;
 				return tool !== _this2;
 			}).map(function () {
 				return localMachine.data;
@@ -59807,11 +60007,7 @@ var ResizeTool = exports.ResizeTool = function (_MouseTool) {
 			}), 'IDLE');
 
 			/* prep for highlighting and mouse cursors */
-			var handlerOrNull = function handlerOrNull(key) {
-				return function (a) {
-					return a && a.handlers[key] && a.handlers['highlightable'] ? a.handlers[key] : null;
-				};
-			};
+			var handlerOrNull = _ref13;
 			var resizableArtefact = coach.p('selectedArtefact').map(function (originalArtefact) {
 				var handler = handlerOrNull('resizable')(originalArtefact);
 				if (!handler) {
@@ -59821,10 +60017,10 @@ var ResizeTool = exports.ResizeTool = function (_MouseTool) {
 			});
 
 			/* highlighting */
-			coach.highlightTool.register(this, localMachine.p(['state', 'data']).switchMap(function (_ref9) {
-				var _ref10 = _slicedToArray(_ref9, 2),
-				    state = _ref10[0],
-				    data = _ref10[1];
+			coach.highlightTool.register(this, localMachine.p(['state', 'data']).switchMap(function (_ref14) {
+				var _ref15 = _slicedToArray(_ref14, 2),
+				    state = _ref15[0],
+				    data = _ref15[1];
 
 				return (0, _utilities.match)(state)({
 					'IDLE': resizableArtefact,
@@ -59839,10 +60035,10 @@ var ResizeTool = exports.ResizeTool = function (_MouseTool) {
 			}));
 
 			/* mouse cursors */
-			coach.mouseCursorTool.register(this, localMachine.p(['state', 'data']).switchMap(function (_ref11) {
-				var _ref12 = _slicedToArray(_ref11, 2),
-				    state = _ref12[0],
-				    data = _ref12[1];
+			coach.mouseCursorTool.register(this, localMachine.p(['state', 'data']).switchMap(function (_ref16) {
+				var _ref17 = _slicedToArray(_ref16, 2),
+				    state = _ref17[0],
+				    data = _ref17[1];
 
 				return (0, _utilities.match)(state)({
 					'IDLE': resizableArtefact.map(borderCursor),
@@ -59920,6 +60116,27 @@ var floor = Math.floor,
     round = Math.round,
     atan2 = Math.atan2,
     PI = Math.PI;
+
+function _OTHER_TOOL() {}
+
+function _ref6() {
+	return { 'OTHER_TOOL': _OTHER_TOOL };
+}
+
+function _IDLE() {}
+
+function _BUSY() {}
+
+function _ref7() {
+	return { 'IDLE': _IDLE, 'BUSY': _BUSY };
+}
+
+function _ref10(key) {
+	return function (a) {
+		return a && a.handlers[key] && a.handlers['highlightable'] ? a.handlers[key].artefact : null;
+	};
+}
+
 var RotateTool = exports.RotateTool = (_temp = _class = function (_MouseTool) {
 	_inherits(RotateTool, _MouseTool);
 
@@ -59999,6 +60216,15 @@ var RotateTool = exports.RotateTool = (_temp = _class = function (_MouseTool) {
 							snapping: false,
 							angle: start.angle
 						};
+
+						function _onComplete() {
+							tracking.angle = (tracking.angle % 360 + 360) % 360;
+						}
+
+						function _ref4() {
+							return tracking.angle;
+						}
+
 						(_context3 = mousemove.map(function (moveEvent) {
 							var angle = moveEvent.point.minus(start.center).angle();
 							angle -= start.mouseAngle;
@@ -60008,6 +60234,15 @@ var RotateTool = exports.RotateTool = (_temp = _class = function (_MouseTool) {
 							}
 							return (angle + 360) % 360;
 						}).distinctUntilChanged().switchMap(function (angle) {
+							function _ref3(obs) {
+								return _TweenLite.TweenLite.to(tracking, abs(diff) / 45 * 0.2, {
+									angle: angle,
+									ease: _TweenLite.TweenLite.Power3.easeOut,
+									onUpdate: obs.next.bind(obs),
+									onComplete: _onComplete
+								});
+							}
+
 							if (tracking.snapping) {
 								var diff = angle - tracking.angle;
 								while (diff < -180) {
@@ -60016,18 +60251,7 @@ var RotateTool = exports.RotateTool = (_temp = _class = function (_MouseTool) {
 								while (diff > +180) {
 									angle -= 360;diff -= 360;
 								}
-								return _expectRxjs.Observable.create(function (obs) {
-									return _TweenLite.TweenLite.to(tracking, abs(diff) / 45 * 0.2, {
-										angle: angle,
-										ease: _TweenLite.TweenLite.Power3.easeOut,
-										onUpdate: obs.next.bind(obs),
-										onComplete: function onComplete() {
-											tracking.angle = (tracking.angle % 360 + 360) % 360;
-										}
-									});
-								}).share().map(function () {
-									return tracking.angle;
-								});
+								return _expectRxjs.Observable.create(_ref3).share().map(_ref4);
 							} else {
 								return _expectRxjs.Observable.of(angle);
 							}
@@ -60041,8 +60265,8 @@ var RotateTool = exports.RotateTool = (_temp = _class = function (_MouseTool) {
 							artefact.transformation = start.transformation;
 							_misc.callIfFunction.call(cancel, args);
 							return _expectRxjs.Observable.of({});
-						}).do(function (_ref3) {
-							var point = _ref3.point;
+						}).do(function (_ref5) {
+							var point = _ref5.point;
 
 							/* stop dragging */
 							artefact.handlesActive = true;
@@ -60054,20 +60278,16 @@ var RotateTool = exports.RotateTool = (_temp = _class = function (_MouseTool) {
 			});
 
 			/* mutual exclusion between this machine and other machines, coordinated by coach.stateMachine */
-			localMachine.extend(function () {
-				return { 'OTHER_TOOL': function OTHER_TOOL() {} };
-			});
-			coach.stateMachine.extend(function () {
-				return { 'IDLE': function IDLE() {}, 'BUSY': function BUSY() {} };
-			});
-			localMachine.link('IDLE', coach.stateMachine.BUSY.filter(function (_ref4) {
-				var tool = _ref4.tool;
+			localMachine.extend(_ref6);
+			coach.stateMachine.extend(_ref7);
+			localMachine.link('IDLE', coach.stateMachine.BUSY.filter(function (_ref8) {
+				var tool = _ref8.tool;
 				return tool !== _this2;
 			}).map(function () {
 				return localMachine.data;
 			}), 'OTHER_TOOL');
-			localMachine.link('OTHER_TOOL', coach.stateMachine.IDLE.filter(function (_ref5) {
-				var tool = _ref5.tool;
+			localMachine.link('OTHER_TOOL', coach.stateMachine.IDLE.filter(function (_ref9) {
+				var tool = _ref9.tool;
 				return tool !== _this2;
 			}).map(function () {
 				return localMachine.data;
@@ -60080,11 +60300,7 @@ var RotateTool = exports.RotateTool = (_temp = _class = function (_MouseTool) {
 			}), 'IDLE');
 
 			/* prep for highlighting and mouse cursors */
-			var handlerOrNull = function handlerOrNull(key) {
-				return function (a) {
-					return a && a.handlers[key] && a.handlers['highlightable'] ? a.handlers[key].artefact : null;
-				};
-			};
+			var handlerOrNull = _ref10;
 			var rotatableArtefact = coach.p('selectedArtefact').map(function (originalArtefact) {
 				var handler = handlerOrNull('rotatable')(originalArtefact);
 				if (!handler) {
@@ -60094,10 +60310,10 @@ var RotateTool = exports.RotateTool = (_temp = _class = function (_MouseTool) {
 			});
 
 			/* highlighting */
-			coach.highlightTool.register(this, localMachine.p(['state', 'data']).switchMap(function (_ref6) {
-				var _ref7 = _slicedToArray(_ref6, 2),
-				    state = _ref7[0],
-				    data = _ref7[1];
+			coach.highlightTool.register(this, localMachine.p(['state', 'data']).switchMap(function (_ref11) {
+				var _ref12 = _slicedToArray(_ref11, 2),
+				    state = _ref12[0],
+				    data = _ref12[1];
 
 				return (0, _utilities.match)(state)({
 					'IDLE': rotatableArtefact,
@@ -60114,15 +60330,18 @@ var RotateTool = exports.RotateTool = (_temp = _class = function (_MouseTool) {
 			/* mouse cursors */
 			var grabCursor = _cssprefix2.default.getValue('cursor', 'grab');
 			var grabbingCursor = _cssprefix2.default.getValue('cursor', 'grabbing');
-			coach.mouseCursorTool.register(this, localMachine.p('state').startWith(null).pairwise().switchMap(function (_ref8) {
-				var _ref9 = _slicedToArray(_ref8, 2),
-				    prev = _ref9[0],
-				    next = _ref9[1];
+
+			function _ref15(ma) {
+				return ma && grabCursor;
+			}
+
+			coach.mouseCursorTool.register(this, localMachine.p('state').startWith(null).pairwise().switchMap(function (_ref13) {
+				var _ref14 = _slicedToArray(_ref13, 2),
+				    prev = _ref14[0],
+				    next = _ref14[1];
 
 				return (0, _utilities.match)(next)({
-					'IDLE': rotatableArtefact.map(function (ma) {
-						return ma && grabCursor;
-					}).startWith(prev && grabCursor),
+					'IDLE': rotatableArtefact.map(_ref15).startWith(prev && grabCursor),
 					'THRESHOLD': _expectRxjs.Observable.of(grabbingCursor),
 					'DRAGGING': _expectRxjs.Observable.of(grabbingCursor),
 					'OTHER_TOOL': _expectRxjs.Observable.of(null)
@@ -60178,6 +60397,34 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
+function _ref2() {}
+
+function _ref3() {}
+
+function _ref4() {}
+
+function _ref5() {}
+
+function _ref7(handler) {
+	return handler.originalArtefact || handler.artefact;
+}
+
+function _ref8(handler) {
+	return handler.originalArtefact || handler.artefact;
+}
+
+function _ref9(e) {
+	e.preventDefault();
+}
+
+function _ref10(e) {
+	return e.deltaY;
+}
+
+function _ref11() {
+	return null;
+}
+
 var SelectTool = exports.SelectTool = function (_Tool) {
 	_inherits(SelectTool, _Tool);
 
@@ -60197,7 +60444,7 @@ var SelectTool = exports.SelectTool = function (_Tool) {
 
 			_get(SelectTool.prototype.__proto__ || Object.getPrototypeOf(SelectTool.prototype), 'init', this).call(this, { coach: coach, events: ['mouseover', 'mouseout', 'mouseenter', 'mouseleave'] });
 
-			this.reacquire = function () {};
+			this.reacquire = _ref2;
 			var reacquires = _expectRxjs.Observable.create(function (observer) {
 				_this2.reacquire = function (point) {
 					var element = void 0;
@@ -60221,11 +60468,16 @@ var SelectTool = exports.SelectTool = function (_Tool) {
 					}
 				};
 				return function () {
-					_this2.reacquire = function () {};
+					_this2.reacquire = _ref3;
 				};
 			}).share();
 
-			coach.setSelectedArtefact = function () {};
+			coach.setSelectedArtefact = _ref4;
+
+			function _ref6() {
+				coach.setSelectedArtefact = _ref5;
+			}
+
 			var apiAcquires = _expectRxjs.Observable.create(function (observer) {
 				coach.setSelectedArtefact = function (artefact) {
 					if (!artefact) {
@@ -60240,26 +60492,16 @@ var SelectTool = exports.SelectTool = function (_Tool) {
 						}
 					}
 				};
-				return function () {
-					coach.setSelectedArtefact = function () {};
-				};
+				return _ref6;
 			}).share();
 
 			var mouseEnter = (_context = this.e('mouseover').merge(reacquires).merge(apiAcquires), _Coach.handleBoxer).call(_context, '*') // TODO: <-- selectable?
-			.map(function (handler) {
-				return handler.originalArtefact || handler.artefact;
-			});
+			.map(_ref7);
 
 			var mouseLeave = (_context = this.e('mouseout').merge(reacquires), _Coach.handleBoxer).call(_context, '*') // TODO: <-- selectable?
-			.map(function (handler) {
-				return handler.originalArtefact || handler.artefact;
-			});
+			.map(_ref8);
 
-			var altScroll = this.rootE('mousewheel').filter((0, _utilities.withMod)('alt')).do(function (e) {
-				e.preventDefault();
-			}).map(function (e) {
-				return e.deltaY;
-			});
+			var altScroll = this.rootE('mousewheel').filter((0, _utilities.withMod)('alt')).do(_ref9).map(_ref10);
 
 			var mouseArtefact = mouseEnter.switchMap(function (enter) {
 
@@ -60269,9 +60511,7 @@ var SelectTool = exports.SelectTool = function (_Tool) {
 					return next !== enter;
 				}), mouseLeave.filter(function (leave) {
 					return leave === enter;
-				}).map(function () {
-					return null;
-				})).take(1);
+				}).map(_ref11)).take(1);
 
 				var stack = [];
 				var altScrollSelect = altScroll.scan(function (s, d) {
@@ -96792,11 +97032,14 @@ mode.next('Manipulate');
 (_context = coach.windowE('keydown'), _utilities.which).call(_context, KEY_ESCAPE).subscribe(function () {
 	mode.next('Manipulate');
 });
+
+function _ref() {}
+
 mode.subscribe(function (m) {
 	var _modes$m = _slicedToArray(modes[m], 2),
 	    tools = _modes$m[0],
 	    _modes$m$ = _modes$m[1],
-	    fn = _modes$m$ === undefined ? function () {} : _modes$m$;
+	    fn = _modes$m$ === undefined ? _ref : _modes$m$;
 
 	coach.activateExclusiveTools(tools);
 	fn();
@@ -96807,20 +97050,21 @@ var _iteratorNormalCompletion = true;
 var _didIteratorError = false;
 var _iteratorError = undefined;
 
+function _ref2() {
+	var label = _step.value;
+
+	var button = (0, _jquery2.default)('<button>' + label + '</button>').click(function () {
+		mode.next(label);
+	}).appendTo('#buttons');
+	mode.map(function (m) {
+		return m === label;
+	}).subscribe(function (active) {
+		button.css('font-weight', active ? 'bold' : 'normal');
+	});
+}
+
 try {
-	var _loop = function _loop() {
-		var label = _step.value;
-
-		var button = (0, _jquery2.default)('<button>' + label + '</button>').click(function () {
-			mode.next(label);
-		}).appendTo('#buttons');
-		mode.map(function (m) {
-			return m === label;
-		}).subscribe(function (active) {
-			button.css('font-weight', active ? 'bold' : 'normal');
-		});
-	};
-
+	var _loop = _ref2;
 	for (var _iterator = _lodashBound.keys.call(modes)[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
 		_loop();
 	}

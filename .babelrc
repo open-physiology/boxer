@@ -12,7 +12,8 @@
     "transform-async-to-generator",
     "transform-function-bind",
     "syntax-flow",
-    "transform-flow-strip-types"
+    "transform-flow-strip-types",
+    "closure-elimination"
   ],
   "env": {
     "development": {

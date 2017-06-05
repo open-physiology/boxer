@@ -6,6 +6,7 @@ import assert from 'power-assert';
 import {fromPairs, keys} from 'lodash-bound';
 
 import {lyphDataByName} from './data.js';
+const lyphNames = lyphDataByName::keys();
 
 import KeyCode from 'keycode-js';
 import {InfoPanel, InfoPanelModule} from './InfoPanel';
@@ -97,7 +98,7 @@ const {KEY_ESCAPE} = KeyCode;
 })
 export class LyphInfoPanel extends InfoPanel {
 	
-	get autoCompleteOptions() { return lyphDataByName::keys() }
+	get autoCompleteOptions() { return lyphNames }
 	
 	get symbol() { return '&#9636;' }
 	

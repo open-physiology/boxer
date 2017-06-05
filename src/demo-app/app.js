@@ -340,8 +340,11 @@ export class DemoApp extends ValueTracker {
 					434.9340794205365  ,
 					408.86981318779766
 				);
-				setTimeout(() => {
-					this.load(autoloadModel);
+				setTimeout(async () => {
+					// console.profile('FinalDemo-load-normal');
+					// debugger;
+					await this.load(autoloadModel);
+					// console.profileEnd();
 				}, 2000);
 			}, 2000);
 		}
@@ -371,7 +374,6 @@ export class DemoApp extends ValueTracker {
 			ProcessModel
 		};
 		
-		
 		const idsSeen = new Set;
 		
 		/* create a map from model id to corresponding json object */
@@ -393,6 +395,8 @@ export class DemoApp extends ValueTracker {
 		const createModel = async (jsn) => {
 			if (!idsLoaded.has(jsn.id)) {
 				idsLoaded.add(jsn.id);
+				
+				/* make model creation happen on a new stack frame, so we don't stall the main thread for a long time on startup */
 				await new Promise(r => setTimeout(r));
 				
 				const cls = modelClasses[jsn.class];

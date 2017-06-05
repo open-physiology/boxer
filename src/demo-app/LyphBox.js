@@ -96,51 +96,51 @@ export class LyphBox extends Box {
 		for (let key of [
 			'drawzone', 'dropzone'
 		]) { this.handlers[key]::assign(this.contentBox.handlers[key]) }
-		this.contentBox.borders.bottom.handlers.movable = this.handlers.movable;
+		// this.contentBox.borders.bottom.handlers.movable = this.handlers.movable;
 		// deactivate reactivity of contentBox borders and corners
-		for (let outline of {
-			...this.contentBox.borders,
-			...this.contentBox.corners
-		}::values()) { outline.handlesActive = false }
+		// for (let outline of {
+		// 	...this.contentBox.borders,
+		// 	...this.contentBox.corners
+		// }::values()) { outline.handlesActive = false }
 		// reassign snap-to-borders to contentBox
-		for (let [side, x, y, oppositeSide] of [
-			['top',    0, -1, 'bottom'],
-			['right', +1,  0, 'left'  ],
-			['bottom', 0, +1, 'top'   ],
-			['left',  -1,  0, 'right' ]
-		]) {
-			this.borders[side].handlers.dropzone::assign({
-				artefact: this.borders[side],
-				after: ({artefact}) => {
-					// TODO: note that we're currently pretending the two stuck-together things
-					//     : have the same rotational orientation; we don't yet support rotated stuckness
-					if (artefact instanceof Box) {
-						if (artefact.parent === this.contentBox) { // stuck to parent
-							artefact.stuckBorders = {
-								...artefact.stuckBorders,
-								[side]: {
-									box: this.contentBox,
-									relation: 'parent',
-									side,
-									x, y // refers to artefact side (= same as parent side)
-								}
-							};
-						} else if (artefact.parent === this.parent) { // stuck to sibling
-							artefact.stuckBorders = {
-								...artefact.stuckBorders,
-								[oppositeSide]: {
-									box: this,
-									relation: 'sibling',
-									side: oppositeSide,
-									x: -x, y: -y // refers to artefact side (= opposite to sibling side)
-								}
-							};
-						}
-						// TODO: check for certain stuckness constraints
-					}
-				}
-			});
-		}
+		// for (let [side, x, y, oppositeSide] of [
+		// 	['top',    0, -1, 'bottom'],
+		// 	['right', +1,  0, 'left'  ],
+		// 	['bottom', 0, +1, 'top'   ],
+		// 	['left',  -1,  0, 'right' ]
+		// ]) {
+		// 	this.borders[side].handlers.dropzone::assign({
+		// 		artefact: this.borders[side],
+		// 		after: ({artefact}) => {
+		// 			// TODO: note that we're currently pretending the two stuck-together things
+		// 			//     : have the same rotational orientation; we don't yet support rotated stuckness
+		// 			if (artefact instanceof Box) {
+		// 				if (artefact.parent === this.contentBox) { // stuck to parent
+		// 					artefact.stuckBorders = {
+		// 						...artefact.stuckBorders,
+		// 						[side]: {
+		// 							box: this.contentBox,
+		// 							relation: 'parent',
+		// 							side,
+		// 							x, y // refers to artefact side (= same as parent side)
+		// 						}
+		// 					};
+		// 				} else if (artefact.parent === this.parent) { // stuck to sibling
+		// 					artefact.stuckBorders = {
+		// 						...artefact.stuckBorders,
+		// 						[oppositeSide]: {
+		// 							box: this,
+		// 							relation: 'sibling',
+		// 							side: oppositeSide,
+		// 							x: -x, y: -y // refers to artefact side (= opposite to sibling side)
+		// 						}
+		// 					};
+		// 				}
+		// 				// TODO: check for certain stuckness constraints
+		// 			}
+		// 		}
+		// 	});
+		// }
 		
 		
 		/* adapt contentBox position to presence of axis */
@@ -169,13 +169,13 @@ export class LyphBox extends Box {
 		// 	this.hasAxis = !stb.bottom;
 		// });
 		
-		/* when clicking border, toggle open/closed sides */
-		Observable.merge(this.borders.left.e('click'), this.corners.tl.e('click')).subscribe(() => {
-			this.model.leftSideClosed = !this.model.leftSideClosed;
-		});
-		Observable.merge(this.borders.right.e('click'), this.corners.tr.e('click')).subscribe(() => {
-			this.model.rightSideClosed = !this.model.rightSideClosed;
-		});
+		// /* when clicking border, toggle open/closed sides */
+		// Observable.merge(this.borders.left.e('click'), this.corners.tl.e('click')).subscribe(() => {
+		// 	this.model.leftSideClosed = !this.model.leftSideClosed;
+		// });
+		// Observable.merge(this.borders.right.e('click'), this.corners.tr.e('click')).subscribe(() => {
+		// 	this.model.rightSideClosed = !this.model.rightSideClosed;
+		// });
 		
 		/* change corner rounding based on open/closed sides */
 		this.p('model.leftSideClosed') .subscribe(this.corners.tl.p('rounded'));
@@ -214,14 +214,14 @@ export class LyphBox extends Box {
 					    this.contentBox.handlers[key]::assign(parent.handlers[key]);
 	                    this.handlers[key]::assign(parent.handlers[key]);
 				    }
-				    for (let outline of {
-			            ...this.borders,
-			            ...this.corners
-			        }::values()) { outline.handlesActive = false }
-			        if (layerNr !== 0) {
-				        this.corners.bl.svg.main.css({ opacity: 0 });
-				        this.corners.br.svg.main.css({ opacity: 0 });
-			        }
+			        // for (let outline of {
+			        //     ...this.borders,
+			        //     ...this.corners
+			        // }::values()) { outline.handlesActive = false }
+			        // if (layerNr !== 0) {
+				     //    this.corners.bl.svg.main.css({ opacity: 0 });
+				     //    this.corners.br.svg.main.css({ opacity: 0 });
+			        // }
 			    }
 		    });
 		
