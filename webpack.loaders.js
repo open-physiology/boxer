@@ -15,5 +15,9 @@ module.exports = [
 	{
 		test: /images[\/\\][\w\-]+\.png$/,
 		loader: 'url-loader?limit=20000'
+	},
+	{
+		test: /\.pdf$/,
+		loader: 'file-loader'
 	}
 ];

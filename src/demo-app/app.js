@@ -38,6 +38,10 @@ import {createSVGMatrix} from '../util/svg';
 
 
 
+// const HELP_PDF_URL = '../'+require('file-loader!./refmap.pdf');
+const HELP_PDF_URL = './help.pdf';
+
+
 
 /**
  * The demo application.
@@ -70,7 +74,7 @@ import {createSVGMatrix} from '../util/svg';
 			margin: 0;
 			padding: 2px;
 			width: 202px;
-			height: 80px;
+			height: 110px;
 			border: solid 1px black;
 			z-index: 10;
 			background-color: white;
@@ -88,6 +92,10 @@ import {createSVGMatrix} from '../util/svg';
 			background-color: transparent;
 			flex-basis: 90px;
 			flex-grow: 1;
+		}
+		
+		div.button-section > button.wide {
+			flex-basis: 190px;
 		}
 		
 		div.button-section > button:hover {
@@ -116,9 +124,9 @@ import {createSVGMatrix} from '../util/svg';
 			margin: 0;
 			padding: 0;
 			position: absolute;
-			top: 80px;
+			top: 110px;
 			right: 0;
-			height: calc(100% - 80px);
+			height: calc(100% - 110px);
 			width:  202px;
 			/*overflow-y: auto;*/
 		}
@@ -216,14 +224,15 @@ import {createSVGMatrix} from '../util/svg';
 	    ></div>
 	    
 		<div class="button-section">
-			 <button (click) = " zoomTo({x: -1270, y: -1395, width: 1284, height:  808}) "> Urinary    </button
+			 <button (click) = " window.open('${HELP_PDF_URL}', '_blank', 'height=800,width=800') " class="wide"> Help    </button
+            ><button (click) = " zoomTo({x: -1270, y: -1395, width: 1284, height:  808}) "> Urinary    </button
 	        ><button (click) = " zoomTo({x:    61, y: -1096, width: 1445, height:  990}) "> Vascular   </button
 	        ><button (click) = " zoomTo({x:     4, y:   136, width: 1779, height: 1103}) "> Neural     </button
 	    	><button (click) = " zoomTo({x: -1270, y: -1395, width: 3053, height: 2634}) "> Reset View </button
-	        ><button [class.selected]="showCytosolProcesses" (click) = " showCytosolProcesses = !showCytosolProcesses "> Show Cytosol Processes </button
+	        ><button (click) = " showCytosolProcesses = !showCytosolProcesses " class="wide" [class.selected]="showCytosolProcesses"> Show Cytosol Processes </button
         ></div>
 		<perfect-scrollbar class="right-panel"
-			[class.top-right-panel]="autoload && readonly"
+			[class.top-right-panel]="autoload && readonly && false"
 			[class.color-picker-open]="colorPickerOpen"
 			(mouseenter)=" mouseOverRightPanel = true  "
 			(mouseleave)=" mouseOverRightPanel = false "
@@ -247,7 +256,7 @@ import {createSVGMatrix} from '../util/svg';
 					></lyph-info-panel>
 				</div>
 				
-				<div *ngIf="processModels.length"
+				<div *ngIf=" false "
 				     [class.model-section] = " true               "
 				     [class.animating]     = " animationCount > 0 ">
 					<h2 #processesHeader><div>Processes</div></h2>
@@ -280,6 +289,8 @@ import {createSVGMatrix} from '../util/svg';
 	`
 })
 export class DemoApp extends ValueTracker {
+	
+	window = window;
 	
 	@ViewChild('boxer') boxer: NgBoxer;
 	
