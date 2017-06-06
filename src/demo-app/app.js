@@ -214,6 +214,14 @@ import {createSVGMatrix} from '../util/svg';
 			    [class.selected]        = " boxer.toolMode === toolMode     "
 			    (click)                 = " boxer.toolMode =   toolMode     ">{{ toolMode }}</button
 	    ></div>
+	    
+		<div class="button-section">
+			 <button (click) = " zoomTo({x: -1270, y: -1395, width: 1284, height:  808}) "> Urinary    </button
+	        ><button (click) = " zoomTo({x:    61, y: -1096, width: 1445, height:  990}) "> Vascular   </button
+	        ><button (click) = " zoomTo({x:     4, y:   136, width: 1779, height: 1103}) "> Neural     </button
+	    	><button (click) = " zoomTo({x: -1270, y: -1395, width: 3053, height: 2634}) "> Reset View </button
+	        ><button [class.selected]="showCytosolProcesses" (click) = " showCytosolProcesses = !showCytosolProcesses "> Show Cytosol Processes </button
+        ></div>
 		<perfect-scrollbar class="right-panel"
 			[class.top-right-panel]="autoload && readonly"
 			[class.color-picker-open]="colorPickerOpen"
@@ -291,6 +299,8 @@ export class DemoApp extends ValueTracker {
 	colorPickerOpen     = false;
 	mouseOverRightPanel = false;
 	
+	@property({ initial: false }) showCytosolProcesses;
+	
 	@property({ initial: null }) selectedModel;
 	
 	
@@ -311,9 +321,9 @@ export class DemoApp extends ValueTracker {
 	ngAfterViewInit() {
 		/* react to artefact creation */
 		// TODO: the .e() version of this caused errors. Why??
-		this.boxer.drawTool.p('artefactCreated')
-		    .filter(v=>!!v)
-		    .subscribe(::this.onArtefactCreated);
+		// this.boxer.drawTool.p('artefactCreated')
+		//     .filter(v=>!!v)
+		//     .subscribe(::this.onArtefactCreated);
 		
 		/* register events we'll use */
 		this.boxer.registerArtefactEvent('mouseenter', 'mouseleave');
@@ -332,22 +342,20 @@ export class DemoApp extends ValueTracker {
 		/* autoload file */
 		if (this.autoload) {
 			setTimeout(() => {
-				this.boxer.root.transformation = createSVGMatrix(
-					0.28098253721978733,
-					0                  ,
-					0                  ,
-					0.28098253721978733,
-					434.9340794205365  ,
-					408.86981318779766
-				);
+				this.zoomTo({x: -1270, y: -1395, width: 3053, height: 2634});
 				setTimeout(async () => {
 					// console.profile('FinalDemo-load-normal');
 					// debugger;
 					await this.load(autoloadModel);
 					// console.profileEnd();
-				}, 2000);
-			}, 2000);
+				}, 500);
+			}, 500);
 		}
+		
+		this.boxer.root.e('click').subscribe(({point}) => {
+			this.boxer.helperTool.showPoint(point);
+		});
+		
 	}
 	
 	save() {
@@ -426,6 +434,10 @@ export class DemoApp extends ValueTracker {
 		for (let jsn of jsonById::values()) {
 			await createModel(jsn);
 		}
+	}
+	
+	zoomTo({x, y, width, height}) {
+		this.boxer.viewAreaTool.zoomToFit({x, y, width, height});
 	}
 	
 	onArtefactCreated(newArtefact) {
@@ -546,7 +558,7 @@ export class DemoApp extends ValueTracker {
 				});
 				newModel.p('internal').switchMap(int => int
 					? Observable.never()
-					: newArtefact.p('parent.parent.model.selected')
+					: Observable.combineLatest(newArtefact.p('parent.parent.model.selected'), this.p('showCytosolProcesses'), (a, b) => a||b)
 				).subscribe(newArtefact.p('revealed'));
 			}
 			if (isProcess) {

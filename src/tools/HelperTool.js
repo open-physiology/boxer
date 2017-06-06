@@ -7,6 +7,8 @@ export class HelperTool extends Tool {
 		
 		point = point.in(this.coach.root.svg.main);
 		
+		console.info(...point.in(this.coach.root.svg.children).xy);
+		
 		let center = $.svg('<circle>').attr({
 			...point.obj('cx', 'cy'),
 			r: 5,

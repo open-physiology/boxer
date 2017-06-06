@@ -24,6 +24,7 @@ import {ProcessChain} from './ProcessChain';
 import {ProcessNode}  from './ProcessNode';
 import {PanTool} from '../tools/PanTool';
 import {ZoomTool} from '../tools/ZoomTool';
+import {ViewAreaTool} from '../tools/ViewAreaTool';
 const {KEY_ESCAPE} = KeyCode;
 
 
@@ -71,32 +72,33 @@ export class NgBoxer extends Coach {
 			.addTool(new MouseCursorTool)
 			.addTool(new HighlightTool  )
 			.addTool(new HelperTool     )
-			.addTool(new ClickTool      )
-			.addTool(new MoveTool       )
-			.addTool(new ResizeTool     )
-			.addTool(new RotateTool     )
-			.addTool(new DeleteTool     )
-			.addTool(new PanTool        )
-			.addTool(new ZoomTool       )
-			.addTool(new DrawTool({
-				boxFactory:   LyphBox,
-				edgeFactory:  ProcessChain,
-				glyphFactory: ProcessNode
-			}));
+			.addTool(new ViewAreaTool   )
+			.addTool(new ClickTool      );
+			// .addTool(new MoveTool       )
+			// .addTool(new ResizeTool     )
+			// .addTool(new RotateTool     )
+			// .addTool(new DeleteTool     )
+			// .addTool(new PanTool        )
+			// .addTool(new ZoomTool       )
+			// .addTool(new DrawTool({
+			// 	boxFactory:   LyphBox,
+			// 	edgeFactory:  ProcessChain,
+			// 	glyphFactory: ProcessNode
+			// }));
 		
 		/* setup modes */
 		this.addStapleTools(SelectTool, HighlightTool, MouseCursorTool, HelperTool);
 		if (!this.readonly) {
-			this.addToolMode('Manipulate', [ClickTool, MoveTool, ResizeTool, RotateTool, PanTool, ZoomTool]);
-			this.addToolMode('Delete',     [DeleteTool]);
-			this.addToolMode('Draw Lyph',  [DrawTool], () => { this.drawTool.mode = DrawTool.DRAWING_BOX   });
-			this.addToolMode('Draw Edge',  [DrawTool], () => { this.drawTool.mode = DrawTool.DRAWING_EDGE  });
-			
-			/* escape to Manipulate */
-			this.toolMode = 'Manipulate';
-			this.windowE('keydown')::which(KEY_ESCAPE).subscribe(() => { this.toolMode = 'Manipulate' });
+			// this.addToolMode('Manipulate', [ClickTool, MoveTool, ResizeTool, RotateTool, PanTool, ZoomTool]);
+			// this.addToolMode('Delete',     [DeleteTool]);
+			// this.addToolMode('Draw Lyph',  [DrawTool], () => { this.drawTool.mode = DrawTool.DRAWING_BOX   });
+			// this.addToolMode('Draw Edge',  [DrawTool], () => { this.drawTool.mode = DrawTool.DRAWING_EDGE  });
+			//
+			// /* escape to Manipulate */
+			// this.toolMode = 'Manipulate';
+			// this.windowE('keydown')::which(KEY_ESCAPE).subscribe(() => { this.toolMode = 'Manipulate' });
 		} else {
-			this.activateExclusiveTools([...this.stapleTools, PanTool, ZoomTool]);
+			this.activateExclusiveTools([...this.stapleTools, ViewAreaTool, ClickTool]);
 		}
 		
 		// this.toolMode = 'Manipulate';
