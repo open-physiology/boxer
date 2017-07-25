@@ -3,6 +3,7 @@
     "es2015"
   ],
   "plugins": [
+    ["transform-builtin-extend", { "globals": ["Set"] }],
     "angular2-annotations",
     "transform-decorators-legacy",
     "transform-class-properties",
@@ -27,5 +28,6 @@
       ]
     }
   },
-  "sourceMaps": true
+  "sourceMaps": true,
+  "ignore": ["*.png"]
 }

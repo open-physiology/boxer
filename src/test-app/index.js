@@ -1,9 +1,9 @@
-import $ from 'jquery';
-import {assign, entries, keys} from 'lodash-bound';
+import $ from '../libs/jquery.js';
+import {keys} from 'lodash-bound';
 import {BehaviorSubject} from '../libs/provide-rxjs.js';
 
-import {Box, Glyph, Edge, LineSegment, BoxCorner, Canvas, Coach} from '../index.js';
-import {ID_MATRIX, Point2D} from '../util/svg.js';
+import {Box, Glyph, Edge, Canvas, Coach} from '../index.js';
+import {ID_MATRIX} from '../util/svg.js';
 
 import {HelperTool}      from '../tools/HelperTool.js';
 import {MoveTool}        from '../tools/MoveTool.js';
@@ -39,7 +39,9 @@ coach
 	.addTool(new RotateTool     )
 	.addTool(new DeleteTool     )
 	.addTool(new DrawTool({
-		css: { '&': { 'fill': 'white', 'stroke': 'black' } }
+		factoryOptions: {
+			css: { '&': { 'fill': 'white', 'stroke': 'black' } }
+		}
 	}))
 	.start();
 
