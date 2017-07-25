@@ -4,7 +4,6 @@
   ],
   "plugins": [
     ["transform-builtin-extend", { "globals": ["Set"] }],
-    "angular2-annotations",
     "transform-decorators-legacy",
     "transform-class-properties",
     "transform-strict-mode",

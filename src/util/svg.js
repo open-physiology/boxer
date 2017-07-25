@@ -3,8 +3,6 @@ import {assign, pick, minBy, isUndefined} from 'lodash-bound';
 
 import assert from 'power-assert';
 
-import {humanMsg} from 'utilities';
-
 const {abs, sqrt, atan2, PI} = Math;
 
 /* constants to use as keys to get matrix values */

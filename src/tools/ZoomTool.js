@@ -1,4 +1,3 @@
-import $ from '../libs/jquery.js';
 import Tool from './Tool';
 import {stopPropagation, withoutMod, property} from 'utilities';
 import {multiply as _multiply} from 'lodash';

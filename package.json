@@ -2,7 +2,7 @@
   "name": "boxer",
   "version": "0.7.0",
   "description": "library for rendering interactive, nestable, transforming svg boxes",
-  "main": "dist/index.js",
+  "main": "src",
   "scripts": {
     "test": "mocha-webpack --opts mocha-webpack.opts",
     "build": "cross-env BABEL_ENV=production webpack",

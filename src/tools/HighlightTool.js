@@ -1,13 +1,9 @@
 import RxCSS from 'rxcss';
 import {sineWave, animationFrames} from '../util/misc';
-import {plainDOM} from '../libs/jquery';
 import {sum} from 'lodash-bound';
 import {GlobalBehaviorTool} from './GlobalBehaviorTool';
 
 const {floor, PI, min} = Math;
-
-
-
 
 
 export class HighlightTool extends GlobalBehaviorTool {

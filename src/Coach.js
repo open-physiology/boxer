@@ -1,19 +1,15 @@
-import {camelCase, mergeWith, isFunction, entries} from 'lodash-bound';
-import {Observable}                       from './libs/expect-rxjs.js';
-import $                                  from './libs/jquery.js';
-import assert                             from 'power-assert';
-
-import Machine from './util/Machine';
-
-import {Point2D} from './util/svg';
-
-import {SvgArtefact} from './artefacts/SvgArtefact.js';
-import {match, ValueTracker} from 'utilities';
-
+import {camelCase, isFunction} from 'lodash-bound';
+import assert                  from 'power-assert';
+import {Observable}            from './libs/expect-rxjs.js';
+import $                       from './libs/jquery.js';
+import Machine                 from './util/Machine';
+import {Point2D}               from './util/svg';
+import {ValueTracker}          from 'utilities';
 
 const $$domEvents   = Symbol('$$domEvents');
 const $$tools       = Symbol('$$tools');
 const $$initialized = Symbol('$$initialized');
+
 
 export class Coach extends ValueTracker {
 	
