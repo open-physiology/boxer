@@ -242,6 +242,11 @@ export class Box extends SvgTransformable {
 		this.p('parent').subscribe(() => {
 			this.stuckBorders = {};
 		});
+
+		
+		
+		
+		
 		
 		// this.p('stuckBorders').switchMap((stb) => {
 		//
@@ -266,9 +271,10 @@ export class Box extends SvgTransformable {
 		// 		}
 		// 	}
 		//
-		// 	streams.left.subscribe(console.info);
+		//
 		//
 		// 	// TODO: top, bottom
+		//
 		//
 		//
 		// 	const thisWX = this.p(['width', 'transformation']).map(([w, t]) => [w, t[MX]]);
@@ -290,6 +296,10 @@ export class Box extends SvgTransformable {
 		// 	this.transformation = ID_MATRIX.translate(x, this.transformation[MY]);
 		// 	this.width = w;
 		// });
+		
+		
+		
+		
 		
 		/* react to parent resizing when stuck to border */
 		this.p(['width', 'height', 'parent.width', 'parent.height', 'stuckBorders']).subscribe(([w, h, pw, ph, stb]) => {

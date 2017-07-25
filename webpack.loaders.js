@@ -5,7 +5,7 @@ module.exports = [
 		loader: 'babel-loader'
 	},
 	{
-		test: /node_modules[\\\/](utilities|rxjs-animation-loop)[\\\/].*\.js$/,
+		test: /node_modules[\/\\](utilities|open-physiology-manifest|open-physiology-model|rxjs-animation-loop)[\/\\]src[\/\\].*\.js$/,
 		loader: 'babel-loader'
 	},
 	{
@@ -13,7 +13,7 @@ module.exports = [
 		loader: 'json-loader'
 	},
 	{
-		test: /images[\/\\][\w\-]+\.png$/,
+		test: /\.png$/,
 		loader: 'url-loader?limit=20000'
 	}
 ];

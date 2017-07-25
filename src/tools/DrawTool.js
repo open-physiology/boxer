@@ -197,37 +197,25 @@ export class DrawTool extends MouseTool {
 				artefact.moveToFront();
 				if (before::isFunction()) { before(args) }
 				
-				// /* record start dimensions and mouse position */
-				// const start = {
-				// 	transformation: artefact.transformation,
-				// 	mouse:          point
-				// };
 				// TODO: allow move following initial mousedown
 				
-				/* cancel or stop dragging */
-				Observable.merge(
-					escaping,
-					this.p('active').filter(a=>!a),
-					this.p('mode').filter(m => m !== DRAWING_EDGE),
-				).concatMap(Observable.throw()).merge(
-					droppingOrClicking.do(() => {
-						artefact.handlesActive = true;
-						artefact.moveToFront();
-					})
-				).catch(() => {
-					/* cancel drawing */
-					artefact.delete();
-					cancel::callIfFunction(args);
-					return Observable.of({ deleted: true });
-                }).do(({point}) => {
+				/***/
+				droppingOrClicking.do(({point}) => {
 					/* stop drawing */
+					artefact.handlesActive = true;
+					artefact.moveToFront();
 					coach.selectTool.reacquire(point);
-					after::callIfFunction(); // TODO: pass args?
+					after::callIfFunction(args);
+				}).catch((e) => {
+					console.error(e); // TODO
 				})::enterState('IDLE');
 				
 			},
 			'DRAWING_EDGE': (args1) => {
 				const {accepts, before, after, cancel} = args1;
+				
+				// TODO: A lot of this code is similar to DRAWING_GLYPH above;
+				//     : Can their common code be elegantly reused?
 				
 				let glyph1;
 				
@@ -257,51 +245,23 @@ export class DrawTool extends MouseTool {
 				glyph1.moveToFront();
 				if (before::isFunction()) { before(args1) }
 				
-				// /* record start dimensions and mouse position */
-				// const start = {
-				// 	transformation: artefact.transformation,
-				// 	mouse:          point
-				// };
 				// TODO: allow move following initial mousedown
-				
 				
 				/* escape / cancel */
 				Observable.merge(
 					this.p('active').filter(a=>!a),
 					this.p('mode').filter(m => m !== DRAWING_EDGE),
 					escaping
-				).merge(this.p('active').filter(a=>!a)).do(() => {
-					if (cancel::isFunction()) { cancel(args1) }
+				).do(() => {
+					cancel::callIfFunction(args1);
 					glyph1.handlesActive = true;
 				})::enterState('IDLE');
-				/* cancel or stop dragging */
-				Observable.merge(
-					escaping,
-					this.p('active').filter(a=>!a),
-					this.p('mode').filter(m => m !== DRAWING_EDGE),
-				).concatMap(Observable.throw()).merge(
-					droppingOrClicking.do(() => {
-						artefact.handlesActive = true;
-						artefact.moveToFront();
-					})
-				).catch(() => {
-					/* cancel drawing */
-					artefact.delete();
-					cancel::callIfFunction(args);
-					return Observable.of({ deleted: true });
-                }).do(({point}) => {
-					/* stop drawing */
-					coach.selectTool.reacquire(point);
-					after::callIfFunction(); // TODO: pass args?
-				});
 				
-				
+				/***/
 				droppingOrClicking.do(() => {
 					glyph1.handlesActive = true;
 					glyph1.moveToFront();
 				});
-				
-				/***/
 				threshold.do((args2) => {
 					/* stop drawing glyph1 */
 					glyph1.handlesActive = true;
