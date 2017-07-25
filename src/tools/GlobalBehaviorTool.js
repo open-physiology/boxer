@@ -1,17 +1,5 @@
-import $ from '../libs/jquery.js';
-
 import {Observable} from '../libs/expect-rxjs.js';
-
-import {keys, entries, values, isEmpty, isUndefined} from 'lodash-bound';
-
-import {stopPropagation, humanMsg} from 'utilities';
-
-import {M21, M22} from "../util/svg";
-
 import Tool from './Tool';
-import {handleBoxer} from '../Coach.js';
-import {plainDOM} from '../libs/jquery';
-import {Canvas} from '../artefacts/Canvas';
 
 const {floor} = Math;
 

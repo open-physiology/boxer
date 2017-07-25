@@ -2,7 +2,7 @@ import $ from '../libs/jquery.js';
 import Tool from './Tool';
 import {handleBoxer} from '../Coach.js';
 import {Observable} from '../libs/expect-rxjs.js';
-import {withMod, flag} from 'utilities';
+import {withMod} from 'utilities';
 import {elementController} from '../Coach';
 import {Point2D} from '../util/svg';
 

@@ -1,14 +1,11 @@
-import $ from '../libs/jquery.js';
-import {assign, pick, isFunction, includes} from 'lodash-bound';
+import {assign, isFunction} from 'lodash-bound';
 import {Observable} from '../libs/expect-rxjs.js';
 import CSSPrefix from 'cssprefix/src/cssprefix';
 
-import {withoutMod, stopPropagation, property, match, which, event} from 'utilities';
-import {emitWhenComplete} from '../util/misc.js';
+import {property, match} from 'utilities';
 
-import {snap45, moveToFront, ID_MATRIX, M11, M12, M21, M22} from "../util/svg";
+import {ID_MATRIX} from "../util/svg";
 
-import Tool from './Tool';
 import {handleBoxer} from '../Coach.js';
 import {MouseTool} from './MouseTool';
 import {SvgArtefact} from '../artefacts/SvgArtefact';

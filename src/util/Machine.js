@@ -1,4 +1,4 @@
-import {entries, isArray, isUndefined, isFunction, isString, constant, toPairs} from 'lodash-bound';
+import {isArray, isUndefined, isString, toPairs} from 'lodash-bound';
 import {ValueTracker, property} from 'utilities';
 
 export default class Machine extends ValueTracker {
