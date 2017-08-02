@@ -8,6 +8,13 @@ import Machine from '../util/Machine';
 import KeyCode from 'keycode-js';
 const {KEY_ESCAPE} = KeyCode;
 
+
+/**
+ * An abstract tool used to create other tools that use mouse input.
+ * It supplies a state machine with meaningful mouse-based states.
+ * (Also happens to signal when ESCAPE is pressed. Not mouse based,
+ *  but it made sense in context.)
+ */
 export class MouseTool extends Tool {
 
 	static DRAG_THRESHOLD = 4;

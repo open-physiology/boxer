@@ -3,6 +3,9 @@ import {isUndefined}            from 'lodash-bound';
 import {Observable}             from '../libs/expect-rxjs.js';
 
 
+/**
+ * The abstract `Tool` class is the basis of all boxer tools.
+ */
 export default class Tool extends ValueTracker {
 	
 	@property({ initial: true }) active;

@@ -1,17 +1,303 @@
 {
-  "coverage": "100%",
-  "expectCount": 5,
-  "actualCount": 5,
+  "coverage": "40.77%",
+  "expectCount": 206,
+  "actualCount": 84,
   "files": {
-    "src/test-app/app.js": {
-      "expectCount": 2,
-      "actualCount": 2,
-      "undocumentLines": []
+    "src/artefacts/Box.js": {
+      "expectCount": 14,
+      "actualCount": 1,
+      "undocumentLines": [
+        20,
+        21,
+        86,
+        125,
+        56,
+        30,
+        99,
+        47,
+        323,
+        39,
+        225,
+        303,
+        44
+      ]
     },
-    "src/index.js": {
+    "src/artefacts/BoxBorder.js": {
       "expectCount": 3,
-      "actualCount": 3,
-      "undocumentLines": []
+      "actualCount": 1,
+      "undocumentLines": [
+        16,
+        18
+      ]
+    },
+    "src/artefacts/BoxCorner.js": {
+      "expectCount": 5,
+      "actualCount": 1,
+      "undocumentLines": [
+        27,
+        72,
+        16,
+        23
+      ]
+    },
+    "src/artefacts/Canvas.js": {
+      "expectCount": 5,
+      "actualCount": 1,
+      "undocumentLines": [
+        28,
+        11,
+        52,
+        18
+      ]
+    },
+    "src/tools/ClickTool.js": {
+      "expectCount": 2,
+      "actualCount": 1,
+      "undocumentLines": [
+        10
+      ]
+    },
+    "src/Coach.js": {
+      "expectCount": 18,
+      "actualCount": 12,
+      "undocumentLines": [
+        31,
+        88,
+        61,
+        59,
+        30,
+        28
+      ]
+    },
+    "src/tools/DeleteTool.js": {
+      "expectCount": 3,
+      "actualCount": 1,
+      "undocumentLines": [
+        16,
+        39
+      ]
+    },
+    "src/tools/DrawTool.js": {
+      "expectCount": 9,
+      "actualCount": 1,
+      "undocumentLines": [
+        48,
+        43,
+        39,
+        41,
+        45,
+        42,
+        44,
+        53
+      ]
+    },
+    "src/artefacts/Edge.js": {
+      "expectCount": 6,
+      "actualCount": 1,
+      "undocumentLines": [
+        30,
+        66,
+        101,
+        81,
+        22
+      ]
+    },
+    "src/tools/GlobalBehaviorTool.js": {
+      "expectCount": 7,
+      "actualCount": 1,
+      "undocumentLines": [
+        26,
+        32,
+        31,
+        33,
+        42,
+        14
+      ]
+    },
+    "src/artefacts/Glyph.js": {
+      "expectCount": 4,
+      "actualCount": 1,
+      "undocumentLines": [
+        20,
+        52,
+        16
+      ]
+    },
+    "src/handlers/Handler.js": {
+      "expectCount": 4,
+      "actualCount": 0,
+      "undocumentLines": [
+        4,
+        10,
+        6,
+        12
+      ]
+    },
+    "src/tools/HelperTool.js": {
+      "expectCount": 2,
+      "actualCount": 1,
+      "undocumentLines": [
+        12
+      ]
+    },
+    "src/tools/HighlightTool.js": {
+      "expectCount": 6,
+      "actualCount": 1,
+      "undocumentLines": [
+        62,
+        16,
+        47,
+        45,
+        86
+      ]
+    },
+    "src/util/svg.js": {
+      "expectCount": 43,
+      "actualCount": 41,
+      "undocumentLines": [
+        255,
+        115
+      ]
+    },
+    "src/artefacts/LineSegment.js": {
+      "expectCount": 9,
+      "actualCount": 1,
+      "undocumentLines": [
+        43,
+        70,
+        74,
+        28,
+        31,
+        22,
+        25,
+        18
+      ]
+    },
+    "src/util/Machine.js": {
+      "expectCount": 11,
+      "actualCount": 6,
+      "undocumentLines": [
+        126,
+        31,
+        35,
+        26,
+        30
+      ]
+    },
+    "src/tools/MouseCursorTool.js": {
+      "expectCount": 3,
+      "actualCount": 1,
+      "undocumentLines": [
+        16,
+        12
+      ]
+    },
+    "src/tools/MouseTool.js": {
+      "expectCount": 3,
+      "actualCount": 1,
+      "undocumentLines": [
+        21,
+        28
+      ]
+    },
+    "src/tools/MoveTool.js": {
+      "expectCount": 2,
+      "actualCount": 1,
+      "undocumentLines": [
+        23
+      ]
+    },
+    "src/tools/PanTool.js": {
+      "expectCount": 2,
+      "actualCount": 1,
+      "undocumentLines": [
+        29
+      ]
+    },
+    "src/tools/ResizeTool.js": {
+      "expectCount": 2,
+      "actualCount": 1,
+      "undocumentLines": [
+        24
+      ]
+    },
+    "src/tools/RotateTool.js": {
+      "expectCount": 2,
+      "actualCount": 1,
+      "undocumentLines": [
+        25
+      ]
+    },
+    "src/tools/SelectTool.js": {
+      "expectCount": 3,
+      "actualCount": 1,
+      "undocumentLines": [
+        18,
+        23
+      ]
+    },
+    "src/artefacts/SvgArtefact.js": {
+      "expectCount": 16,
+      "actualCount": 2,
+      "undocumentLines": [
+        168,
+        200,
+        106,
+        156,
+        192,
+        216,
+        180,
+        187,
+        40,
+        108,
+        35,
+        166,
+        160,
+        47
+      ]
+    },
+    "src/artefacts/SvgTransformable.js": {
+      "expectCount": 3,
+      "actualCount": 1,
+      "undocumentLines": [
+        15,
+        22
+      ]
+    },
+    "src/tools/Tool.js": {
+      "expectCount": 10,
+      "actualCount": 1,
+      "undocumentLines": [
+        13,
+        18,
+        10,
+        33,
+        36,
+        17,
+        24,
+        27,
+        30
+      ]
+    },
+    "src/tools/ZoomTool.js": {
+      "expectCount": 2,
+      "actualCount": 1,
+      "undocumentLines": [
+        15
+      ]
+    },
+    "src/util/misc.js": {
+      "expectCount": 7,
+      "actualCount": 0,
+      "undocumentLines": [
+        46,
+        56,
+        11,
+        29,
+        48,
+        52,
+        15
+      ]
     }
   }
 }

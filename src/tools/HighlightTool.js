@@ -6,6 +6,13 @@ import {GlobalBehaviorTool} from './GlobalBehaviorTool';
 const {floor, PI, min} = Math;
 
 
+/**
+ * A tool that can create an animated color-shifting highlighting border
+ * around some artifact based on some observable conditions.
+ * Those specific conditions and the nature of the visual border
+ * are defined inside the tools that want to use highlighting
+ * to signal their state, using `coach.highlightTool.register()`.
+ */
 export class HighlightTool extends GlobalBehaviorTool {
 	
 	/* 'selectable' related highlighting */

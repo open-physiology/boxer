@@ -15,6 +15,9 @@ import {callIfFunction} from '../util/misc';
 const {min, max, floor} = Math;
 
 
+/**
+ * A tool for resizing boxes by dragging its borders or corners with the mouse.
+ */
 export class ResizeTool extends MouseTool {
 	
 	init({coach}) {

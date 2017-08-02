@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <base data-ice="baseUrl" href="../../">
+  <title data-ice="title">tools/ResizeTool.js | API Document</title>
+  <link type="text/css" rel="stylesheet" href="css/style.css">
+  <link type="text/css" rel="stylesheet" href="css/prettify-tomorrow.css">
+  <script src="script/prettify/prettify.js"></script>
+  
+  
+  <script src="script/manual.js"></script>
+</head>
+<body class="layout-container" data-ice="rootContainer">
+
+<header>
+  <a href="./">Home</a>
+  
+  <a href="identifiers.html">Reference</a>
+  <a href="source.html">Source</a>
+  <a href="test.html" data-ice="testLink">Test</a>
+  <a data-ice="repoURL" href="https://github.com/open-physiology/boxer" class="repo-url-github">Repository</a>
+  <div class="search-box">
+  <span>
+    <img src="./image/search.png">
+    <span class="search-input-edge"></span><input class="search-input"><span class="search-input-edge"></span>
+  </span>
+    <ul class="search-result"></ul>
+  </div>
+</header>
+
+<nav class="navigation" data-ice="nav"><div>
+  <ul>
+    
+  <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/tools/ClickTool.js~ClickTool.html">ClickTool</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/tools/DeleteTool.js~DeleteTool.html">DeleteTool</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/tools/DrawTool.js~DrawTool.html">DrawTool</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/tools/GlobalBehaviorTool.js~GlobalBehaviorTool.html">GlobalBehaviorTool</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/tools/HelperTool.js~HelperTool.html">HelperTool</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/tools/HighlightTool.js~HighlightTool.html">HighlightTool</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/tools/MouseCursorTool.js~MouseCursorTool.html">MouseCursorTool</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/tools/MouseTool.js~MouseTool.html">MouseTool</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/tools/MoveTool.js~MoveTool.html">MoveTool</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/tools/PanTool.js~PanTool.html">PanTool</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/tools/ResizeTool.js~ResizeTool.html">ResizeTool</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/tools/RotateTool.js~RotateTool.html">RotateTool</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/tools/SelectTool.js~SelectTool.html">SelectTool</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/tools/Tool.js~Tool.html">Tool</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/tools/ZoomTool.js~ZoomTool.html">ZoomTool</a></span></span></li>
+</ul>
+</div>
+</nav>
+
+<div class="content" data-ice="content"><h1 data-ice="title">tools/ResizeTool.js</h1>
+<pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">import $ from &apos;../libs/jquery.js&apos;;
+import {assign, isFunction} from &apos;lodash-bound&apos;;
+import {Observable} from &apos;../libs/expect-rxjs.js&apos;;
+
+import {withoutMod, match} from &apos;utilities&apos;;
+
+import {M21, M22} from &quot;../util/svg&quot;;
+
+import {handleBoxer} from &apos;../Coach.js&apos;;
+import {MouseTool} from &apos;./MouseTool&apos;;
+import {plainDOM} from &apos;../libs/jquery&apos;;
+import Machine from &apos;../util/Machine&apos;;
+import {callIfFunction} from &apos;../util/misc&apos;;
+
+const {min, max, floor} = Math;
+
+
+/**
+ * A tool for resizing boxes by dragging its borders or corners with the mouse.
+ */
+export class ResizeTool extends MouseTool {
+	
+	init({coach}) {
+		super.init({ coach });
+		
+		/* extend state machine */
+		const mousemove = this.windowE(&apos;mousemove&apos;);
+		const threshold = this.mouseMachine.THRESHOLD
+			.filter(() =&gt; this.active)
+			.filter(withoutMod(&apos;shift&apos;, &apos;ctrl&apos;, &apos;alt&apos;))
+			::handleBoxer(&apos;resizable&apos;);
+		const dragging = this.mouseMachine.DRAGGING
+			.filter(() =&gt; this.active)
+			::handleBoxer(&apos;resizable&apos;);
+		const dropping = this.mouseMachine.DROPPING;
+		const escaping = this.mouseMachine.ESCAPING;
+		
+		/* determining proper resizing cursor */
+		const borderCursor = (handler) =&gt; {
+			if (!handler) { return null }
+			
+			let m = handler.artefact.svg.main::plainDOM().getScreenCTM();
+			let angle = Math.atan2(m[M21], m[M22]) * 180 / Math.PI;
+
+			let {x, y} = handler.directions;
+			x = (x === -1) ? &apos;-&apos; : (x === 1) ? &apos;+&apos; : &apos;0&apos;;
+			y = (y === -1) ? &apos;-&apos; : (y === 1) ? &apos;+&apos; : &apos;0&apos;;
+			switch (x+&apos; &apos;+y) {
+				case &apos;0 -&apos;: { angle +=   0 } break;
+				case &apos;+ -&apos;: { angle +=  45 } break;
+				case &apos;+ 0&apos;: { angle +=  90 } break;
+				case &apos;+ +&apos;: { angle += 135 } break;
+				case &apos;0 +&apos;: { angle += 180 } break;
+				case &apos;- +&apos;: { angle += 225 } break;
+				case &apos;- 0&apos;: { angle += 270 } break;
+				case &apos;- -&apos;: { angle += 315 } break;
+			}
+			angle = (angle + 360) % 360;
+			return [
+				&apos;ns-resize&apos;,   // 0,   0&#xB0;:  |
+				&apos;nesw-resize&apos;, // 1,  45&#xB0;:  /
+				&apos;ew-resize&apos;,   // 2,  90&#xB0;:  -
+				&apos;nwse-resize&apos;  // 3, 135&#xB0;:  \
+			][floor((angle + 180/8) % 180 / (180/4)) % 4];
+		};
+		
+		/* main state machine of this tool */
+		const localMachine = new Machine(&apos;ResizeTool&apos;, { state: &apos;IDLE&apos; });
+		localMachine.extend(({ enterState, subscribeDuringState }) =&gt; ({
+			&apos;IDLE&apos;: () =&gt; {
+				threshold::enterState(&apos;THRESHOLD&apos;);
+				coach.selectTool.reacquire();
+			},
+			&apos;THRESHOLD&apos;: () =&gt; {
+				dragging::enterState(&apos;DRAGGING&apos;);
+				this.mouseMachine.IDLE::enterState(&apos;IDLE&apos;);
+			},
+			&apos;DRAGGING&apos;: (args) =&gt; {
+				const {point, artefact, before, after, cancel, directions} = args;
+				
+				/* drag initialization */
+				artefact.handlesActive = false;
+				coach.selectTool.reacquire();
+				artefact.moveToFront();
+				if (before::isFunction()) { before(args) }
+				
+				/* record start dimensions and mouse position */
+				const start = {
+					transformation: artefact.transformation,
+					width:          artefact.width,
+					height:         artefact.height,
+					mouse:          point
+				};
+				
+				/* resize while dragging */
+				mousemove
+					.map(event =&gt; event.point.in(artefact.svg.children).minus(start.mouse))
+					::subscribeDuringState(({x: xDiff, y: yDiff}) =&gt; {
+						xDiff = directions.x * max(directions.x * xDiff, artefact.minWidth  - start.width );
+						yDiff = directions.y * max(directions.y * yDiff, artefact.minHeight - start.height);
+						artefact::assign({
+							transformation: start.transformation.translate(xDiff/2, yDiff/2),
+							width:          start.width  + directions.x * xDiff,
+							height:         start.height + directions.y * yDiff
+						});
+					});
+				
+				/* cancel or stop dragging */
+				Observable.merge(
+					escaping.concatMap(Observable.throw()),
+					dropping.map(({point, target}) =&gt; ({
+						dropzone: $(target).data(&apos;boxer-handlers&apos;).dropzone,
+						point
+					})).do(({dropzone}) =&gt; {
+						// artefact.parent = dropzone.artefact; // TODO: Maybe we&apos;ll need this to snap borders
+						dropzone.after::callIfFunction(args);
+					})
+				).catch((error, caught) =&gt; {
+					/* cancel dragging */
+					artefact.transformation = start.transformation;
+					artefact.width  = start.width;
+					artefact.height = start.height;
+					cancel::callIfFunction(args);
+					return Observable.of({});
+                }).map(({point}) =&gt; {
+					/* stop dragging */
+					artefact.handlesActive = true;
+					artefact.moveToFront();
+					coach.selectTool.reacquire(point);
+					after::callIfFunction(); // TODO: pass args?
+					return { ...args, point };
+				})::enterState(&apos;IDLE&apos;);
+				
+			}
+		}));
+		
+		/* mutual exclusion between this machine and other machines, coordinated by coach.stateMachine */
+		localMachine.extend(() =&gt; ({ &apos;OTHER_TOOL&apos;: ()=&gt;{} }));
+		coach.stateMachine.extend(() =&gt; ({ &apos;IDLE&apos;: ()=&gt;{}, &apos;BUSY&apos;: ()=&gt;{} }));
+		localMachine.link(&apos;IDLE&apos;,       coach.stateMachine.BUSY.filter(({tool}) =&gt; tool !== this).map(()=&gt;localMachine.data), &apos;OTHER_TOOL&apos;);
+		localMachine.link(&apos;OTHER_TOOL&apos;, coach.stateMachine.IDLE.filter(({tool}) =&gt; tool !== this).map(()=&gt;localMachine.data), &apos;IDLE&apos;);
+		coach.stateMachine.link(&apos;IDLE&apos;, localMachine.DRAGGING.map(() =&gt; ({ tool: this })), &apos;BUSY&apos;);
+		coach.stateMachine.link(&apos;BUSY&apos;, localMachine.IDLE    .map(() =&gt; ({ tool: this })), &apos;IDLE&apos;);
+		
+		/* prep for highlighting and mouse cursors */
+		const handlerOrNull = (key) =&gt; (a) =&gt; (a &amp;&amp; a.handlers[key] &amp;&amp; a.handlers[&apos;highlightable&apos;]) ? a.handlers[key] : null;
+		const resizableArtefact = coach.p(&apos;selectedArtefact&apos;).map((originalArtefact) =&gt; {
+			let handler = handlerOrNull(&apos;resizable&apos;)(originalArtefact);
+			if (!handler) { return null }
+			return { originalArtefact, ...handler };
+		});
+		
+		/* highlighting */
+		coach.highlightTool.register(this, localMachine.p([&apos;state&apos;, &apos;data&apos;]).switchMap(([state, data]) =&gt; match(state)({
+			&apos;IDLE&apos;:       resizableArtefact,
+			&apos;THRESHOLD&apos;:  Observable.of(data),
+			&apos;DRAGGING&apos;:   Observable.of(data),
+			&apos;OTHER_TOOL&apos;: Observable.of(null)
+		})).map((handler) =&gt; handler &amp;&amp; {
+			...coach.highlightTool.HIGHLIGHT_DEFAULT,
+			artefact: handler.originalArtefact
+		}));
+		 
+		/* mouse cursors */
+		coach.mouseCursorTool.register(this, localMachine.p([&apos;state&apos;, &apos;data&apos;]).switchMap(([state, data]) =&gt; match(state)({
+			&apos;IDLE&apos;:       resizableArtefact.map(borderCursor),
+			&apos;THRESHOLD&apos;:  Observable.of(borderCursor(data)),
+			&apos;DRAGGING&apos;:   Observable.of(borderCursor(data)),
+			&apos;OTHER_TOOL&apos;: Observable.of(null)
+		})));
+		
+	}
+}
+</code></pre>
+
+</div>
+
+<footer class="footer">
+  Generated by <a href="https://esdoc.org">ESDoc<span data-ice="esdocVersion">(0.5.2)</span><img src="./image/esdoc-logo-mini-black.png"></a>
+</footer>
+
+<script src="script/search_index.js"></script>
+<script src="script/search.js"></script>
+<script src="script/pretty-print.js"></script>
+<script src="script/inherited-summary.js"></script>
+<script src="script/test-summary.js"></script>
+<script src="script/inner-link.js"></script>
+<script src="script/patch-for-local.js"></script>
+</body>
+</html>

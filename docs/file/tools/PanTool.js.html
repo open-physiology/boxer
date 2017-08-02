@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <base data-ice="baseUrl" href="../../">
+  <title data-ice="title">tools/PanTool.js | API Document</title>
+  <link type="text/css" rel="stylesheet" href="css/style.css">
+  <link type="text/css" rel="stylesheet" href="css/prettify-tomorrow.css">
+  <script src="script/prettify/prettify.js"></script>
+  
+  
+  <script src="script/manual.js"></script>
+</head>
+<body class="layout-container" data-ice="rootContainer">
+
+<header>
+  <a href="./">Home</a>
+  
+  <a href="identifiers.html">Reference</a>
+  <a href="source.html">Source</a>
+  <a href="test.html" data-ice="testLink">Test</a>
+  <a data-ice="repoURL" href="https://github.com/open-physiology/boxer" class="repo-url-github">Repository</a>
+  <div class="search-box">
+  <span>
+    <img src="./image/search.png">
+    <span class="search-input-edge"></span><input class="search-input"><span class="search-input-edge"></span>
+  </span>
+    <ul class="search-result"></ul>
+  </div>
+</header>
+
+<nav class="navigation" data-ice="nav"><div>
+  <ul>
+    
+  <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/tools/ClickTool.js~ClickTool.html">ClickTool</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/tools/DeleteTool.js~DeleteTool.html">DeleteTool</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/tools/DrawTool.js~DrawTool.html">DrawTool</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/tools/GlobalBehaviorTool.js~GlobalBehaviorTool.html">GlobalBehaviorTool</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/tools/HelperTool.js~HelperTool.html">HelperTool</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/tools/HighlightTool.js~HighlightTool.html">HighlightTool</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/tools/MouseCursorTool.js~MouseCursorTool.html">MouseCursorTool</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/tools/MouseTool.js~MouseTool.html">MouseTool</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/tools/MoveTool.js~MoveTool.html">MoveTool</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/tools/PanTool.js~PanTool.html">PanTool</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/tools/ResizeTool.js~ResizeTool.html">ResizeTool</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/tools/RotateTool.js~RotateTool.html">RotateTool</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/tools/SelectTool.js~SelectTool.html">SelectTool</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/tools/Tool.js~Tool.html">Tool</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/tools/ZoomTool.js~ZoomTool.html">ZoomTool</a></span></span></li>
+</ul>
+</div>
+</nav>
+
+<div class="content" data-ice="content"><h1 data-ice="title">tools/PanTool.js</h1>
+<pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">import {isFunction} from &apos;lodash-bound&apos;;
+import {Observable} from &apos;../libs/expect-rxjs.js&apos;;
+import CSSPrefix from &apos;cssprefix/src/cssprefix&apos;;
+
+import {match} from &apos;utilities&apos;;
+
+import {handleBoxer} from &apos;../Coach.js&apos;;
+import {MouseTool} from &apos;./MouseTool&apos;;
+import Machine from &apos;../util/Machine&apos;;
+
+import KeyCode from &apos;keycode-js&apos;;
+import {callIfFunction} from &apos;../util/misc&apos;;
+
+const {KEY_ESCAPE} = KeyCode;
+
+const {max, sign, abs} = Math;
+
+const DRAWING_BOX   = &apos;DRAWING_BOX&apos;;
+const DRAWING_GLYPH = &apos;DRAWING_GLYPH&apos;;
+const DRAWING_EDGE  = &apos;DRAWING_EDGE&apos;;
+const DRAWING_EDGES = &apos;DRAWING_EDGES&apos;;
+const MODES = [
+	DRAWING_BOX,
+	DRAWING_GLYPH,
+	DRAWING_EDGE,
+	DRAWING_EDGES
+];
+
+
+/**
+ * A tool for panning the main canvas using drag-and-drop.
+ */
+export class PanTool extends MouseTool {
+	
+	init({coach}) {
+		super.init({ coach });
+		
+		const mousemove = this.windowE(&apos;mousemove&apos;);
+		const idle      = this.mouseMachine.IDLE;
+		const threshold = this.mouseMachine.THRESHOLD
+			::handleBoxer(&apos;pannable&apos;);
+		const dragging = this.mouseMachine.DRAGGING
+			::handleBoxer(&apos;pannable&apos;);
+		const dropping = this.mouseMachine.DROPPING;
+		
+		/* local state machine */
+		const localMachine = new Machine(this.constructor.name, { state: &apos;IDLE&apos; });
+		localMachine.extend(({ enterState, subscribeDuringState }) =&gt; ({
+			&apos;IDLE&apos;: () =&gt; {
+				threshold::enterState(&apos;THRESHOLD&apos;);
+			},
+			&apos;THRESHOLD&apos;: () =&gt; {
+				dragging::enterState(&apos;PANNING&apos;);
+				idle    ::enterState(&apos;IDLE&apos;);
+			},
+			&apos;PANNING&apos;: (args) =&gt; {
+				const {before, after, point, artefact} = args;
+				
+				/* pan initialization */
+				if (before::isFunction()) { before(args) }
+				
+				/* record start dimensions and mouse position */
+				const start = {
+					transformation: artefact.transformation,
+					mouse:          point
+				};
+				
+				/* resize while dragging */
+				mousemove
+					.map(event =&gt; event.point.in(artefact.svg.children).minus(start.mouse))
+					.map(({x: xDiff, y: yDiff}) =&gt; start.transformation.translate(xDiff, yDiff))
+					::subscribeDuringState((m) =&gt; { artefact.transformation = m });
+				
+				/* cancel or stop dragging */
+				dropping.do(({point}) =&gt; {
+					/* stop drawing */
+					// coach.selectTool.reacquire(point);
+					coach.selectTool.reacquire();
+					after::callIfFunction(); // TODO: pass args?
+				})::enterState(&apos;IDLE&apos;);
+				
+			}
+		}));
+		
+		/* mutual exclusion between this machine and other machines, coordinated by coach.stateMachine */
+		localMachine.extend(() =&gt; ({ &apos;OTHER_TOOL&apos;: ()=&gt;{} }));
+		coach.stateMachine.extend(() =&gt; ({ &apos;IDLE&apos;: ()=&gt;{}, &apos;BUSY&apos;: ()=&gt;{} }));
+		localMachine.link(&apos;IDLE&apos;,       coach.stateMachine.BUSY.filter(({tool}) =&gt; tool !== this).map(()=&gt;localMachine.data), &apos;OTHER_TOOL&apos;);
+		localMachine.link(&apos;OTHER_TOOL&apos;, coach.stateMachine.IDLE.filter(({tool}) =&gt; tool !== this).map(()=&gt;localMachine.data), &apos;IDLE&apos;);
+		coach.stateMachine.link(&apos;IDLE&apos;, localMachine.PANNING.map(() =&gt; ({ tool: this })), &apos;BUSY&apos;);
+		coach.stateMachine.link(&apos;BUSY&apos;, localMachine.IDLE   .map(() =&gt; ({ tool: this })), &apos;IDLE&apos;);
+		
+		/* prep for mouse cursors */
+		const handlerArtefactOrNull = (key) =&gt; (a) =&gt; (a &amp;&amp; a.handlers[key]) ? a.handlers[key].artefact : null;
+		const canvasArtefact = coach.p(&apos;selectedArtefact&apos;).map(handlerArtefactOrNull(&apos;pannable&apos;));
+		
+		/* mouse cursors */
+		const grabCursor     = CSSPrefix.getValue(&apos;cursor&apos;, &apos;grab&apos;    );
+		const grabbingCursor = CSSPrefix.getValue(&apos;cursor&apos;, &apos;grabbing&apos;);
+		coach.mouseCursorTool.register(this, localMachine.p(&apos;state&apos;).startWith(null).pairwise().switchMap(([prev, next]) =&gt; match(next)({
+			&apos;IDLE&apos;:       canvasArtefact.map(ma =&gt; ma &amp;&amp; grabCursor).startWith(prev &amp;&amp; grabCursor),
+			&apos;THRESHOLD&apos;:  Observable.of(grabbingCursor),
+			&apos;PANNING&apos;:    Observable.of(grabbingCursor),
+			&apos;OTHER_TOOL&apos;: Observable.of(null)
+		})));
+	}
+}
+</code></pre>
+
+</div>
+
+<footer class="footer">
+  Generated by <a href="https://esdoc.org">ESDoc<span data-ice="esdocVersion">(0.5.2)</span><img src="./image/esdoc-logo-mini-black.png"></a>
+</footer>
+
+<script src="script/search_index.js"></script>
+<script src="script/search.js"></script>
+<script src="script/pretty-print.js"></script>
+<script src="script/inherited-summary.js"></script>
+<script src="script/test-summary.js"></script>
+<script src="script/inner-link.js"></script>
+<script src="script/patch-for-local.js"></script>
+</body>
+</html>

@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <base data-ice="baseUrl" href="../../../">
+  <title data-ice="title">src/artefacts/Box.js | API Document</title>
+  <link type="text/css" rel="stylesheet" href="css/style.css">
+  <link type="text/css" rel="stylesheet" href="css/prettify-tomorrow.css">
+  <script src="script/prettify/prettify.js"></script>
+  
+  
+  <script src="script/manual.js"></script>
+</head>
+<body class="layout-container" data-ice="rootContainer">
+
+<header>
+  <a href="./">Home</a>
+  
+  <a href="identifiers.html">Reference</a>
+  <a href="source.html">Source</a>
+  <a href="test.html" data-ice="testLink">Test</a>
+  <a data-ice="repoURL" href="https://github.com/open-physiology/boxer" class="repo-url-github">Repository</a>
+  <div class="search-box">
+  <span>
+    <img src="./image/search.png">
+    <span class="search-input-edge"></span><input class="search-input"><span class="search-input-edge"></span>
+  </span>
+    <ul class="search-result"></ul>
+  </div>
+</header>
+
+<nav class="navigation" data-ice="nav"><div>
+  <ul>
+    
+  <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/Coach.js~Coach.html">Coach</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-elementController">elementController</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-handleBoxer">handleBoxer</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">artefacts</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/artefacts/Box.js~Box.html">Box</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/artefacts/BoxBorder.js~BoxBorder.html">BoxBorder</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/artefacts/BoxCorner.js~BoxCorner.html">BoxCorner</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/artefacts/Canvas.js~Canvas.html">Canvas</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/artefacts/Edge.js~Edge.html">Edge</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/artefacts/Glyph.js~Glyph.html">Glyph</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/artefacts/LineSegment.js~LineSegment.html">LineSegment</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/artefacts/SvgArtefact.js~SvgArtefact.html">SvgArtefact</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/artefacts/SvgTransformable.js~SvgTransformable.html">SvgTransformable</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-BORDER_WIDTH">BORDER_WIDTH</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-MIN_MIN_SIZE">MIN_MIN_SIZE</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">handlers</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/handlers/Handler.js~Handler.html">Handler</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">tools</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/tools/ClickTool.js~ClickTool.html">ClickTool</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/tools/DeleteTool.js~DeleteTool.html">DeleteTool</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/tools/DrawTool.js~DrawTool.html">DrawTool</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/tools/GlobalBehaviorTool.js~GlobalBehaviorTool.html">GlobalBehaviorTool</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/tools/HelperTool.js~HelperTool.html">HelperTool</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/tools/HighlightTool.js~HighlightTool.html">HighlightTool</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/tools/MouseCursorTool.js~MouseCursorTool.html">MouseCursorTool</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/tools/MouseTool.js~MouseTool.html">MouseTool</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/tools/MoveTool.js~MoveTool.html">MoveTool</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/tools/PanTool.js~PanTool.html">PanTool</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/tools/ResizeTool.js~ResizeTool.html">ResizeTool</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/tools/RotateTool.js~RotateTool.html">RotateTool</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/tools/SelectTool.js~SelectTool.html">SelectTool</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/tools/Tool.js~Tool.html">Tool</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/tools/ZoomTool.js~ZoomTool.html">ZoomTool</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">util</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/util/Machine.js~Machine.html">Machine</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/util/svg.js~Point2D.html">Point2D</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/util/svg.js~Vector2D.html">Vector2D</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-callIfFunction">callIfFunction</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-emitWhenComplete">emitWhenComplete</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-sineWave">sineWave</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-strictSubclassOf">strictSubclassOf</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-subclassOf">subclassOf</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-withLatestFrom">withLatestFrom</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getCTM">getCTM</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-matrixEquals">matrixEquals</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-moveToFront">moveToFront</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-rotateAroundPoint">rotateAroundPoint</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-scaleFromPoint">scaleFromPoint</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-setCTM">setCTM</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-snap45">snap45</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-animationFrames">animationFrames</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-ID_MATRIX">ID_MATRIX</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-M11">M11</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-M12">M12</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-M21">M21</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-M22">M22</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-MX">MX</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-MY">MY</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-ORIG_POINT">ORIG_POINT</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-SVGMatrix">SVGMatrix</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-SVGPoint">SVGPoint</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-MachineLink">MachineLink</a></span></span></li>
+</ul>
+</div>
+</nav>
+
+<div class="content" data-ice="content"><h1 data-ice="title">src/artefacts/Box.js</h1>
+<pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">import assert from &apos;power-assert&apos;;
+import $      from &apos;../libs/jquery.js&apos;;
+import {entries, isEmpty, isArray, pull, values} from &apos;lodash-bound&apos;;
+import {Observable} from &apos;../libs/expect-rxjs.js&apos;;
+
+import {ID_MATRIX, Point2D} from &apos;../util/svg.js&apos;;
+import {property, flag, definePropertiesByValue} from &apos;utilities&apos;;
+import {_isNonNegative} from &apos;../util/misc.js&apos;;
+
+import {SvgTransformable} from &apos;./SvgTransformable.js&apos;;
+import {BoxCorner}        from &apos;./BoxCorner.js&apos;;
+import {MX, MY, setCTM} from &apos;../util/svg&apos;;
+import {BoxBorder} from &apos;./BoxBorder&apos;;
+import {Glyph} from &apos;./Glyph&apos;;
+
+const {max} = Math;
+
+export const BORDER_WIDTH = 2;
+export const MIN_MIN_SIZE = 2*max(BoxCorner.RADIUS, BORDER_WIDTH);
+
+/**
+ * Representation of an interactive rectangle in svg space.
+ */
+export class Box extends SvgTransformable {
+	
+	@property({ isValid: _isNonNegative, initial: MIN_MIN_SIZE }) minWidth;
+	@property({ isValid: _isNonNegative, initial: MIN_MIN_SIZE }) minHeight;
+	
+	@property({ isValid: _isNonNegative, initial: MIN_MIN_SIZE, transform(w) { return max(w || MIN_MIN_SIZE, this.minWidth  || MIN_MIN_SIZE) } }) width;
+	@property({ isValid: _isNonNegative, initial: MIN_MIN_SIZE, transform(h) { return max(h || MIN_MIN_SIZE, this.minHeight || MIN_MIN_SIZE) } }) height;
+	
+	@property({ initial: {} }) stuckBorders; // TODO: more elegant solution
+	
+	
+	getSvgContainerFor(artefact) {
+		// TODO: if still needed, move this functionality to the dropzone handler
+		if (artefact instanceof BoxBorder || artefact instanceof BoxCorner) {
+			return this.svg.outline;
+		}
+		// return this.svg.content;
+		return this.svg.children;
+	}
+	
+	preCreate(options) {
+		super.preCreate(options);
+		
+		/* set width/height if given */
+		if (options.width)  { this.width  = options.width  }
+		if (options.height) { this.height = options.height }
+		
+		/* keep width/height at or above minimum */
+		for (let [ minKey    ,  key    ] of [
+			     [&apos;minWidth&apos; , &apos;width&apos; ],
+			     [&apos;minHeight&apos;, &apos;height&apos;]
+		]) {
+			this.p([minKey], [key])
+			    .filter(([m, v]) =&gt; v &lt; m)
+			    .map   (([m, v]) =&gt; m    )
+			    .subscribe( this.p(key) );
+		}
+	}
+	
+	create(options = {}) {
+		super.create(options);
+		
+		this.svg.outline = $.svg(&apos;&lt;g class=&quot;outline&quot;&gt;&apos;)
+			.css(this.constructor.inheritedProperties)
+			.insertAfter(this.svg.children);
+		
+		const handlePath = $.svg(&apos;&lt;path&gt;&apos;).attr({
+			rx:      BoxCorner.RADIUS,
+			ry:      BoxCorner.RADIUS,
+			stroke: &apos;none&apos;,
+			fill:   &apos;none&apos;
+		}).appendTo(this.svg.handles);
+		
+		const inkPath = $.svg(&apos;&lt;path&gt;&apos;).attr({
+			rx:      BoxCorner.RADIUS,
+			ry:      BoxCorner.RADIUS,
+			stroke:  &apos;transparent&apos;,
+			fill:    &apos;inherit&apos;
+		}).appendTo(this.svg.ink);
+		
+		const overlayPath = $.svg(&apos;&lt;path&gt;&apos;).attr({
+			stroke:           &apos;inherit&apos;,
+			strokeWidth:      &apos;inherit&apos;,
+			strokeDasharray:  &apos;inherit&apos;,
+			strokeDashoffset: &apos;inherit&apos;,
+			fill:             &apos;transparent&apos;,
+		}).appendTo(this.svg.overlay);
+		
+		/* borders */
+		this.borders = {};
+		for (let [key, x, y] of [
+			[&apos;top&apos;,    0, -1],
+			[&apos;right&apos;, +1,  0],
+			[&apos;bottom&apos;, 0, +1],
+			[&apos;left&apos;,  -1,  0]
+		]) {
+			this.borders[key] = new BoxBorder({
+				parent: this,
+				lengthen1: -BoxCorner.RADIUS,
+				lengthen2: -BoxCorner.RADIUS,
+				side:      {key, x, y}
+			});
+			this.borders[key].registerHandlers({
+				resizable: {
+					artefact: this,
+					directions: {x, y},
+					before: () =&gt; { this.handlesActive = false },
+					after:  () =&gt; { this.handlesActive = true  }
+				},
+				highlightable: {
+					artefact: this,
+					effect: {
+						elements: this.borders[key].svg.overlay
+					}
+				},
+				dropzone: {
+					artefact: this.borders[key],
+					after: ({artefact}) =&gt; {
+						if (artefact instanceof Box) {
+							// TODO: finish this (mirror the LyphBox.js version)
+						} else if (artefact instanceof Glyph) {
+							artefact.parent = this.borders[key]
+						}
+					}
+				}
+			});
+		}
+		
+		/* corners */
+		this.corners = {};
+		for (let [key, x, y, s1, s2] of [
+			[&apos;tl&apos;, -1, -1, &apos;top&apos;,    &apos;left&apos; ],
+			[&apos;tr&apos;, +1, -1, &apos;top&apos;,    &apos;right&apos;],
+			[&apos;bl&apos;, -1, +1, &apos;bottom&apos;, &apos;left&apos; ],
+			[&apos;br&apos;, +1, +1, &apos;bottom&apos;, &apos;right&apos;]
+		]) {
+			this.corners[key] = new BoxCorner({
+				parent: this
+			});
+			this.corners[key].registerHandlers({
+				resizable: {
+					artefact: this,
+					directions: {x, y},
+					before: () =&gt; { this.handlesActive = false },
+					after:  () =&gt; { this.handlesActive = true  }
+				},
+				highlightable: {
+					artefact: this,
+					effect: {
+						elements: this.corners[key].svg.overlay
+							  .add(this.borders[s1].svg.overlay)
+							  .add(this.borders[s2].svg.overlay)
+					}
+				}
+			});
+		}
+		
+		/* better corner accessibility */
+		this.corners::definePropertiesByValue({
+			top:    { left: this.corners.tl, right:  this.corners.tr },
+			right:  { top:  this.corners.tr, bottom: this.corners.br },
+			bottom: { left: this.corners.bl, right:  this.corners.br },
+			left:   { top:  this.corners.tl, bottom: this.corners.bl }
+		});
+		
+		/* bookkeeping */
+		let cornerPoints = {
+			tl: { x: -1, y: -1, r:   0 },
+			tr: { x: +1, y: -1, r:  90 },
+			br: { x: +1, y: +1, r: 180 },
+			bl: { x: -1, y: +1, r: 270 },
+		};
+		let borderPoints = {
+			top:    [cornerPoints.tl, cornerPoints.tr],
+			right:  [cornerPoints.tr, cornerPoints.br],
+			bottom: [cornerPoints.br, cornerPoints.bl],
+			left:   [cornerPoints.bl, cornerPoints.tl]
+		};
+		
+		/* keep outline updated */
+		Observable.combineLatest(
+			this.p(&apos;width&apos;),
+			this.p(&apos;height&apos;),
+			this.corners.tr.p(&apos;rounded&apos;),
+			this.corners.br.p(&apos;rounded&apos;),
+			this.corners.bl.p(&apos;rounded&apos;),
+			this.corners.tl.p(&apos;rounded&apos;)
+		).subscribe(([w, h]) =&gt; {
+			/* place the four corners */
+			for (let [key, cp] of cornerPoints::entries()) {
+				cp.p = new Point2D({
+					x:                cp.x * w / 2,
+					y:                cp.y * h / 2,
+					coordinateSystem: this.svg.outline
+				});
+				this.corners[key].transformation = ID_MATRIX.translate(...cp.p.xy).rotate(cp.r);
+			}
+			/* place the borders */
+			for (let [key, [{p:p1}, {p:p2}]] of borderPoints::entries()) {
+				this.borders[key].point1 = p1.in(this.svg.outline);
+				this.borders[key].point2 = p2.in(this.svg.outline);
+			}
+			
+			/* generate outline */
+			const top1    = this.borders.top   .inkPoint1;
+			const top2    = this.borders.top   .inkPoint2;
+			const right1  = this.borders.right .inkPoint1;
+			const right2  = this.borders.right .inkPoint2;
+			const bottom1 = this.borders.bottom.inkPoint1;
+			const bottom2 = this.borders.bottom.inkPoint2;
+			const left1   = this.borders.left  .inkPoint1;
+			const left2   = this.borders.left  .inkPoint2;
+			const cornerPath = (key) =&gt; {
+				const c = this.corners[key];
+				const s = BoxCorner.RADIUS;
+				const {x, y} = cornerPoints[key];
+				if (c.rounded) {
+					return `A ${s} ${s}, 0, 0, 0,`;
+				} else {
+					if (x*y === -1) { return `v ${y*s} L` }
+					else            { return `h ${x*s} L` }
+				}
+			};
+			$().add(inkPath)
+			   .add(handlePath)
+			   .add(overlayPath).attr({
+				d: `M
+					${left1.xy}   L ${left2.xy}   ${cornerPath(&apos;bl&apos;)}
+					${bottom1.xy} L ${bottom2.xy} ${cornerPath(&apos;br&apos;)}
+					${right1.xy}  L ${right2.xy}  ${cornerPath(&apos;tr&apos;)}
+					${top1.xy}    L ${top2.xy}    ${cornerPath(&apos;tl&apos;)}
+					${left1.xy}
+				Z`
+			});
+		});
+		
+		/* when parent changes, &apos;unstuck&apos; all borders */
+		this.p(&apos;parent&apos;).subscribe(() =&gt; {
+			this.stuckBorders = {};
+		});
+
+		
+		
+		
+		
+		
+		// this.p(&apos;stuckBorders&apos;).switchMap((stb) =&gt; {
+		//
+		// 	console.log(&apos;----&apos;, stb);
+		//
+		// 	if (!stb.left &amp;&amp; !stb.right &amp;&amp; !stb.top &amp;&amp; !stb.bottom) {
+		// 		return Observable.never();
+		// 	}
+		//
+		// 	let streams = {};
+		//
+		// 	for (let side of [&apos;left&apos;, &apos;right&apos;]) {
+		// 		if (stb[side]) {
+		// 			const {box, relation, x} = stb[side];
+		// 			if (relation === &apos;parent&apos;) {
+		// 				streams[side] = box.p(&apos;width&apos;).map(w =&gt; x * w/2);
+		// 			} else { // sibling
+		// 				streams[side] = box.p([&apos;width&apos;, &apos;transformation&apos;]).map(([w, t]) =&gt; t[MX] - x * w/2);
+		// 			}
+		// 		} else {
+		// 			streams[side] = Observable.of(null);
+		// 		}
+		// 	}
+		//
+		//
+		//
+		// 	// TODO: top, bottom
+		//
+		//
+		//
+		// 	const thisWX = this.p([&apos;width&apos;, &apos;transformation&apos;]).map(([w, t]) =&gt; [w, t[MX]]);
+		// 	const thisL  = thisWX.map(([w, x]) =&gt; x - w/2);
+		// 	const thisR  = thisWX.map(([w, x]) =&gt; x + w/2);
+		// 	return Observable
+		// 		.combineLatest(streams.left, streams.right)
+		// 		.withLatestFrom(thisL, thisR, ([l, r], tl, tr) =&gt; {
+		// 			console.log(l, r, tl, tr);
+		// 			if (l === null) { l = tl }
+		// 			if (r === null) { r = tr }
+		// 			return {
+		// 				x:    (l + r) / 2,
+		// 				width: r - l
+		// 			};
+		// 		});
+		// }).subscribe(({x, width}) =&gt; {
+		// 	console.log(x, width);
+		// 	this.transformation = ID_MATRIX.translate(x, this.transformation[MY]);
+		// 	this.width = w;
+		// });
+		
+		
+		
+		
+		
+		/* react to parent resizing when stuck to border */
+		this.p([&apos;width&apos;, &apos;height&apos;, &apos;parent.width&apos;, &apos;parent.height&apos;, &apos;stuckBorders&apos;]).subscribe(([w, h, pw, ph, stb]) =&gt; {
+			stb = [...stb::values()];
+			if (!stb || stb.length === 0) { return }
+			const stX = [...new Set(stb.map(({x}) =&gt; x))];
+			const stY = [...new Set(stb.map(({y}) =&gt; y))];
+			if (stX.length &gt; 1) { stX::pull(0) }
+			if (stY.length &gt; 1) { stY::pull(0) }
+			if (stX.length === 2) { w = pw }
+			if (stY.length === 2) { h = ph }
+			const [x, y] = [stX[0], stY[0]];
+			const oldX = this.transformation[MX];
+			const oldY = this.transformation[MY];
+			this.transformation = ID_MATRIX.translate(!x * oldX + x*(pw-w)/2, !y * oldY + y*(ph-h)/2).rotate(0);  // TODO
+			this.width  = w;
+			this.height = h;
+		});
+		
+		/* when stuck to borders, deactivate the appropriate outline handles */
+		this.p(&apos;stuckBorders&apos;).subscribe((stb) =&gt; {
+			// borders
+			this.borders.left.handlesActive   = !stb.left;
+			this.borders.right.handlesActive  = !stb.right;
+			this.borders.top.handlesActive    = !stb.top;
+			this.borders.bottom.handlesActive = !stb.bottom;
+			// corners
+			this.corners.tl.handlesActive = !stb.top    &amp;&amp; !stb.left;
+			this.corners.tr.handlesActive = !stb.top    &amp;&amp; !stb.right;
+			this.corners.bl.handlesActive = !stb.bottom &amp;&amp; !stb.left;
+			this.corners.br.handlesActive = !stb.bottom &amp;&amp; !stb.right;
+		});
+		
+	}
+	
+	postCreate(options = {}) {
+		/* set standard handlers */
+		this.registerHandlers({
+			movable:   {
+				artefact: this,
+				after: () =&gt; {
+					/* when dropped, reapply relevant border stucknesses */
+					this.stuckBorders = {...this.stuckBorders};
+				}
+			},
+			rotatable: {
+				artefact: this,
+				after: () =&gt; {
+					/* after rotating, reapply relevant border stucknesses */
+					//  which, if present, would undo rotation
+					this.stuckBorders = {...this.stuckBorders};
+					// TODO: simply disallow rotation when stuck
+				}
+			},
+			dropzone:  {
+				artefact: this,
+				after: ({artefact}) =&gt; {
+					artefact.parent = this;
+				}
+			},
+			drawzone: {
+				artefact: this,
+				accepts({ artefact }) {
+					return artefact instanceof SvgTransformable;
+				}
+			},
+			highlightable: {
+				artefact: this,
+				effect: { elements: this.svg.overlay }
+			},
+			deletable: {
+				artefact: this
+			}
+		});
+		
+		/***/
+		super.postCreate(options);
+	}
+	
+}
+</code></pre>
+
+</div>
+
+<footer class="footer">
+  Generated by <a href="https://esdoc.org">ESDoc<span data-ice="esdocVersion">(0.5.2)</span><img src="./image/esdoc-logo-mini-black.png"></a>
+</footer>
+
+<script src="script/search_index.js"></script>
+<script src="script/search.js"></script>
+<script src="script/pretty-print.js"></script>
+<script src="script/inherited-summary.js"></script>
+<script src="script/test-summary.js"></script>
+<script src="script/inner-link.js"></script>
+<script src="script/patch-for-local.js"></script>
+</body>
+</html>

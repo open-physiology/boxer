@@ -3,6 +3,9 @@ import {handleBoxer} from '../Coach.js';
 import {MouseTool} from './MouseTool';
 
 
+/**
+ * A tool for handling clicks on artefacts. Answers to the 'clickable' handler.
+ */
 export class ClickTool extends MouseTool {
 	
 	init({ coach }) {

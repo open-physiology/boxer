@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <base data-ice="baseUrl" href="../../">
+  <title data-ice="title">artefacts/LineSegment.js | API Document</title>
+  <link type="text/css" rel="stylesheet" href="css/style.css">
+  <link type="text/css" rel="stylesheet" href="css/prettify-tomorrow.css">
+  <script src="script/prettify/prettify.js"></script>
+  
+  
+  <script src="script/manual.js"></script>
+</head>
+<body class="layout-container" data-ice="rootContainer">
+
+<header>
+  <a href="./">Home</a>
+  
+  <a href="identifiers.html">Reference</a>
+  <a href="source.html">Source</a>
+  <a href="test.html" data-ice="testLink">Test</a>
+  <a data-ice="repoURL" href="https://github.com/open-physiology/boxer" class="repo-url-github">Repository</a>
+  <div class="search-box">
+  <span>
+    <img src="./image/search.png">
+    <span class="search-input-edge"></span><input class="search-input"><span class="search-input-edge"></span>
+  </span>
+    <ul class="search-result"></ul>
+  </div>
+</header>
+
+<nav class="navigation" data-ice="nav"><div>
+  <ul>
+    
+  <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/artefacts/Box.js~Box.html">Box</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/artefacts/BoxBorder.js~BoxBorder.html">BoxBorder</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/artefacts/BoxCorner.js~BoxCorner.html">BoxCorner</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/artefacts/Canvas.js~Canvas.html">Canvas</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/artefacts/Edge.js~Edge.html">Edge</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/artefacts/Glyph.js~Glyph.html">Glyph</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/artefacts/LineSegment.js~LineSegment.html">LineSegment</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/artefacts/SvgArtefact.js~SvgArtefact.html">SvgArtefact</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/artefacts/SvgTransformable.js~SvgTransformable.html">SvgTransformable</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-BORDER_WIDTH">BORDER_WIDTH</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-MIN_MIN_SIZE">MIN_MIN_SIZE</a></span></span></li>
+</ul>
+</div>
+</nav>
+
+<div class="content" data-ice="content"><h1 data-ice="title">artefacts/LineSegment.js</h1>
+<pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">import $      from &apos;../libs/jquery.js&apos;;
+import {isBoolean as _isBoolean, isNumber as _isNumber} from &apos;lodash&apos;;
+
+import {Point2D}  from &apos;../util/svg.js&apos;;
+import {property} from &apos;utilities&apos;;
+
+const {max} = Math;
+
+import {SvgArtefact} from &apos;./SvgArtefact.js&apos;;
+
+/**
+ * Representation of an interactive line segment in svg space.
+ */
+export class LineSegment extends SvgArtefact {
+	
+	@property({ isValid: v =&gt; v instanceof Point2D }) point1;
+	@property({ isValid: v =&gt; v instanceof Point2D }) point2;
+	@property({ isValid: _isNumber, initial: 0     }) lengthen1;
+	@property({ isValid: _isNumber, initial: 0     }) lengthen2;
+	
+	preCreate(options = {}) {
+		super.preCreate(options);
+		
+		if (options.point1)    { this.point1    = options.point1.in(this.parent.svg.children) }
+		if (options.point2)    { this.point2    = options.point2.in(this.parent.svg.children) }
+		if (options.lengthen1) { this.lengthen1 = options.lengthen1                           }
+		if (options.lengthen2) { this.lengthen2 = options.lengthen2                           }
+		
+		/* smoothly transitioning to a new coordinateSystem */
+		this.p(&apos;parent&apos;).filter(p=&gt;p).subscribe((parent) =&gt; {
+			if (this.point1 &amp;&amp; this.point2) {
+				this.point1 = this.point1.in(parent.svg.children);
+				this.point2 = this.point2.in(parent.svg.children);
+			}
+		});
+	}
+	
+	create(options = {}) {
+		
+		const inkLine = $.svg(&apos;&lt;line&gt;&apos;).css({
+			stroke:           &apos;inherit&apos;,
+			strokeWidth:      &apos;inherit&apos;,
+			strokeDasharray:  &apos;inherit&apos;,
+			strokeDashoffset: &apos;inherit&apos;
+		}).appendTo(this.svg.ink);
+		
+		const overlayLine = $.svg(&apos;&lt;line&gt;&apos;).css({
+			stroke:           &apos;inherit&apos;,
+			strokeWidth:      &apos;inherit&apos;,
+			strokeDasharray:  &apos;inherit&apos;,
+			strokeDashoffset: &apos;inherit&apos;
+		}).appendTo(this.svg.overlay);
+		
+		const handleLine = $.svg(&apos;&lt;line&gt;&apos;).css({
+			strokeWidth: &apos;inherit&apos;,
+		}).appendTo(this.svg.handles);
+		
+		this.p([&apos;parent&apos;, &apos;point1&apos;, &apos;point2&apos;, &apos;lengthen1&apos;, &apos;lengthen2&apos;])
+		    .filter(([parent, p1, p2]) =&gt; parent &amp;&amp; p1 &amp;&amp; p2)
+		    .subscribe(([parent, p1, p2, l1, l2]) =&gt; {
+				p1 = p1.in(parent.svg.children);
+				p2 = p2.in(parent.svg.children);
+				$().add(inkLine)
+				   .add(overlayLine)
+				   .add(handleLine)
+				   .attr({
+						...p1.withDistanceTo(-l2, p2).obj(&apos;x1&apos;, &apos;y1&apos;),
+						...p2.withDistanceTo(-l1, p1).obj(&apos;x2&apos;, &apos;y2&apos;)
+					});
+			});
+		
+		
+	}
+	
+	get inkPoint1() {
+		return this.point1.withDistanceTo(-this.lengthen2, this.point2);
+	}
+	
+	get inkPoint2() {
+		return this.point2.withDistanceTo(-this.lengthen1, this.point1);
+	}
+	
+}
+</code></pre>
+
+</div>
+
+<footer class="footer">
+  Generated by <a href="https://esdoc.org">ESDoc<span data-ice="esdocVersion">(0.5.2)</span><img src="./image/esdoc-logo-mini-black.png"></a>
+</footer>
+
+<script src="script/search_index.js"></script>
+<script src="script/search.js"></script>
+<script src="script/pretty-print.js"></script>
+<script src="script/inherited-summary.js"></script>
+<script src="script/test-summary.js"></script>
+<script src="script/inner-link.js"></script>
+<script src="script/patch-for-local.js"></script>
+</body>
+</html>

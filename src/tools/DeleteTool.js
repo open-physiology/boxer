@@ -8,6 +8,9 @@ import {match} from 'utilities';
 const {min, max, floor, PI} = Math;
 
 
+/**
+ * A tool for deleting artefacts on click. Answers to the 'deletable' handler.
+ */
 export class DeleteTool extends MouseTool {
 	
 	/* 'selectable' related highlighting */

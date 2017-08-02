@@ -1,24 +1,22 @@
-import assert from 'power-assert';
 import $      from '../libs/jquery.js';
 import {isBoolean as _isBoolean, isNumber as _isNumber} from 'lodash';
 
-import {ID_MATRIX, ID_POINT, SVGMatrix, setCTM, Point2D} from '../util/svg.js';
-import {property, flag} from 'utilities';
-import {_isNonNegative} from '../util/misc.js';
+import {Point2D}  from '../util/svg.js';
+import {property} from 'utilities';
 
 const {max} = Math;
 
 import {SvgArtefact} from './SvgArtefact.js';
 
 /**
- * Representation of an interactive rectangle in svg space.
+ * Representation of an interactive line segment in svg space.
  */
 export class LineSegment extends SvgArtefact {
 	
-	@property({ isValid: v => v instanceof Point2D, initial: ID_POINT }) point1;
-	@property({ isValid: v => v instanceof Point2D, initial: ID_POINT }) point2;
-	@property({ isValid: _isNumber,                 initial: 0        }) lengthen1;
-	@property({ isValid: _isNumber,                 initial: 0        }) lengthen2;
+	@property({ isValid: v => v instanceof Point2D }) point1;
+	@property({ isValid: v => v instanceof Point2D }) point2;
+	@property({ isValid: _isNumber, initial: 0     }) lengthen1;
+	@property({ isValid: _isNumber, initial: 0     }) lengthen2;
 	
 	preCreate(options = {}) {
 		super.preCreate(options);

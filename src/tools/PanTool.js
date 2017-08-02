@@ -26,6 +26,10 @@ const MODES = [
 	DRAWING_EDGES
 ];
 
+
+/**
+ * A tool for panning the main canvas using drag-and-drop.
+ */
 export class PanTool extends MouseTool {
 	
 	init({coach}) {

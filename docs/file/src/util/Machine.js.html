@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <base data-ice="baseUrl" href="../../../">
+  <title data-ice="title">src/util/Machine.js | API Document</title>
+  <link type="text/css" rel="stylesheet" href="css/style.css">
+  <link type="text/css" rel="stylesheet" href="css/prettify-tomorrow.css">
+  <script src="script/prettify/prettify.js"></script>
+  
+  
+  <script src="script/manual.js"></script>
+</head>
+<body class="layout-container" data-ice="rootContainer">
+
+<header>
+  <a href="./">Home</a>
+  
+  <a href="identifiers.html">Reference</a>
+  <a href="source.html">Source</a>
+  <a href="test.html" data-ice="testLink">Test</a>
+  <a data-ice="repoURL" href="https://github.com/open-physiology/boxer" class="repo-url-github">Repository</a>
+  <div class="search-box">
+  <span>
+    <img src="./image/search.png">
+    <span class="search-input-edge"></span><input class="search-input"><span class="search-input-edge"></span>
+  </span>
+    <ul class="search-result"></ul>
+  </div>
+</header>
+
+<nav class="navigation" data-ice="nav"><div>
+  <ul>
+    
+  <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/Coach.js~Coach.html">Coach</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-elementController">elementController</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-handleBoxer">handleBoxer</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">artefacts</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/artefacts/Box.js~Box.html">Box</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/artefacts/BoxBorder.js~BoxBorder.html">BoxBorder</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/artefacts/BoxCorner.js~BoxCorner.html">BoxCorner</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/artefacts/Canvas.js~Canvas.html">Canvas</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/artefacts/Edge.js~Edge.html">Edge</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/artefacts/Glyph.js~Glyph.html">Glyph</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/artefacts/LineSegment.js~LineSegment.html">LineSegment</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/artefacts/SvgArtefact.js~SvgArtefact.html">SvgArtefact</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/artefacts/SvgTransformable.js~SvgTransformable.html">SvgTransformable</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-BORDER_WIDTH">BORDER_WIDTH</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-MIN_MIN_SIZE">MIN_MIN_SIZE</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">handlers</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/handlers/Handler.js~Handler.html">Handler</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">tools</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/tools/ClickTool.js~ClickTool.html">ClickTool</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/tools/DeleteTool.js~DeleteTool.html">DeleteTool</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/tools/DrawTool.js~DrawTool.html">DrawTool</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/tools/GlobalBehaviorTool.js~GlobalBehaviorTool.html">GlobalBehaviorTool</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/tools/HelperTool.js~HelperTool.html">HelperTool</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/tools/HighlightTool.js~HighlightTool.html">HighlightTool</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/tools/MouseCursorTool.js~MouseCursorTool.html">MouseCursorTool</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/tools/MouseTool.js~MouseTool.html">MouseTool</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/tools/MoveTool.js~MoveTool.html">MoveTool</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/tools/PanTool.js~PanTool.html">PanTool</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/tools/ResizeTool.js~ResizeTool.html">ResizeTool</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/tools/RotateTool.js~RotateTool.html">RotateTool</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/tools/SelectTool.js~SelectTool.html">SelectTool</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/tools/Tool.js~Tool.html">Tool</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/tools/ZoomTool.js~ZoomTool.html">ZoomTool</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">util</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/util/Machine.js~Machine.html">Machine</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/util/svg.js~Point2D.html">Point2D</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/util/svg.js~Vector2D.html">Vector2D</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-callIfFunction">callIfFunction</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-emitWhenComplete">emitWhenComplete</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-sineWave">sineWave</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-strictSubclassOf">strictSubclassOf</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-subclassOf">subclassOf</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-withLatestFrom">withLatestFrom</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getCTM">getCTM</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-matrixEquals">matrixEquals</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-moveToFront">moveToFront</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-rotateAroundPoint">rotateAroundPoint</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-scaleFromPoint">scaleFromPoint</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-setCTM">setCTM</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-snap45">snap45</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-animationFrames">animationFrames</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-ID_MATRIX">ID_MATRIX</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-M11">M11</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-M12">M12</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-M21">M21</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-M22">M22</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-MX">MX</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-MY">MY</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-ORIG_POINT">ORIG_POINT</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-SVGMatrix">SVGMatrix</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-SVGPoint">SVGPoint</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-MachineLink">MachineLink</a></span></span></li>
+</ul>
+</div>
+</nav>
+
+<div class="content" data-ice="content"><h1 data-ice="title">src/util/Machine.js</h1>
+<pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">import {isArray, isUndefined, isString, toPairs} from &apos;lodash-bound&apos;;
+import {ValueTracker, property} from &apos;utilities&apos;;
+
+
+/**
+ * A finite state machine in which state transitions are controlled by
+ * observables which are only active in specific states.
+ */
+export default class Machine extends ValueTracker {
+	
+	/**
+	 * the current state
+	 * @type {string}
+	 */
+	@property({ initial: null }) state;
+	
+	/**
+	 * the data belonging to the current state
+	 * @type {*}
+	 */
+	@property({ initial: null }) data;
+	
+	/**
+	 * the name of this state machine, used for log output
+	 * @type {?string}
+	 */
+	name = null;
+	
+	/**
+	 * the currently active (state-specific) observable subscriptions
+	 * @type {Array&lt;Rx.Subscription&gt;}
+	 * @private
+	 */
+	_subscriptions = [];
+	
+	/**
+	 * Create a new finite state machine.
+	 * @param {string} name - the name of the state machine
+	 * @param {Object} options
+	 * @param {string} options.state - the initial state
+	 * @param {*}      options.data  - the initial state data
+	 * @param {?Function|true} options.log   - the function to which to record log messages
+	 */
+	constructor(name, options) {
+		super();
+		const {state, data, log} = options;
+		this.name  = name;
+		this.state = state;
+		this.data  = data;
+		if (log === true)         { this.log = ::console.info }
+		else if (log::isString()) { this.log = ::console[log] }
+		else                      { this.log = ()=&gt;{}         }
+	}
+	
+	/**
+	 * a description of how arrival to a certain state in some other machine leads to a specific state transition in this machine;
+	 * the format is `[&apos;stateBefore&apos;, otherMachine.e(&apos;newState&apos;), &apos;stateAfter&apos;]`
+	 * @typedef {[string, Observable, string]} MachineLink
+	 */
+	
+	/**
+	 * Link a state transition in one machine to a state transition in another.
+	 * @param {...(Array&lt;MachineLink&gt;|MachineLink)} links
+	 * @return {Machine}
+	 */
+	link(...links) {
+		if (!links[0]::isArray()) { links = [links] }
+		for (let [localState1, otherState, localState2] of links) {
+			this.extend(({ enterState }) =&gt; ({
+				[localState1]: () =&gt; {
+					otherState::enterState(localState2)
+				}
+			}));
+		}
+		/* return machine itself */
+		return this;
+	}
+	
+	/**
+	 * Extend this machine with additional states, behavior and/or transitions.
+	 * @param {Function} descFn - a function that should return an object mapping state-names
+	 *                            to functions that may (asynchronously, conditionally) initiate
+	 *                            new state transitions in turn. It is passed an object with the
+	 *                            `enterState` and `subscribeDuringState`. Use the former to enter
+	 *                            new states (can also be bound to an observable). Bind the latter
+	 *                            to an `Observable` instead of using `.subscribe` from within a
+	 *                            machine state, so it is automatically unsubscribed at a state-
+	 *                            transition.
+	 * @param {function (): boolean} [runCondition] - a function that should dynamically indicate
+	 *                                                whether the machine is currently active;
+	 *                                                if omitted, assumes the machine is always active
+	 */
+	extend(descFn, runCondition = ()=&gt;true) {
+		/* define bound convenience functions */
+		const thisMachine = this;
+		const boundFunctions = {
+			enterState(nextState, data) {
+				if (this::isUndefined()) {
+					return thisMachine.enterState(nextState, data);
+				} else {
+					return this::(boundFunctions.subscribeDuringState)((data) =&gt; {
+						thisMachine.enterState(nextState, data);
+					});
+				}
+			},
+			subscribeDuringState(...args) {
+				const sub = this.subscribe(...args);
+				thisMachine._subscriptions.push(sub);
+				return sub;
+			}
+		};
+		/* extend descriptions */
+		let result = descFn(boundFunctions);
+		let subscribers = [];
+		for (let [key, fn] of result::toPairs()) {
+			if (this[key]::isUndefined()) {
+				this[key] = this.newEvent(key);
+			}
+			const subscriber = this.e(key).filter(runCondition).subscribe((data) =&gt; {
+				this._runStateSpecificCode(fn);
+			});
+			subscribers.push(subscriber);
+		}
+		/* run if it says something about the current state */
+		if (this.state in result &amp;&amp; runCondition()) {
+			this._runStateSpecificCode(result[this.state]);
+		}
+		/* return a way to undo the extension */
+		return () =&gt; {
+			for (const sub of subscribers) {
+				sub.unsubscribe();
+			}
+		};
+	}
+	
+	/**
+	 * Unsubscribe from all currently registered `Observable` subscriptions.
+	 */
+	unsubscribe() {
+		for (let sub of this._subscriptions.reverse()) {
+			sub.unsubscribe();
+		}
+		this._subscriptions = [];
+	}
+	
+	/**
+	 * Enter a new machine state.
+	 * @param {string} state - the new state
+	 * @param {*}      data  - data to send to the new state
+	 */
+	enterState(state, data) {
+		this.unsubscribe();
+		this.log(`${this.name} - entering state: &apos;${state}&apos;`, [data]);
+		[this.state, this.data] = [state, data];
+		this.e(state).next(data);
+	}
+	
+	/**
+	 * Run the code associated with transition to some specific state.
+	 * Running it through this method keeps track of subscriptions returned from it.
+	 * @param {function(*):(void|Rx.Subscription|Array&lt;Rx.Subscription&gt;)} specifiedStateFn - the code to run
+	 * @private
+	 */
+	_runStateSpecificCode(specifiedStateFn) {
+		let newSubscriptions = specifiedStateFn(this.data);
+		if (newSubscriptions::isUndefined()) { newSubscriptions = []                 }
+		if (!newSubscriptions::isArray())    { newSubscriptions = [newSubscriptions] }
+		this._subscriptions.push(...newSubscriptions);
+	}
+	
+};
+</code></pre>
+
+</div>
+
+<footer class="footer">
+  Generated by <a href="https://esdoc.org">ESDoc<span data-ice="esdocVersion">(0.5.2)</span><img src="./image/esdoc-logo-mini-black.png"></a>
+</footer>
+
+<script src="script/search_index.js"></script>
+<script src="script/search.js"></script>
+<script src="script/pretty-print.js"></script>
+<script src="script/inherited-summary.js"></script>
+<script src="script/test-summary.js"></script>
+<script src="script/inner-link.js"></script>
+<script src="script/patch-for-local.js"></script>
+</body>
+</html>

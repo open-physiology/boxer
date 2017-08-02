@@ -6,6 +6,11 @@ import {scaleFromPoint} from "../util/svg";
 
 const {pow} = Math;
 
+
+/**
+ * A tool to zoom in and out on the main canvas using the scrollwheel,
+ * centered around the current mouse-position.
+ */
 export class ZoomTool extends Tool {
 	
 	@property({ initial: 0.004             }) sensitivity;

@@ -13,6 +13,10 @@ import {callIfFunction} from '../util/misc';
 import Machine from '../util/Machine';
 
 
+/**
+ * A tool for moving artefacts around, and in and out of other artefacts,
+ * using drag-and-drop.
+ */
 export class MoveTool extends MouseTool {
 	
 	init({ coach }) {
@@ -64,7 +68,7 @@ export class MoveTool extends MouseTool {
 				mousemove::subscribeDuringState((moveEvent) => {
 					let mouseVector = moveEvent.point.in(artefact.svg.children);
 					if (referencePoint && moveEvent.ctrlKey) {
-						mouseVector = snap45(mouseVector, artefact, referencePoint);
+						mouseVector = mouseVector::snap45(referencePoint);
 					}
 					let translationDiff = mouseVector.minus(point);
 					artefact.transformation = transformationStart
@@ -72,6 +76,7 @@ export class MoveTool extends MouseTool {
 				});
 				
 				/* cancel or stop dragging */
+				// TODO: don't use exceptions for cancellation; separate it from the concept of dropping
 				Observable.merge(
 					escaping
 						.concatMap(Observable.throw()),
@@ -84,17 +89,11 @@ export class MoveTool extends MouseTool {
 					cancel::callIfFunction(args);
 					return Observable.of({});
                 }).do(({point}) => {
-					// try {
-						/* stop dragging */
-						artefact.handlesActive = true;
-						artefact.moveToFront();
-						coach.selectTool.reacquire(point);
-						after::callIfFunction(args);
-						
-					// 	console.log('(((DRAGGING -> IDLE)))');
-					// } catch (err) {
-					// 	console.error(err);
-					// }
+					/* stop dragging */
+					artefact.handlesActive = true;
+					artefact.moveToFront();
+					coach.selectTool.reacquire(point);
+					after::callIfFunction(args);
 				})::enterState('IDLE');
 				
 			}

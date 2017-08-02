@@ -19,7 +19,6 @@ export class Handler {
 	constructor() {
 	}
 	
-	
 	register(obj) {
 		this::mergeWith(obj, (val1, val2, key) => {
 			if (val1::isFunction()) {

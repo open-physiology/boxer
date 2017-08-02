@@ -12,7 +12,7 @@ import {Subject} from 'rxjs';
 
 import Machine from '../src/util/Machine';
 
-/** @test */
+/** @test Machine */
 describe("Machine state machine", () => {
 	
 	let machine1, subject1_1, subject1_2, values1;
@@ -33,7 +33,7 @@ describe("Machine state machine", () => {
 		}));
 	});
 	
-	/** @test */
+	/** @test Machine#extend */
 	it("can move from state to state", () => {
 		expect(machine1.state).to.equal('STATE_1');
 		expect(values1).to.deep.equal([ undefined ]);
@@ -80,7 +80,7 @@ describe("Machine state machine", () => {
 	});
 	
 	
-	/** @test */
+	/** @test Machine#link */
 	it("can link states from multiple state machines", () => {
 		
 		machine2.link(

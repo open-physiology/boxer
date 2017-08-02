@@ -1,31 +1,38 @@
 {
-  "name": "project-template",
-  "version": "0.1.0",
-  "description": "Templates for starting new open-physiology projects",
-  "main": "dist/index.js",
+  "name": "boxer",
+  "version": "0.8.0",
+  "description": "library for rendering interactive, nestable, transforming svg boxes",
+  "main": "src",
   "scripts": {
-    "test":       "mocha-webpack --opts mocha-webpack.opts",
-    "build":      "cross-env BABEL_ENV=production webpack",
-    "docs":       "esdoc",
-    "everything": "npm test && npm run build && npm run docs"
+    "test": "mocha-webpack --opts mocha-webpack.opts",
+    "build": "cross-env BABEL_ENV=production webpack",
+    "docs": "esdoc",
+    "everything": "npm test && npm run build && npm run docs",
+    "watch": "webpack --progress --watch",
+    "dev-server": "webpack-dev-server --open --hot --config webpack.config-dev.js"
   },
+  "authors": [
+    "Michiel Helvensteijn <mhelvens@gmail.com>"
+  ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/open-physiology/project-template.git"
+    "url": "git+https://github.com/open-physiology/boxer.git"
   },
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/open-physiology/project-template/issues"
+    "url": "https://github.com/open-physiology/boxer/issues"
   },
-  "homepage": "https://github.com/open-physiology/project-template#readme",
+  "homepage": "https://github.com/open-physiology/boxer#readme",
   "devDependencies": {
     "babel-cli": "6",
     "babel-core": "6",
     "babel-loader": "6",
     "babel-plugin-angular2-annotations": "5",
     "babel-plugin-espower": "2",
+    "babel-plugin-remove-decorator": "github:mhelvens/babel-plugin-remove-decorator#with-built-file",
     "babel-plugin-syntax-flow": "6",
     "babel-plugin-transform-async-to-generator": "6",
+    "babel-plugin-transform-builtin-extend": "1",
     "babel-plugin-transform-class-properties": "6",
     "babel-plugin-transform-decorators-legacy": "1",
     "babel-plugin-transform-es2015-instanceof": "6",
@@ -35,6 +42,7 @@
     "babel-plugin-transform-strict-mode": "6",
     "babel-plugin-typecheck": "3",
     "babel-plugin-unassert": "2",
+    "babel-plugin-unwrap-wrapper-function": "github:mhelvens/babel-plugin-unwrap-wrapper-function",
     "babel-polyfill": "6",
     "babel-preset-es2015": "6",
     "chai": "3",
@@ -47,32 +55,36 @@
     "esdoc-babel-plugin": "0.1",
     "file-loader": "0.11",
     "html-webpack-plugin": "2.28",
-    "json-stringify-safe": "5",
     "mocha": "2",
     "mocha-webpack": "0.5",
     "npm-cli": "0.1",
-    "polyfill-function-prototype-bind": "0.0.1",
+    "polyfill-function-prototype-bind": "0.0",
     "power-assert": "1",
     "sinon": "1",
     "sinon-chai": "2",
     "source-map-support": "0.4",
     "url-loader": "0.5",
     "webpack": "2",
+    "webpack-dev-server": "2",
     "webpack-node-externals": "1.5"
   },
   "dependencies": {
-    "utilities": "open-physiology/utilities",
-    "bound-native-methods": "0.1",
-    "deep-freeze-strict": "1",
-    "lodash-bound": "1",
-    "rxjs": "5",
-    "@angular/common": "2",
-    "@angular/compiler": "2",
-    "@angular/core": "2",
-    "@angular/platform-browser": "2",
-    "@angular/platform-browser-dynamic": "2",
-    "@angular/router": "3",
     "babel-polyfill": "6",
+    "bound-native-methods": "0.1",
+    "cssprefix": "2",
+    "deep-freeze-strict": "1",
+    "file-saver": "1",
+    "gsap": "1",
+    "jquery": "3",
+    "jquery-mousewheel": "3",
+    "keycode-js": "0.0",
+    "lodash": "4",
+    "lodash-bound": "1",
+    "open-physiology-manifest": "open-physiology/open-physiology-manifest",
+    "open-physiology-model": "open-physiology/open-physiology-model",
+    "rxcss": "0.9",
+    "rxjs": "5",
+    "utilities": "open-physiology/utilities",
     "zone.js": "0.7"
   }
 }

@@ -32,6 +32,11 @@ const MODES = [
 	DRAWING_EDGES
 ];
 
+/**
+ * A tool for drawing new artefacts inside existing artefacts.
+ * It can draw inside artefacts with the 'drawzone' handler, and
+ * parameters on what to draw can be configured directly.
+ */
 export class DrawTool extends MouseTool {
 	
 	static DRAWING_BOX   = DRAWING_BOX;

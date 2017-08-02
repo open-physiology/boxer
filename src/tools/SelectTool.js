@@ -6,6 +6,14 @@ import {withMod} from 'utilities';
 import {elementController} from '../Coach';
 import {Point2D} from '../util/svg';
 
+
+/**
+ * A tool that keeps track of which artefact is 'selected'. That is,
+ * which artefact has the mouse currently pointing at it, but also
+ * taking other factors into account. For example, the selection
+ * can be shifted along the artefact nesting hierarchy by using the
+ * scroll-wheel while ALT is pressed.
+ */
 export class SelectTool extends Tool {
 	
 	init({coach}) {
