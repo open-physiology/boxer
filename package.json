@@ -1,6 +1,6 @@
 {
   "name": "boxer",
-  "version": "0.8.0",
+  "version": "0.9.0",
   "description": "library for rendering interactive, nestable, transforming svg boxes",
   "main": "src",
   "scripts": {
