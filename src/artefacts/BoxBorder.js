@@ -24,5 +24,4 @@ export class BoxBorder extends LineSegment {
 		this.side = args.side;
 	}
 	
-	
 }

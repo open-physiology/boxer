@@ -5,11 +5,11 @@ const {floor} = Math;
 
 const $$values = Symbol('$$values');
 
+/**
+ * An abstract class for defining tools that activate or deactivate
+ * exclusive behaviors on screen based on observables.
+ */
 export class GlobalBehaviorTool extends Tool {
-	
-	init({coach}) {
-		super.init({ coach, events: ['mouseleave', 'mouseover'] });
-	}
 	
 	register(condition, patternStream) {
 		let active;
@@ -66,100 +66,3 @@ export class GlobalBehaviorTool extends Tool {
 	}
 	
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// export class GlobalBehaviorTool extends Tool {
-//
-//
-// 	register(states, handlerTypes, condition, getValue) {
-// 		for (let state of states) for (let handlerType of handlerTypes) {
-// 			if (!this[$$values])                     { this[$$values]                     = {} }
-// 			if (!this[$$values][state])              { this[$$values][state]              = {} }
-// 			if (!this[$$values][state][handlerType]) { this[$$values][state][handlerType] = [] }
-// 			this[$$values][state][handlerType].push({ condition, getValue });
-// 		}
-// 	}
-//
-//
-// 	init({coach}) {
-// 		super.init({ coach, events: ['mouseleave', 'mouseover'] });
-// 	}
-//
-// 	activateGlobalBehavior() {} // override
-// 	activateLocalBehavior () {} // override
-//
-// 	postInit({coach}) {
-//
-// 		/* keeping track of the current cursor */
-// 		let cValue       = '';
-// 		let cState       = '';
-// 		let cHandlerType = null;
-// 		let cHandler     = null;
-// 		const activate = (v, s, handler, methods = [
-// 			'activateGlobalBehavior',
-// 		    'activateLocalBehavior'
-// 		]) => {
-// 			if (v::isUndefined()) { return }
-// 			cValue       = v;
-// 			cState       = s;
-// 			cHandler     = handler || null;
-// 			cHandlerType = handler ? handler.handlerType : null;
-// 			for (let method of methods) {
-// 				this[method]({ ...handler, value: cValue });
-// 			}
-// 		};
-//
-// 		function firstAvailable(values, handler) {
-// 			for (let {condition, getValue} of values) {
-// 				if (condition(handler)) { return getValue(handler) }
-// 			}
-// 		}
-//
-// 		/* configure the state machine */
-// 		for (let [state, valuesByHandlerType] of this[$$values]::entries()) {
-// 			coach.stateMachine.extend(({ enterState, subscribeDuringState }) => ({
-// 				[state]: (handler) => {
-// 					for (let [handlerType, values] of valuesByHandlerType::entries()) {
-// 						if (values.length === 0) { continue }
-// 						if (handlerType === '*' || handler && handlerType === handler.handlerType) {
-// 							activate(firstAvailable(values, handler), state, handler);
-// 						} else if (handlerType === cHandlerType) {
-// 							activate(firstAvailable(values, cHandler), state, cHandler);
-// 						}
-// 						this.e('mouseover') // not 'mouseenter'
-// 						    .do(stopPropagation)
-// 							::handleBoxer(handlerType)
-// 							::subscribeDuringState((handler) => {
-// 								activate(firstAvailable(values, handler), state, handler);
-// 							});
-// 						this.e('mouseleave')
-// 						    .do(stopPropagation)
-// 							::handleBoxer(handlerType)
-// 							::subscribeDuringState((handler) => {
-// 								if (cState === state && cHandlerType === handler.handlerType) {
-// 									activate(null, state, handler, ['activateGlobalBehavior']);
-// 								}
-// 								if (cHandler && cHandler.artefact === handler.artefact) {
-// 									activate(null, state, handler, ['activateLocalBehavior']);
-// 								}
-// 							});
-// 					}
-// 				}
-// 			}), () => this.active);
-// 		}
-//
-// 	}
-//
-// }

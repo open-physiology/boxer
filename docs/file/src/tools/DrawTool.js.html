@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <base data-ice="baseUrl" href="../../../">
+  <title data-ice="title">src/tools/DrawTool.js | API Document</title>
+  <link type="text/css" rel="stylesheet" href="css/style.css">
+  <link type="text/css" rel="stylesheet" href="css/prettify-tomorrow.css">
+  <script src="script/prettify/prettify.js"></script>
+  
+  
+  <script src="script/manual.js"></script>
+</head>
+<body class="layout-container" data-ice="rootContainer">
+
+<header>
+  <a href="./">Home</a>
+  
+  <a href="identifiers.html">Reference</a>
+  <a href="source.html">Source</a>
+  <a href="test.html" data-ice="testLink">Test</a>
+  <a data-ice="repoURL" href="https://github.com/open-physiology/boxer" class="repo-url-github">Repository</a>
+  <div class="search-box">
+  <span>
+    <img src="./image/search.png">
+    <span class="search-input-edge"></span><input class="search-input"><span class="search-input-edge"></span>
+  </span>
+    <ul class="search-result"></ul>
+  </div>
+</header>
+
+<nav class="navigation" data-ice="nav"><div>
+  <ul>
+    
+  <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/Coach.js~Coach.html">Coach</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-elementController">elementController</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-handleBoxer">handleBoxer</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">artefacts</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/artefacts/Box.js~Box.html">Box</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/artefacts/BoxBorder.js~BoxBorder.html">BoxBorder</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/artefacts/BoxCorner.js~BoxCorner.html">BoxCorner</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/artefacts/Canvas.js~Canvas.html">Canvas</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/artefacts/Edge.js~Edge.html">Edge</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/artefacts/Glyph.js~Glyph.html">Glyph</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/artefacts/LineSegment.js~LineSegment.html">LineSegment</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/artefacts/SvgArtefact.js~SvgArtefact.html">SvgArtefact</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/artefacts/SvgTransformable.js~SvgTransformable.html">SvgTransformable</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-BORDER_WIDTH">BORDER_WIDTH</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-MIN_MIN_SIZE">MIN_MIN_SIZE</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">handlers</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/handlers/Handler.js~Handler.html">Handler</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">tools</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/tools/ClickTool.js~ClickTool.html">ClickTool</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/tools/DeleteTool.js~DeleteTool.html">DeleteTool</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/tools/DrawTool.js~DrawTool.html">DrawTool</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/tools/GlobalBehaviorTool.js~GlobalBehaviorTool.html">GlobalBehaviorTool</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/tools/HelperTool.js~HelperTool.html">HelperTool</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/tools/HighlightTool.js~HighlightTool.html">HighlightTool</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/tools/MouseCursorTool.js~MouseCursorTool.html">MouseCursorTool</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/tools/MouseTool.js~MouseTool.html">MouseTool</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/tools/MoveTool.js~MoveTool.html">MoveTool</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/tools/PanTool.js~PanTool.html">PanTool</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/tools/ResizeTool.js~ResizeTool.html">ResizeTool</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/tools/RotateTool.js~RotateTool.html">RotateTool</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/tools/SelectTool.js~SelectTool.html">SelectTool</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/tools/Tool.js~Tool.html">Tool</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/tools/ZoomTool.js~ZoomTool.html">ZoomTool</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">util</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/util/Machine.js~Machine.html">Machine</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/util/svg.js~Point2D.html">Point2D</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/util/svg.js~Vector2D.html">Vector2D</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-callIfFunction">callIfFunction</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-emitWhenComplete">emitWhenComplete</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-sineWave">sineWave</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-strictSubclassOf">strictSubclassOf</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-subclassOf">subclassOf</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-withLatestFrom">withLatestFrom</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getCTM">getCTM</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-matrixEquals">matrixEquals</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-moveToFront">moveToFront</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-rotateAroundPoint">rotateAroundPoint</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-scaleFromPoint">scaleFromPoint</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-setCTM">setCTM</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-snap45">snap45</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-animationFrames">animationFrames</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-ID_MATRIX">ID_MATRIX</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-M11">M11</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-M12">M12</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-M21">M21</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-M22">M22</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-MX">MX</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-MY">MY</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-ORIG_POINT">ORIG_POINT</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-SVGMatrix">SVGMatrix</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-SVGPoint">SVGPoint</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-MachineLink">MachineLink</a></span></span></li>
+</ul>
+</div>
+</nav>
+
+<div class="content" data-ice="content"><h1 data-ice="title">src/tools/DrawTool.js</h1>
+<pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">import {assign, isFunction} from &apos;lodash-bound&apos;;
+import {Observable} from &apos;../libs/expect-rxjs.js&apos;;
+import CSSPrefix from &apos;cssprefix/src/cssprefix&apos;;
+
+import {property, match} from &apos;utilities&apos;;
+
+import {ID_MATRIX} from &quot;../util/svg&quot;;
+
+import {handleBoxer} from &apos;../Coach.js&apos;;
+import {MouseTool} from &apos;./MouseTool&apos;;
+import {SvgArtefact} from &apos;../artefacts/SvgArtefact&apos;;
+import {Box} from &apos;../artefacts/Box&apos;;
+import {Glyph} from &apos;../artefacts/Glyph&apos;;
+import {Edge} from &apos;../artefacts/Edge&apos;;
+import Machine from &apos;../util/Machine&apos;;
+
+import KeyCode from &apos;keycode-js&apos;;
+import {callIfFunction, subclassOf} from &apos;../util/misc&apos;;
+
+const {KEY_ESCAPE} = KeyCode;
+
+const {max, sign, abs} = Math;
+
+const DRAWING_BOX   = &apos;DRAWING_BOX&apos;;
+const DRAWING_GLYPH = &apos;DRAWING_GLYPH&apos;;
+const DRAWING_EDGE  = &apos;DRAWING_EDGE&apos;;
+const DRAWING_EDGES = &apos;DRAWING_EDGES&apos;;
+const MODES = [
+	DRAWING_BOX,
+	DRAWING_GLYPH,
+	DRAWING_EDGE,
+	DRAWING_EDGES
+];
+
+/**
+ * A tool for drawing new artefacts inside existing artefacts.
+ * It can draw inside artefacts with the &apos;drawzone&apos; handler, and
+ * parameters on what to draw can be configured directly.
+ */
+export class DrawTool extends MouseTool {
+	
+	static DRAWING_BOX   = DRAWING_BOX;
+	static DRAWING_GLYPH = DRAWING_GLYPH;
+	static DRAWING_EDGE  = DRAWING_EDGE;
+	static MODES = MODES;
+	
+	@property({ initial: null }) artefactCreated;
+	
+	@property({ initial: DRAWING_BOX }) mode;
+	
+	data: Object = {};
+	
+	boxFactory:   Class | () =&gt; Box;
+	glyphFactory: Class | () =&gt; Glyph;
+	edgeFactory:  Class | () =&gt; Edge;
+	
+	factoryOptions:      Object = {};
+	boxFactoryOptions:   Object = {};
+	glyphFactoryOptions: Object = {};
+	edgeFactoryOptions:  Object = {};
+	
+	constructor(options = {}) {
+		super(options);
+		for (let key of [
+			&apos;boxFactory&apos;,
+			&apos;glyphFactory&apos;,
+			&apos;edgeFactory&apos;,
+			&apos;factoryOptions&apos;,
+			&apos;boxFactoryOptions&apos;,
+			&apos;glyphFactoryOptions&apos;,
+			&apos;edgeFactoryOptions&apos;,
+			&apos;data&apos;
+		]) {
+			if (options[key]) { this[key] = options[key] }
+		}
+	}
+	
+	init({coach}) {
+		super.init({ coach });
+		
+		const mousemove = this.windowE(&apos;mousemove&apos;);
+		const keydown   = this.windowE(&apos;keydown&apos;);
+		const droppingOrClicking = Observable.merge(
+			this.mouseMachine.DROPPING,
+			this.mouseMachine.CLICKING
+		);
+		const escaping = this.mouseMachine.ESCAPING;
+		const threshold = this.mouseMachine.THRESHOLD
+			::handleBoxer(&apos;drawzone&apos;);
+		
+		/* artefact factory functions */
+		const f = (key, classOptionsKey, baseClass) =&gt; (options = {}) =&gt; {
+			const fn = this[key]::isFunction() ? this[key] : baseClass;
+			const finalOptions = { ...this.factoryOptions, ...this[classOptionsKey], ...options };
+			return fn::subclassOf(SvgArtefact)
+				? new fn(finalOptions)
+				:     fn(finalOptions);
+		};
+		const boxFactory   = f(&apos;boxFactory&apos;,   &apos;boxFactoryOptions&apos;,   Box  );
+		const glyphFactory = f(&apos;glyphFactory&apos;, &apos;glyphFactoryOptions&apos;, Glyph);
+		const edgeFactory  = f(&apos;edgeFactory&apos;,  &apos;edgeFactoryOptions&apos;,  Edge );
+		
+		/* local state machine */
+		const localMachine = new Machine(this.constructor.name, { state: &apos;IDLE&apos; });
+		for (let mode of MODES) {
+			localMachine.link(&apos;IDLE&apos;, threshold.filter(() =&gt; this.mode === mode), mode);
+		}
+		localMachine.extend(({ enterState, subscribeDuringState }) =&gt; ({
+			&apos;DRAWING_BOX&apos;: (args) =&gt; {
+				const {accepts, before, after, cancel} = args;
+				
+				/* create new box */
+				const drawZone = args.drawZone = args.artefact;
+				const point = args.point.in(drawZone.svg.children);
+				const artefact = args.artefact = boxFactory({
+					transformation: ID_MATRIX.translate(...point.xy)
+				});
+				
+				/* allow the draw zone to reject */
+				if (accepts::isFunction() &amp;&amp; !accepts({artefact})) {
+					artefact.delete();
+					enterState(&apos;IDLE&apos;);
+					return;
+				}
+				artefact.parent = drawZone;
+				
+				/* notify the outside world */
+				this.p(&apos;artefactCreated&apos;).next(artefact);
+				
+				/* start drawing */
+				artefact.handlesActive = false;
+				artefact.moveToFront();
+				if (before::isFunction()) { before(args) }
+				
+				/* record start dimensions and mouse position */
+				const start = {
+					transformation: artefact.transformation,
+					mouse:          point
+				};
+				
+				/* resize while dragging */
+				const directions = { x: +1, y: +1 };
+				mousemove
+					.map(event =&gt; event.point.in(drawZone.svg.children).minus(start.mouse))
+					::subscribeDuringState(({x: xDiff, y: yDiff}) =&gt; {
+						if (directions.x === -sign(xDiff)) { directions.x = -directions.x }
+						if (directions.y === -sign(yDiff)) { directions.y = -directions.y }
+						artefact::assign({
+							transformation: start.transformation.translate(xDiff/2, yDiff/2),
+							width:          directions.x * xDiff,
+							height:         directions.y * yDiff
+						});
+					});
+				
+				/* cancel or stop dragging */
+				Observable.merge(
+					this.p(&apos;active&apos;).filter(a=&gt;!a).concatMap(Observable.throw()),
+					escaping                      .concatMap(Observable.throw()),
+					droppingOrClicking.do(() =&gt; {
+						artefact.handlesActive = true;
+						artefact.moveToFront();
+					})
+				).catch(() =&gt; {
+					/* cancel drawing */
+					artefact.delete();
+					cancel::callIfFunction(args);
+					return Observable.of({ deleted: true });
+                }).do(({deleted, point}) =&gt; {
+					/* stop drawing */
+					// coach.selectTool.reacquire(point);
+					coach.selectTool.reacquire();
+					after::callIfFunction(); // TODO: pass args?
+				})::enterState(&apos;IDLE&apos;);
+				
+			},
+			&apos;DRAWING_GLYPH&apos;: (args) =&gt; {
+				const {accepts, before, after, cancel} = args;
+				
+				/* create new glyph */
+				const drawZone = args.drawZone = args.artefact;
+				const point = args.point.in(drawZone.svg.children);
+				const artefact = args.artefact = glyphFactory({
+					transformation: ID_MATRIX.translate(...point.xy)
+				});
+				
+				/* allow the draw zone to reject */
+				if (accepts::isFunction() &amp;&amp; !accepts({artefact})) {
+					artefact.delete();
+					enterState(&apos;IDLE&apos;);
+					return;
+				}
+				artefact.parent = drawZone;
+				
+				/* notify the outside world */
+				this.p(&apos;artefactCreated&apos;).next(artefact);
+				
+				/* start drawing */
+				artefact.handlesActive = false;
+				artefact.moveToFront();
+				if (before::isFunction()) { before(args) }
+				
+				// TODO: allow move following initial mousedown
+				
+				/***/
+				droppingOrClicking.do(({point}) =&gt; {
+					/* stop drawing */
+					artefact.handlesActive = true;
+					artefact.moveToFront();
+					coach.selectTool.reacquire(point);
+					after::callIfFunction(args);
+				}).catch((e) =&gt; {
+					console.error(e); // TODO
+				})::enterState(&apos;IDLE&apos;);
+				
+			},
+			&apos;DRAWING_EDGE&apos;: (args1) =&gt; {
+				const {accepts, before, after, cancel} = args1;
+				
+				// TODO: A lot of this code is similar to DRAWING_GLYPH above;
+				//     : Can their common code be elegantly reused?
+				
+				let glyph1;
+				
+				/* set glyph1 */
+				if (args1.artefact instanceof Glyph) {
+					glyph1 = args1.artefact;
+				} else {
+					const drawZone1 = args1.artefact;
+					const point1 = args1.point.in(drawZone1.svg.children);
+					glyph1 = args1.artefact = glyphFactory({
+						transformation: ID_MATRIX.translate(...point1.xy)
+					});
+					/* allow the draw zone to reject */
+					if (accepts::isFunction() &amp;&amp; !accepts({ artefact: glyph1 })) {
+						glyph1.delete();
+						enterState(&apos;IDLE&apos;);
+						return;
+					}
+					glyph1.parent = drawZone1;
+				
+					/* notify the outside world */
+					this.p(&apos;artefactCreated&apos;).next(glyph1);
+				}
+				
+				/* start drawing */
+				glyph1.handlesActive = false;
+				glyph1.moveToFront();
+				if (before::isFunction()) { before(args1) }
+				
+				// TODO: allow move following initial mousedown
+				
+				/* escape / cancel */
+				Observable.merge(
+					this.p(&apos;active&apos;).filter(a=&gt;!a),
+					this.p(&apos;mode&apos;).filter(m =&gt; m !== DRAWING_EDGE),
+					escaping
+				).do(() =&gt; {
+					cancel::callIfFunction(args1);
+					glyph1.handlesActive = true;
+				})::enterState(&apos;IDLE&apos;);
+				
+				/***/
+				droppingOrClicking.do(() =&gt; {
+					glyph1.handlesActive = true;
+					glyph1.moveToFront();
+				});
+				threshold.do((args2) =&gt; {
+					/* stop drawing glyph1 */
+					glyph1.handlesActive = true;
+					
+					/* set glyph2 */
+					let glyph2;
+					if (args2.artefact instanceof Glyph) {
+						glyph2 = args2.artefact;
+					} else {
+						const drawZone2 = args2.artefact;
+						const point2 = args2.point.in(drawZone2.svg.children);
+						glyph2 = args2.artefact = glyphFactory({
+							transformation: ID_MATRIX.translate(...point2.xy)
+						});
+						/* allow the draw zone to reject */
+						if (args2.accepts::isFunction() &amp;&amp; !args2.accepts({ artefact: glyph2 })) {
+							glyph2.delete();
+							enterState(&apos;IDLE&apos;);
+							return;
+						}
+						glyph2.parent = drawZone2;
+				
+						/* notify the outside world */
+						this.p(&apos;artefactCreated&apos;).next(glyph2);
+					}
+					
+					/* create edge */
+					let edge = edgeFactory({
+						glyph1,
+						glyph2
+					});
+				
+					/* notify the outside world */
+					this.p(&apos;artefactCreated&apos;).next(edge);
+					
+					/* communicating new glyph1 to next iteration */
+					args2.artefact = glyph2;
+					
+				})::enterState(&apos;DRAWING_EDGE&apos;);
+				
+			}
+		}));
+		
+		/* mutual exclusion between this machine and other machines, coordinated by coach.stateMachine */
+		const drawing = Observable.merge(
+			localMachine.DRAWING_BOX,
+			localMachine.DRAWING_GLYPH,
+			localMachine.DRAWING_EDGE
+		);
+		localMachine.extend(() =&gt; ({ &apos;OTHER_TOOL&apos;: ()=&gt;{} }));
+		coach.stateMachine.extend(() =&gt; ({ &apos;IDLE&apos;: ()=&gt;{}, &apos;BUSY&apos;: ()=&gt;{} }));
+		localMachine.link(&apos;IDLE&apos;,       coach.stateMachine.BUSY.filter(({tool}) =&gt; tool !== this).map(()=&gt;localMachine.data), &apos;OTHER_TOOL&apos;);
+		localMachine.link(&apos;OTHER_TOOL&apos;, coach.stateMachine.IDLE.filter(({tool}) =&gt; tool !== this).map(()=&gt;localMachine.data), &apos;IDLE&apos;);
+		coach.stateMachine.link(&apos;IDLE&apos;, drawing          .map(() =&gt; ({ tool: this })), &apos;BUSY&apos;);
+		coach.stateMachine.link(&apos;BUSY&apos;, localMachine.IDLE.map(() =&gt; ({ tool: this })), &apos;IDLE&apos;);
+		
+		/* prep for highlighting and mouse cursors */
+		const handlerArtefactOrNull = (key) =&gt; (a) =&gt; (a &amp;&amp; a.handlers[key]) ? a.handlers[key].artefact : null;
+		const drawZoneArtefact = coach.p(&apos;selectedArtefact&apos;).map(handlerArtefactOrNull(&apos;drawzone&apos;));
+		
+		/* highlighting */
+		coach.highlightTool.register(this, localMachine.p([&apos;state&apos;, &apos;data&apos;]).switchMap(([state, data]) =&gt; match(state)({
+			&apos;IDLE&apos;:          drawZoneArtefact,
+			&apos;THRESHOLD&apos;:     Observable.of(data &amp;&amp; data.artefact),
+			&apos;DRAWING_BOX&apos;:   Observable.of(data &amp;&amp; data.artefact),
+			&apos;DRAWING_GLYPH&apos;: Observable.of(data &amp;&amp; data.artefact),
+			&apos;DRAWING_EDGE&apos;:  Observable.of(data &amp;&amp; data.artefact),
+			&apos;OTHER_TOOL&apos;:    Observable.of(null)
+		})).map(a =&gt; a &amp;&amp; !!a.handlers[&apos;highlightable&apos;] ? a : null).map((artefact) =&gt; artefact &amp;&amp; {
+			...coach.highlightTool.HIGHLIGHT_DEFAULT,
+			artefact
+		}));
+		 
+		/* mouse cursors */
+		const drawCursor = CSSPrefix.getValue(&apos;cursor&apos;, &apos;crosshair&apos;);
+		coach.mouseCursorTool.register(this, localMachine.p(&apos;state&apos;).startWith(null).pairwise().switchMap(([prev, next]) =&gt; match(next)({
+			&apos;IDLE&apos;:          drawZoneArtefact.map(dza =&gt; dza &amp;&amp; drawCursor).startWith(prev &amp;&amp; drawCursor),
+			&apos;THRESHOLD&apos;:     Observable.of(drawCursor),
+			&apos;DRAWING_BOX&apos;:   Observable.of(drawCursor),
+			&apos;DRAWING_GLYPH&apos;: Observable.of(drawCursor),
+			&apos;DRAWING_EDGE&apos;:  Observable.of(drawCursor),
+			&apos;OTHER_TOOL&apos;:    Observable.of(null)
+		})));
+		
+	}
+}
+</code></pre>
+
+</div>
+
+<footer class="footer">
+  Generated by <a href="https://esdoc.org">ESDoc<span data-ice="esdocVersion">(0.5.2)</span><img src="./image/esdoc-logo-mini-black.png"></a>
+</footer>
+
+<script src="script/search_index.js"></script>
+<script src="script/search.js"></script>
+<script src="script/pretty-print.js"></script>
+<script src="script/inherited-summary.js"></script>
+<script src="script/test-summary.js"></script>
+<script src="script/inner-link.js"></script>
+<script src="script/patch-for-local.js"></script>
+</body>
+</html>

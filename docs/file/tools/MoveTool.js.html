@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <base data-ice="baseUrl" href="../../">
+  <title data-ice="title">tools/MoveTool.js | API Document</title>
+  <link type="text/css" rel="stylesheet" href="css/style.css">
+  <link type="text/css" rel="stylesheet" href="css/prettify-tomorrow.css">
+  <script src="script/prettify/prettify.js"></script>
+  
+  
+  <script src="script/manual.js"></script>
+</head>
+<body class="layout-container" data-ice="rootContainer">
+
+<header>
+  <a href="./">Home</a>
+  
+  <a href="identifiers.html">Reference</a>
+  <a href="source.html">Source</a>
+  <a href="test.html" data-ice="testLink">Test</a>
+  <a data-ice="repoURL" href="https://github.com/open-physiology/boxer" class="repo-url-github">Repository</a>
+  <div class="search-box">
+  <span>
+    <img src="./image/search.png">
+    <span class="search-input-edge"></span><input class="search-input"><span class="search-input-edge"></span>
+  </span>
+    <ul class="search-result"></ul>
+  </div>
+</header>
+
+<nav class="navigation" data-ice="nav"><div>
+  <ul>
+    
+  <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/tools/ClickTool.js~ClickTool.html">ClickTool</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/tools/DeleteTool.js~DeleteTool.html">DeleteTool</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/tools/DrawTool.js~DrawTool.html">DrawTool</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/tools/GlobalBehaviorTool.js~GlobalBehaviorTool.html">GlobalBehaviorTool</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/tools/HelperTool.js~HelperTool.html">HelperTool</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/tools/HighlightTool.js~HighlightTool.html">HighlightTool</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/tools/MouseCursorTool.js~MouseCursorTool.html">MouseCursorTool</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/tools/MouseTool.js~MouseTool.html">MouseTool</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/tools/MoveTool.js~MoveTool.html">MoveTool</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/tools/PanTool.js~PanTool.html">PanTool</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/tools/ResizeTool.js~ResizeTool.html">ResizeTool</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/tools/RotateTool.js~RotateTool.html">RotateTool</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/tools/SelectTool.js~SelectTool.html">SelectTool</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/tools/Tool.js~Tool.html">Tool</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/tools/ZoomTool.js~ZoomTool.html">ZoomTool</a></span></span></li>
+</ul>
+</div>
+</nav>
+
+<div class="content" data-ice="content"><h1 data-ice="title">tools/MoveTool.js</h1>
+<pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">import $ from &apos;../libs/jquery.js&apos;;
+import {isFunction} from &apos;lodash-bound&apos;;
+import CSSPrefix from &apos;cssprefix/src/cssprefix&apos;;
+
+import {Observable} from &apos;../libs/expect-rxjs.js&apos;;
+
+import {handleBoxer} from &apos;../Coach.js&apos;;
+import {withoutMod, match} from &apos;utilities&apos;;
+
+import {snap45} from &quot;../util/svg&quot;;
+import {MouseTool} from &apos;./MouseTool&apos;;
+import {callIfFunction} from &apos;../util/misc&apos;;
+import Machine from &apos;../util/Machine&apos;;
+
+
+/**
+ * A tool for moving artefacts around, and in and out of other artefacts,
+ * using drag-and-drop.
+ */
+export class MoveTool extends MouseTool {
+	
+	init({ coach }) {
+		super.init({ coach });
+		
+		/* relevant mouse events */
+		const mousemove = this.windowE(&apos;mousemove&apos;);
+		const threshold = this.mouseMachine.THRESHOLD
+			.filter(withoutMod(&apos;shift&apos;, &apos;ctrl&apos;, &apos;alt&apos;))
+			::handleBoxer(&apos;movable&apos;);
+		const dragging = this.mouseMachine.DRAGGING
+			::handleBoxer(&apos;movable&apos;);
+		const dropping = this.mouseMachine.DROPPING;
+		const escaping = this.mouseMachine.ESCAPING;
+		
+		/* main state machine of this tool */
+		const localMachine = new Machine(&apos;MoveTool&apos;, { state: &apos;IDLE&apos; });
+		localMachine.extend(({ enterState, subscribeDuringState }) =&gt; ({
+			&apos;IDLE&apos;: () =&gt; {
+						
+				// console.log(&apos;(((IDLE)))&apos;);
+				
+				threshold::enterState(&apos;THRESHOLD&apos;);
+				coach.selectTool.reacquire();
+			},
+			&apos;THRESHOLD&apos;: () =&gt; {
+						
+				// console.log(&apos;(((THRESHOLD)))&apos;);
+			
+				dragging::enterState(&apos;DRAGGING&apos;);
+				this.mouseMachine.IDLE::enterState(&apos;IDLE&apos;);
+			},
+			&apos;DRAGGING&apos;: (args) =&gt; {
+						
+				// console.log(&apos;(((DRAGGING)))&apos;);
+			
+				const {point, artefact, before, after, cancel, referencePoint = point} = args;
+				
+				/* drag initialization */
+				artefact.handlesActive = false;
+				coach.selectTool.reacquire();
+				artefact.moveToFront();
+				if (before::isFunction()) { before(args) }
+				
+				/* record start transformation */
+				const transformationStart = artefact.transformation;
+
+				/* move while dragging */
+				mousemove::subscribeDuringState((moveEvent) =&gt; {
+					let mouseVector = moveEvent.point.in(artefact.svg.children);
+					if (referencePoint &amp;&amp; moveEvent.ctrlKey) {
+						mouseVector = mouseVector::snap45(referencePoint);
+					}
+					let translationDiff = mouseVector.minus(point);
+					artefact.transformation = transformationStart
+						.translate(...translationDiff.xy);
+				});
+				
+				/* cancel or stop dragging */
+				// TODO: don&apos;t use exceptions for cancellation; separate it from the concept of dropping
+				Observable.merge(
+					escaping
+						.concatMap(Observable.throw()),
+					dropping
+						.map(({point, target}) =&gt; ({ dropzone: $(target).data(&apos;boxer-handlers&apos;).dropzone, point }))
+						.do(({dropzone: {after}}) =&gt; { after::callIfFunction(args) })
+				).catch((error, caught) =&gt; {
+					/* cancel dragging */
+					artefact.transformation = transformationStart;
+					cancel::callIfFunction(args);
+					return Observable.of({});
+                }).do(({point}) =&gt; {
+					/* stop dragging */
+					artefact.handlesActive = true;
+					artefact.moveToFront();
+					coach.selectTool.reacquire(point);
+					after::callIfFunction(args);
+				})::enterState(&apos;IDLE&apos;);
+				
+			}
+		}));
+		
+		
+		/* mutual exclusion between this machine and other machines, coordinated by coach.stateMachine */
+		localMachine.extend(() =&gt; ({ &apos;OTHER_TOOL&apos;: ()=&gt;{} }));
+		coach.stateMachine.extend(() =&gt; ({ &apos;IDLE&apos;: ()=&gt;{}, &apos;BUSY&apos;: ()=&gt;{} }));
+		localMachine.link(&apos;IDLE&apos;,       coach.stateMachine.BUSY.filter(({tool}) =&gt; tool !== this).map(()=&gt;localMachine.data), &apos;OTHER_TOOL&apos;);
+		localMachine.link(&apos;OTHER_TOOL&apos;, coach.stateMachine.IDLE.filter(({tool}) =&gt; tool !== this).map(()=&gt;localMachine.data), &apos;IDLE&apos;);
+		coach.stateMachine.link(&apos;IDLE&apos;, localMachine.DRAGGING.map(() =&gt; ({ tool: this })), &apos;BUSY&apos;);
+		coach.stateMachine.link(&apos;BUSY&apos;, localMachine.IDLE    .map(() =&gt; ({ tool: this })), &apos;IDLE&apos;);
+		
+		/* prep for highlighting and mouse cursors */
+		const handlerArtefactOrNull = (key) =&gt; (a) =&gt; (a &amp;&amp; a.handlers[key]) ? a.handlers[key].artefact : null;
+		const movableArtefact  = coach.p(&apos;selectedArtefact&apos;).map(handlerArtefactOrNull(&apos;movable&apos;));
+		const dropzoneArtefact = coach.p(&apos;selectedArtefact&apos;).map(handlerArtefactOrNull(&apos;dropzone&apos;));
+		
+		/* highlighting */
+		coach.highlightTool.register(this, localMachine.p(&apos;state&apos;).switchMap(state =&gt; match(state)({
+			&apos;IDLE&apos;:       movableArtefact,//.do((ma) =&gt; { console.log(&apos;---&apos;, ma &amp;&amp; ma.constructor.name) }),
+			&apos;THRESHOLD&apos;:  movableArtefact,
+			&apos;DRAGGING&apos;:   dropzoneArtefact.startWith(null),
+			&apos;OTHER_TOOL&apos;: Observable.of(null)
+		})).map(artefact =&gt; artefact &amp;&amp; {
+			...coach.highlightTool.HIGHLIGHT_DEFAULT,
+			artefact
+		}));
+		
+		/* mouse cursors */
+		const grabCursor     = CSSPrefix.getValue(&apos;cursor&apos;, &apos;grab&apos;    );
+		const grabbingCursor = CSSPrefix.getValue(&apos;cursor&apos;, &apos;grabbing&apos;);
+		coach.mouseCursorTool.register(this, localMachine.p(&apos;state&apos;).startWith(null).pairwise().switchMap(([prev, next]) =&gt; match(next)({
+			&apos;IDLE&apos;:       movableArtefact.map(ma =&gt; ma &amp;&amp; grabCursor).startWith(prev &amp;&amp; grabCursor),
+			&apos;THRESHOLD&apos;:  Observable.of(grabbingCursor),
+			&apos;DRAGGING&apos;:   Observable.of(grabbingCursor),
+			&apos;OTHER_TOOL&apos;: Observable.of(null)
+		})));
+		
+	}
+	
+	
+	
+}
+
+</code></pre>
+
+</div>
+
+<footer class="footer">
+  Generated by <a href="https://esdoc.org">ESDoc<span data-ice="esdocVersion">(0.5.2)</span><img src="./image/esdoc-logo-mini-black.png"></a>
+</footer>
+
+<script src="script/search_index.js"></script>
+<script src="script/search.js"></script>
+<script src="script/pretty-print.js"></script>
+<script src="script/inherited-summary.js"></script>
+<script src="script/test-summary.js"></script>
+<script src="script/inner-link.js"></script>
+<script src="script/patch-for-local.js"></script>
+</body>
+</html>

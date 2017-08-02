@@ -8,7 +8,7 @@ import {SvgArtefact} from './SvgArtefact.js';
 import {Point2D} from '../util/svg';
 
 /**
- * Abstract representation of an interactive artefact in svg space.
+ * Abstract representation of an interactive artefact in svg space that can be transformed by affine matrix.
  */
 export class SvgTransformable extends SvgArtefact {
 	

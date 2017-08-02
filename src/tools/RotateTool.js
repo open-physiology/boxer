@@ -16,6 +16,9 @@ import CSSPrefix from 'cssprefix/src/cssprefix';
 const {floor, abs, round, atan2, PI} = Math;
 
 
+/**
+ * A tool to rotate boxes and their content by drag-and-drop while SHIFT is pressed.
+ */
 export class RotateTool extends MouseTool {
 	
 	static SNAP_ANGLE = 45;

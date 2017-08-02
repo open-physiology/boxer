@@ -1,6 +1,11 @@
 import $ from '../libs/jquery.js';
 import Tool from './Tool';
 
+
+/**
+ * A debugging tool that can make little red circles appear on-screen
+ * at certain specific coordinates.
+ */
 export class HelperTool extends Tool {
 	
 	showPoint(point, attrs) {

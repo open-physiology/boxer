@@ -1,11 +1,10 @@
 import {SvgArtefact} from './SvgArtefact.js';
 import {SvgTransformable} from './SvgTransformable';
-import {predicate} from '../handlers/Handler.js';
 import {property} from 'utilities';
 import {ID_MATRIX, setCTM} from '../util/svg';
 
 /**
- * Representation of an svg canvas used to house Boxer artefacts.
+ * Representation of an svg canvas used to house boxer artefacts.
  */
 export class Canvas extends SvgArtefact {
 	
